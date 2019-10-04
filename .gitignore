@@ -1,0 +1,6 @@
+CMSSW
+*.bak
+*~
+*.root
+*.o
+compiledthreads

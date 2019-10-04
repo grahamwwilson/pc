@@ -1,0 +1,14 @@
+0. Check where we are 
+   pwd
+
+0. Make symbolic link to CMSSW
+   ln -s ../CMS_Material/CMSSW CMSSW
+
+1. Set up CMS environment for ROOT etc.
+   by
+   cd CMSSW
+   cmsenv
+
+   then go back to original directory.
+
+2. make
