@@ -1,0 +1,125 @@
+This was with 6.16/00
+
+graham:pc$ python2 runmacro.py 0 1 mylocaldata.list
+['/home/graham/CMS_Material/Small-Sample.root', '/home/graham/CMS_Material/Medium-Sample.root', '/home/graham/CMS_Material/Large-Sample.root']
+('from runmacro numFiles == ', 3, ' nthreads == ', '1')
+./compiledthreads 1 "/home/graham/CMS_Material/Small-Sample.root" "/home/graham/CMS_Material/Medium-Sample.root" "/home/graham/CMS_Material/Large-Sample.root" 
+malloc(): smallbin double linked list corrupted
+Aborted (core dumped)
+
+
+With 8 threads, get
+
+graham:pc$ ./runmyanalysis.sh mylocaldata.list
+Sun Oct  6 17:14:39 CDT 2019
+['/home/graham/CMS_Material/Small-Sample.root', '/home/graham/CMS_Material/Medium-Sample.root', '/home/graham/CMS_Material/Large-Sample.root']
+('from runmacro numFiles == ', 3, ' nthreads == ', '8')
+./compiledthreads 8 "/home/graham/CMS_Material/Small-Sample.root" "/home/graham/CMS_Material/Medium-Sample.root" "/home/graham/CMS_Material/Large-Sample.root" 
+
+ *** Break *** segmentation violation
+
+
+
+===========================================================
+There was a crash.
+This is the entire stack trace of all threads:
+===========================================================
+#0  0x00007f6d9a47b6c2 in __GI___waitpid (pid=26242, stat_loc=stat_loc
+entry=0x7ffd9f574ce8, options=options
+entry=0) at ../sysdeps/unix/sysv/linux/waitpid.c:30
+#1  0x00007f6d9a3e6067 in do_system (line=<optimized out>) at ../sysdeps/posix/system.c:149
+#2  0x00007f6d9caede83 in TUnixSystem::StackTrace() () from /home/graham/root/lib/libCore.so.6.16
+#3  0x00007f6d9caf0874 in TUnixSystem::DispatchSignals(ESignals) () from /home/graham/root/lib/libCore.so.6.16
+#4  <signal handler called>
+#5  0x00007f6d9ca7c709 in std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::_Identity<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::find(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) () from /home/graham/root/lib/libCore.so.6.16
+#6  0x00007f6d9ca74cae in TClassEdit::InsertStd[abi:cxx11](char const*) () from /home/graham/root/lib/libCore.so.6.16
+#7  0x00007f6d93f861b5 in TClingClassInfo::TClingClassInfo(cling::Interpreter*, char const*) () from /home/graham/root/lib/libCling.so
+#8  0x00007f6d93f1f7c7 in TCling::ClassInfo_Factory(char const*) const () from /home/graham/root/lib/libCling.so
+#9  0x00007f6d9c9d1744 in TMemberInspector::GenericShowMembers(char const*, void const*, bool) () from /home/graham/root/lib/libCore.so.6.16
+#10 0x00007f6d9c9d1836 in TMemberInspector::InspectMember(char const*, void const*, char const*, bool) () from /home/graham/root/lib/libCore.so.6.16
+#11 0x00007f6d93f2d26a in TCling::InspectMembers(TMemberInspector&, void const*, TClass const*, bool) () from /home/graham/root/lib/libCling.so
+#12 0x00007f6d9ca8ab48 in TClass::CallShowMembers(void const*, TMemberInspector&, bool) const () from /home/graham/root/lib/libCore.so.6.16
+#13 0x00007f6d9c9d1836 in TMemberInspector::InspectMember(char const*, void const*, char const*, bool) () from /home/graham/root/lib/libCore.so.6.16
+#14 0x00007f6d93f2d26a in TCling::InspectMembers(TMemberInspector&, void const*, TClass const*, bool) () from /home/graham/root/lib/libCling.so
+#15 0x00007f6d9ca8ab48 in TClass::CallShowMembers(void const*, TMemberInspector&, bool) const () from /home/graham/root/lib/libCore.so.6.16
+#16 0x00007f6d9c9d1836 in TMemberInspector::InspectMember(char const*, void const*, char const*, bool) () from /home/graham/root/lib/libCore.so.6.16
+#17 0x00007f6d93f2d26a in TCling::InspectMembers(TMemberInspector&, void const*, TClass const*, bool) () from /home/graham/root/lib/libCling.so
+#18 0x00007f6d9ca8ab48 in TClass::CallShowMembers(void const*, TMemberInspector&, bool) const () from /home/graham/root/lib/libCore.so.6.16
+#19 0x00007f6d9ca99f89 in TClass::BuildRealData(void*, bool) () from /home/graham/root/lib/libCore.so.6.16
+#20 0x00007f6d9c2aeca5 in TBufferFile::WriteClassBuffer(TClass const*, void*) () from /home/graham/root/lib/libRIO.so.6.16
+#21 0x00007f6d9cad12a8 in TStreamerBase::Streamer(TBuffer&) () from /home/graham/root/lib/libCore.so.6.16
+#22 0x00007f6d9c2ae3cc in TBufferFile::WriteObjectClass(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#23 0x00007f6d9c2b55e5 in TBufferIO::WriteObjectAny(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#24 0x00007f6d9ca5a3c8 in TObjArray::Streamer(TBuffer&) () from /home/graham/root/lib/libCore.so.6.16
+#25 0x00007f6d9c2ae3cc in TBufferFile::WriteObjectClass(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#26 0x00007f6d9c2b54d3 in TBufferIO::WriteObjectAny(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#27 0x00007f6d9c366132 in TStreamerInfo::Streamer(TBuffer&) () from /home/graham/root/lib/libRIO.so.6.16
+#28 0x00007f6d9c2ae3cc in TBufferFile::WriteObjectClass(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#29 0x00007f6d9c2b55e5 in TBufferIO::WriteObjectAny(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#30 0x00007f6d9ca55611 in TList::Streamer(TBuffer&) () from /home/graham/root/lib/libCore.so.6.16
+#31 0x00007f6d9c34516d in TKey::TKey(TObject const*, char const*, int, TDirectory*) () from /home/graham/root/lib/libRIO.so.6.16
+#32 0x00007f6d9c30e680 in TFile::WriteStreamerInfo() () from /home/graham/root/lib/libRIO.so.6.16
+#33 0x00007f6d9c30d8f4 in TFile::Close(char const*) () from /home/graham/root/lib/libRIO.so.6.16
+#34 0x00007f6d9c30da71 in TFile::~TFile() () from /home/graham/root/lib/libRIO.so.6.16
+#35 0x00007f6d9c30dd49 in TFile::~TFile() [clone .localalias.194] () from /home/graham/root/lib/libRIO.so.6.16
+#36 0x00007f6d9ca53298 in TList::Delete(char const*) () from /home/graham/root/lib/libCore.so.6.16
+#37 0x00007f6d9c91549f in TROOT::~TROOT() () from /home/graham/root/lib/libCore.so.6.16
+#38 0x00007f6d9a3da041 in __run_exit_handlers (status=0, listp=0x7f6d9a782718 <__exit_funcs>, run_list_atexit=run_list_atexit
+entry=true, run_dtors=run_dtors
+entry=true) at exit.c:108
+#39 0x00007f6d9a3da13a in __GI_exit (status=<optimized out>) at exit.c:139
+#40 0x00007f6d9a3b8b9e in __libc_start_main (main=0x5646cb7cf9ad <main>, argc=5, argv=0x7ffd9f578bb8, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>, stack_end=0x7ffd9f578ba8) at ../csu/libc-start.c:344
+#41 0x00005646cb7cd04a in _start ()
+===========================================================
+
+
+The lines below might hint at the cause of the crash.
+You may get help by asking at the ROOT forum http://root.cern.ch/forum
+Only if you are really convinced it is a bug in ROOT then please submit a
+report at http://root.cern.ch/bugs Please post the ENTIRE stack trace
+from above as an attachment in addition to anything else
+that might help us fixing this issue.
+===========================================================
+#5  0x00007f6d9ca7c709 in std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::_Identity<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::find(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) () from /home/graham/root/lib/libCore.so.6.16
+#6  0x00007f6d9ca74cae in TClassEdit::InsertStd[abi:cxx11](char const*) () from /home/graham/root/lib/libCore.so.6.16
+#7  0x00007f6d93f861b5 in TClingClassInfo::TClingClassInfo(cling::Interpreter*, char const*) () from /home/graham/root/lib/libCling.so
+#8  0x00007f6d93f1f7c7 in TCling::ClassInfo_Factory(char const*) const () from /home/graham/root/lib/libCling.so
+#9  0x00007f6d9c9d1744 in TMemberInspector::GenericShowMembers(char const*, void const*, bool) () from /home/graham/root/lib/libCore.so.6.16
+#10 0x00007f6d9c9d1836 in TMemberInspector::InspectMember(char const*, void const*, char const*, bool) () from /home/graham/root/lib/libCore.so.6.16
+#11 0x00007f6d93f2d26a in TCling::InspectMembers(TMemberInspector&, void const*, TClass const*, bool) () from /home/graham/root/lib/libCling.so
+#12 0x00007f6d9ca8ab48 in TClass::CallShowMembers(void const*, TMemberInspector&, bool) const () from /home/graham/root/lib/libCore.so.6.16
+#13 0x00007f6d9c9d1836 in TMemberInspector::InspectMember(char const*, void const*, char const*, bool) () from /home/graham/root/lib/libCore.so.6.16
+#14 0x00007f6d93f2d26a in TCling::InspectMembers(TMemberInspector&, void const*, TClass const*, bool) () from /home/graham/root/lib/libCling.so
+#15 0x00007f6d9ca8ab48 in TClass::CallShowMembers(void const*, TMemberInspector&, bool) const () from /home/graham/root/lib/libCore.so.6.16
+#16 0x00007f6d9c9d1836 in TMemberInspector::InspectMember(char const*, void const*, char const*, bool) () from /home/graham/root/lib/libCore.so.6.16
+#17 0x00007f6d93f2d26a in TCling::InspectMembers(TMemberInspector&, void const*, TClass const*, bool) () from /home/graham/root/lib/libCling.so
+#18 0x00007f6d9ca8ab48 in TClass::CallShowMembers(void const*, TMemberInspector&, bool) const () from /home/graham/root/lib/libCore.so.6.16
+#19 0x00007f6d9ca99f89 in TClass::BuildRealData(void*, bool) () from /home/graham/root/lib/libCore.so.6.16
+#20 0x00007f6d9c2aeca5 in TBufferFile::WriteClassBuffer(TClass const*, void*) () from /home/graham/root/lib/libRIO.so.6.16
+#21 0x00007f6d9cad12a8 in TStreamerBase::Streamer(TBuffer&) () from /home/graham/root/lib/libCore.so.6.16
+#22 0x00007f6d9c2ae3cc in TBufferFile::WriteObjectClass(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#23 0x00007f6d9c2b55e5 in TBufferIO::WriteObjectAny(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#24 0x00007f6d9ca5a3c8 in TObjArray::Streamer(TBuffer&) () from /home/graham/root/lib/libCore.so.6.16
+#25 0x00007f6d9c2ae3cc in TBufferFile::WriteObjectClass(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#26 0x00007f6d9c2b54d3 in TBufferIO::WriteObjectAny(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#27 0x00007f6d9c366132 in TStreamerInfo::Streamer(TBuffer&) () from /home/graham/root/lib/libRIO.so.6.16
+#28 0x00007f6d9c2ae3cc in TBufferFile::WriteObjectClass(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#29 0x00007f6d9c2b55e5 in TBufferIO::WriteObjectAny(void const*, TClass const*, bool) () from /home/graham/root/lib/libRIO.so.6.16
+#30 0x00007f6d9ca55611 in TList::Streamer(TBuffer&) () from /home/graham/root/lib/libCore.so.6.16
+#31 0x00007f6d9c34516d in TKey::TKey(TObject const*, char const*, int, TDirectory*) () from /home/graham/root/lib/libRIO.so.6.16
+#32 0x00007f6d9c30e680 in TFile::WriteStreamerInfo() () from /home/graham/root/lib/libRIO.so.6.16
+#33 0x00007f6d9c30d8f4 in TFile::Close(char const*) () from /home/graham/root/lib/libRIO.so.6.16
+#34 0x00007f6d9c30da71 in TFile::~TFile() () from /home/graham/root/lib/libRIO.so.6.16
+#35 0x00007f6d9c30dd49 in TFile::~TFile() [clone .localalias.194] () from /home/graham/root/lib/libRIO.so.6.16
+#36 0x00007f6d9ca53298 in TList::Delete(char const*) () from /home/graham/root/lib/libCore.so.6.16
+#37 0x00007f6d9c91549f in TROOT::~TROOT() () from /home/graham/root/lib/libCore.so.6.16
+#38 0x00007f6d9a3da041 in __run_exit_handlers (status=0, listp=0x7f6d9a782718 <__exit_funcs>, run_list_atexit=run_list_atexit
+entry=true, run_dtors=run_dtors
+entry=true) at exit.c:108
+#39 0x00007f6d9a3da13a in __GI_exit (status=<optimized out>) at exit.c:139
+#40 0x00007f6d9a3b8b9e in __libc_start_main (main=0x5646cb7cf9ad <main>, argc=5, argv=0x7ffd9f578bb8, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>, stack_end=0x7ffd9f578ba8) at ../csu/libc-start.c:344
+#41 0x00005646cb7cd04a in _start ()
+===========================================================
+
+
+
