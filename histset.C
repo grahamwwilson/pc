@@ -53,14 +53,14 @@ void histset::init(){
 //init TH1D
 	TH1Manager.at(ind_ptHist) = new ROOT::TThreadedObject<TH1D>("ptHist", "p_{T} Distribution;p_{T};dN/p_{T}dp_{T}", 100, 0, 5);
 	TH1Manager.at(ind_pzHist) = new ROOT::TThreadedObject<TH1D>("pzHist", "p_{Z} Distribution;p_{Z};dN/dp_{Z}", 100, 0, 5);
-	TH1Manager.at(ind_numpcHist) = new ROOT::TThreadedObject<TH1D>("numpcHist", "Number of PC", 51, 0, 50);
+	TH1Manager.at(ind_numpcHist) = new ROOT::TThreadedObject<TH1D>("numpcHist", "Number of PC", 51,-0.5, 50.5);
 
 	TH1Manager.at(ind_rerrHist) = new ROOT::TThreadedObject<TH1D>("rerrHist", "Conversion Radial Error; #Delta R (cm); Entries Per 0.05 bin", 40, 0.0, 2.0);
-	TH1Manager.at(ind_phierrHist) = new ROOT::TThreadedObject<TH1D>("phierrHist", "Conversion Azimuthal Error;#Delta #phi; Entries Per 0.002 bin",50, 0., 0.1);
+	TH1Manager.at(ind_phierrHist) = new ROOT::TThreadedObject<TH1D>("phierrHist", "Conversion Azimuthal Error;#Delta #phi; Entries Per 0.002 bin",50, 0.0, 0.1);
 	TH1Manager.at(ind_zerrHist) = new ROOT::TThreadedObject<TH1D>("zerrHist","Conversion Z Error;#Delta z (cm); Entries Per 0.1 bin", 50, 0.0, 5.0);
 
-	TH1Manager.at(ind_r1dHist) = new ROOT::TThreadedObject<TH1D>("r1dHist","Conversion Radius No Cuts;R (cm);Entries Per 0.1 bin",100,0.,10.);
-	TH1Manager.at(ind_r1dcutHist) = new ROOT::TThreadedObject<TH1D>("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries Per 0.1 bin", 100,0.,10.);
+	TH1Manager.at(ind_r1dHist) = new ROOT::TThreadedObject<TH1D>("r1dHist","Conversion Radius No Cuts;R (cm);Entries Per 0.1 bin",100, 0.0, 10.0);
+	TH1Manager.at(ind_r1dcutHist) = new ROOT::TThreadedObject<TH1D>("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries Per 0.1 bin", 100, 0.0, 10.0);
 
 	TH1Manager.at(ind_r1dlowPUHist) = new ROOT::TThreadedObject<TH1D>("r1dlowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries Per 0.1 bin",100,0.,10.);
 	TH1Manager.at(ind_r1dhiPUHist) = new ROOT::TThreadedObject<TH1D>("r1dhiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries Per 0.1 bin",100,0.,10.);
@@ -68,7 +68,8 @@ void histset::init(){
 	TH1Manager.at(ind_r1dhiPUcutHist) = new ROOT::TThreadedObject<TH1D>("r1dhiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries Per 0.1 bin",100,0.,10.);
 	TH1Manager.at(ind_rhobpHist) = new ROOT::TThreadedObject<TH1D>("rhobpHist","Conversion Radius w.r.t Beam Pipe and Quality Cuts; R (cm); Entries Per 0.05 bin",100,0.,5.);
 
-	TH1Manager.at(ind_mgg1Hist) = new ROOT::TThreadedObject<TH1D>("mgg1Hist","Di-#gamma Mass;Mass GeV; Entries Per 2.5 MeV bin", 100, 0.0,0.25 );
+	TH1Manager.at(ind_mgg1Hist) = new ROOT::TThreadedObject<TH1D>("mgg1Hist","Di-#gamma Mass;Mass GeV; Entries Per 2.5 MeV bin", 100, 0.0, 0.25 );
+
 // init TH2D
 	TH2Manager.at(ind_pxpyHist) = new ROOT::TThreadedObject<TH2D>("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
 
