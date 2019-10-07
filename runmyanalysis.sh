@@ -11,7 +11,7 @@ INPUTLIST=${INPUT}.list
 #python runmacro.py 0 8 "bigmcdata.list"
 python2 runmacro.py 0 8 ${INPUTLIST}
 
-mv PCBigSet.root PC_${INPUT}.root
+mv Outfile.root PC_${INPUT}.root
 
 date
 
