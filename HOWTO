@@ -2,6 +2,9 @@
 0. Assumes symbolic link present for CMSSW
    ln -s ../CMS_Material/CMSSW CMSSW
 
+Or CMSSW: source /cvmfs/cms.cern.ch/cmsset_default.sh
+
+
 1. Set up CMS environment for ROOT etc.
    by
    cd CMSSW

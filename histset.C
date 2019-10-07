@@ -7,9 +7,6 @@
 #include "TTreeReader.h"
 #include "TTreeReaderValue.h"
 #include "myselector.C"
-
-//Maybe use a typedef for ROOT::TThreadedObject<TH1D> etc?  GWW
-
 using MyTH1D = ROOT::TThreadedObject<TH1D>;
 using MyTH2D = ROOT::TThreadedObject<TH2D>;
 
