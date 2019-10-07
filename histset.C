@@ -273,6 +273,5 @@ void histset::AnalyzeEntry(myselector& s){
 			FillTH2(ind_pxpyHist, px, py);
         }
     }
-*/
 }
 #endif
