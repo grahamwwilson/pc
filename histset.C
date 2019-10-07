@@ -10,6 +10,9 @@
 
 //Maybe use a typedef for ROOT::TThreadedObject<TH1D> etc?  GWW
 
+using MyTH1D = ROOT::TThreadedObject<TH1D>;
+using MyTH2D = ROOT::TThreadedObject<TH2D>;
+
 class histset{
 	
 	public:
@@ -21,18 +24,18 @@ class histset{
 	   void AnalyzeEntry(myselector& s); 
 	   //bookeeping enumeration: 
        //(if we do this we dont need to worry about hist pointer copies and merging)
-	   enum th1d_index{ind_ptHist, ind_pzHist, ind_numpcHist, ind_numpvHist,
-                       ind_rerrHist, ind_phierrHist, ind_zerrHist,
-                       ind_r1dHist, ind_r1dcutHist, ind_r1dlowPUHist, 
-                       ind_r1dhiPUHist, ind_r1dlowPUcutHist, 
-                       ind_r1dhiPUcutHist, ind_rhobpHist, ind_mgg1Hist, 
+	   enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
+                       id_rerrHist, id_phierrHist, id_zerrHist,
+                       id_r1dHist, id_r1dcutHist, id_r1dlowPUHist, 
+                       id_r1dhiPUHist, id_r1dlowPUcutHist, 
+                       id_r1dhiPUcutHist, id_rhobpHist, id_mgg1Hist, 
                        numTH1Hist};
-	   enum th2d_index{ind_pxpyHist,ind_xyHist,ind_rphiHist, ind_rzHist,
-                       ind_xycutHist, numTH2Hist};
+	   enum th2d_ids{id_pxpyHist,id_xyHist,id_rphiHist, id_rzHist,
+                       id_xycutHist, numTH2Hist};
 
 	   //make a big vector and load enumerated histograms onto the vector
-       std::vector<ROOT::TThreadedObject<TH1D>* >  TH1Manager{};
- 	   std::vector<ROOT::TThreadedObject<TH2D>* >  TH2Manager{};
+       std::vector<MyTH1D*>  TH1Manager{};
+ 	   std::vector<MyTH2D*>  TH2Manager{};
 
 	   //locate the histogram and perform pointer copying 
 	   void FillTH1(int index, double x, double w);
@@ -43,10 +46,10 @@ class histset{
 
 histset::histset(){
 
-    std::vector<ROOT::TThreadedObject<TH1D>*>  Manager1(numTH1Hist);
+    std::vector<MyTH1D*>  Manager1(numTH1Hist);
     TH1Manager=Manager1;
 
-    std::vector<ROOT::TThreadedObject<TH2D>*>  Manager2(numTH2Hist);
+    std::vector<MyTH2D*>  Manager2(numTH2Hist);
     TH2Manager=Manager2;
 
     init();
@@ -54,45 +57,41 @@ histset::histset(){
 }
 void histset::init(){
 //init TH1D
-	TH1Manager.at(ind_ptHist) = new ROOT::TThreadedObject<TH1D>("ptHist", "p_{T} Distribution;p_{T};1/p_{T} dN/dp_{T}", 100, 0.0, 5.0);
-	TH1Manager.at(ind_pzHist) = new ROOT::TThreadedObject<TH1D>("pzHist", "p_{Z} Distribution;p_{Z};dN/dp_{Z}", 100, 0.0, 5.0);
-	TH1Manager.at(ind_numpcHist) = new ROOT::TThreadedObject<TH1D>("numpcHist", "Number of PC;;Entries per bin", 100,-0.5, 99.5);
-	TH1Manager.at(ind_numpvHist) = new ROOT::TThreadedObject<TH1D>("numpvHist", "Number of PV;;Entries per bin", 100,-0.5, 99.5);
-
-	TH1Manager.at(ind_rerrHist) = new ROOT::TThreadedObject<TH1D>("rerrHist", "Conversion Radial Error; #Delta R (cm); Entries per 0.05 bin", 40, 0.0, 2.0);
-	TH1Manager.at(ind_phierrHist) = new ROOT::TThreadedObject<TH1D>("phierrHist", "Conversion Azimuthal Error;#Delta #phi; Entries per 0.002 bin",50, 0.0, 0.1);
-	TH1Manager.at(ind_zerrHist) = new ROOT::TThreadedObject<TH1D>("zerrHist","Conversion Z Error;#Delta z (cm); Entries per 0.1 bin", 50, 0.0, 5.0);
-
-	TH1Manager.at(ind_r1dHist) = new ROOT::TThreadedObject<TH1D>("r1dHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",100, 0.0, 10.0);
-	TH1Manager.at(ind_r1dcutHist) = new ROOT::TThreadedObject<TH1D>("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 100, 0.0, 10.0);
-
-	TH1Manager.at(ind_r1dlowPUHist) = new ROOT::TThreadedObject<TH1D>("r1dlowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
-	TH1Manager.at(ind_r1dhiPUHist) = new ROOT::TThreadedObject<TH1D>("r1dhiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
-	TH1Manager.at(ind_r1dlowPUcutHist) = new ROOT::TThreadedObject<TH1D>("r1dlowPUcutHist","Conversion Radius: Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
-	TH1Manager.at(ind_r1dhiPUcutHist) = new ROOT::TThreadedObject<TH1D>("r1dhiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
-	TH1Manager.at(ind_rhobpHist) = new ROOT::TThreadedObject<TH1D>("rhobpHist","Conversion Radius w.r.t Beam Pipe and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
-
-	TH1Manager.at(ind_mgg1Hist) = new ROOT::TThreadedObject<TH1D>("mgg1Hist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 100, 0.0, 0.25 );
+	TH1Manager.at(id_ptHist) = new MyTH1D("ptHist", "p_{T} Distribution;p_{T};1/p_{T} dN/dp_{T}", 100, 0.0, 5.0);
+	TH1Manager.at(id_pzHist) = new MyTH1D("pzHist", "p_{Z} Distribution;p_{Z};dN/dp_{Z}", 100, 0.0, 5.0);
+	TH1Manager.at(id_numpcHist) = new MyTH1D("numpcHist", "Number of PC;;Entries per bin", 100,-0.5, 99.5);
+	TH1Manager.at(id_numpvHist) = new MyTH1D("numpvHist", "Number of PV;;Entries per bin", 100,-0.5, 99.5);
+	TH1Manager.at(id_rerrHist) = new MyTH1D("rerrHist", "Conversion Radial Error; #Delta R (cm); Entries per 0.05 bin", 40, 0.0, 2.0);
+	TH1Manager.at(id_phierrHist) = new MyTH1D("phierrHist", "Conversion Azimuthal Error;#Delta #phi; Entries per 0.002 bin",50, 0.0, 0.1);
+	TH1Manager.at(id_zerrHist) = new MyTH1D("zerrHist","Conversion Z Error;#Delta z (cm); Entries per 0.1 bin", 50, 0.0, 5.0);
+	TH1Manager.at(id_r1dHist) = new MyTH1D("r1dHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",100, 0.0, 10.0);
+	TH1Manager.at(id_r1dcutHist) = new MyTH1D("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 100, 0.0, 10.0);
+	TH1Manager.at(id_r1dlowPUHist) = new MyTH1D("r1dlowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
+	TH1Manager.at(id_r1dhiPUHist) = new MyTH1D("r1dhiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
+	TH1Manager.at(id_r1dlowPUcutHist) = new MyTH1D("r1dlowPUcutHist","Conversion Radius: Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
+	TH1Manager.at(id_r1dhiPUcutHist) = new MyTH1D("r1dhiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
+	TH1Manager.at(id_rhobpHist) = new MyTH1D("rhobpHist","Conversion Radius w.r.t Beam Pipe and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
+	TH1Manager.at(id_mgg1Hist) = new MyTH1D("mgg1Hist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 100, 0.0, 0.25 );
 
 // init TH2D
-	TH2Manager.at(ind_pxpyHist) = new ROOT::TThreadedObject<TH2D>("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
-
-	TH2Manager.at(ind_xyHist) = new ROOT::TThreadedObject<TH2D>("xyHist", "Conversion Vertices per mm^{2} bin; -PC_x (cm); PC_y (cm)",200,-10.,10.,200,-10.,10.);
-	TH2Manager.at(ind_rphiHist) = new ROOT::TThreadedObject<TH2D>("rphiHist", "Conversion Vertices in R-#phi per mm*60mrad bin; R (cm); #phi",100,0.,10.,100,-3.2,3.2);
-	TH2Manager.at(ind_rzHist) = new ROOT::TThreadedObject<TH2D>("rzHist", "Conversion Vertices in R-z per mm^{2} bin; PC_z (cm); R (cm)",200,-10.,10.,100,0.,10.);
-
-	TH2Manager.at(ind_xycutHist) = new ROOT::TThreadedObject<TH2D>("xycutHist", "Conversion Vertices per mm^{2} bin; -PC_x (cm); PC_y (cm)",200,-10.,10.,200,-10.,10.);
-
+	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
+	TH2Manager.at(id_xyHist) = new MyTH2D("xyHist", "Conversion Vertices per mm^{2} bin; -PC_x (cm); PC_y (cm)",200,-10.,10.,200,-10.,10.);
+	TH2Manager.at(id_rphiHist) = new MyTH2D("rphiHist", "Conversion Vertices in R-#phi per mm*60mrad bin; R (cm); #phi",100,0.,10.,100,-3.2,3.2);
+	TH2Manager.at(id_rzHist) = new MyTH2D("rzHist", "Conversion Vertices in R-z per mm^{2} bin; PC_z (cm); R (cm)",200,-10.,10.,100,0.,10.);
+	TH2Manager.at(id_xycutHist) = new MyTH2D("xycutHist", "Conversion Vertices per mm^{2} bin; -PC_x (cm); PC_y (cm)",200,-10.,10.,200,-10.,10.);
 }
+
 void histset::FillTH1(int index, double x, double w=1){
 	//we must make pointer copies for performance reasons when trying to fill a histogram
 	auto myhist = TH1Manager.at(index)->Get();
 	myhist->Fill(x,w);
 }
+
 void histset::FillTH2(int index, double x, double y){
 	auto myhist = TH2Manager.at(index)->Get();
 	myhist->Fill(x,y);
 }
+
 void histset::WriteHist(){
 
 	TFile* outfile = new TFile("Outfile.root", "RECREATE");
@@ -108,8 +107,8 @@ void histset::WriteHist(){
 		TH2D* h = (TH2D*) histmerged->Clone();
 		outfile->WriteObject(h, h->GetName() );
 	}	
-
 }
+
 void histset::AnalyzeEntry(myselector& s){
    	
 	//always make a local copy, if its a value dereference. 
@@ -158,8 +157,8 @@ void histset::AnalyzeEntry(myselector& s){
 	double rerr,phierr,zerr;//errors
 	double sphi,cphi;
 
-	FillTH1(ind_numpcHist, numberOfPC);
-	FillTH1(ind_numpvHist, numberOfPV);
+	FillTH1(id_numpcHist, numberOfPC);
+	FillTH1(id_numpvHist, numberOfPV);
 
 	for(int i=0; i<PC_x.GetSize(); i++){
 		x = PC_x[i];
@@ -170,9 +169,9 @@ void histset::AnalyzeEntry(myselector& s){
 		phi = atan2(y, x);
 		theta = PC_fitmomentumOut_theta[i];
 		
-		FillTH2(ind_xyHist, -x, y);
-		FillTH2(ind_rphiHist, r, phi);
-		FillTH2(ind_rzHist, z, r);	
+		FillTH2(id_xyHist, -x, y);
+		FillTH2(id_rphiHist, r, phi);
+		FillTH2(id_rzHist, z, r);	
 
 		vxx = PC_vtx_sigmaxx[i];
 		vxy = PC_vtx_sigmaxy[i];
@@ -189,38 +188,37 @@ void histset::AnalyzeEntry(myselector& s){
 		phierr = sqrt(varsum_phi)/r;
 		zerr = sqrt(vzz);
 
-		FillTH1(ind_rerrHist, rerr);
-		FillTH1(ind_phierrHist, phierr);
-		FillTH1(ind_zerrHist, zerr);
+		FillTH1(id_rerrHist, rerr);
+		FillTH1(id_phierrHist, phierr);
+		FillTH1(id_zerrHist, zerr);
 
 	 	fitprob = TMath::Prob(PC_vtx_chi2[i], 3);
 		//make r plots with quality cuts and without
 		
-		FillTH1(ind_r1dHist, r);
+		FillTH1(id_r1dHist, r);
 
 		//make quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-			FillTH1(ind_r1dcutHist, r);
-			FillTH2(ind_xycutHist, x,y);
+			FillTH1(id_r1dcutHist, r);
+			FillTH2(id_xycutHist, x,y);
 			rho =  sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0)) ;	
-			FillTH1(ind_rhobpHist, rho); 
+			FillTH1(id_rhobpHist, rho); 
 		}			
 	
 		//pileup cuts
 		if( numberOfPV <= 16){
-			FillTH1(ind_r1dlowPUHist, r);
+			FillTH1(id_r1dlowPUHist, r);
 			//low PU quality cuts
 			 if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-				FillTH1(ind_r1dlowPUcutHist, r);
+				FillTH1(id_r1dlowPUcutHist, r);
 			}
 		}
 		if( numberOfPV >= 36){
-			FillTH1(ind_r1dhiPUHist, r);
+			FillTH1(id_r1dhiPUHist, r);
 			 if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-				FillTH1(ind_r1dhiPUcutHist,r);
+				FillTH1(id_r1dhiPUcutHist,r);
 			}
-		}	
-				
+		}				
 	}
 
 	auto& PC_fitmomentumOut_pt = s.PC_fitmomentumOut_pt;
@@ -251,7 +249,7 @@ void histset::AnalyzeEntry(myselector& s){
                 double Rj = sqrt(xj*xj + yj*yj);
                 if (abs(Ri-3.0)<1.0 && abs(Rj-3.0)<1.0&&min(Ei,Ej)>2.0){
                     //mgg->Fill(m12);
-                    FillTH1(ind_mgg1Hist, m12);
+                    FillTH1(id_mgg1Hist, m12);
                     //hmgg->Fill(m12);
                 }
                 //hmggall->Fill(m12);
@@ -267,10 +265,10 @@ void histset::AnalyzeEntry(myselector& s){
 			py = PC_vTrack_pt[i][j] * sin( PC_vTrack_phi[i][j] );
 			pz = PC_vTrack_pt[i][j] * sinh( PC_vTrack_eta[i][j] );
 
-            FillTH1(ind_ptHist, PC_vTrack_pt[i][j], 1./PC_vTrack_pt[i][j]);
-//            FillTH1(ind_ptHist, PC_vTrack_pt[i][j], PC_vTrack_pt[i][j]);
-			FillTH1(ind_pzHist, pz);
-			FillTH2(ind_pxpyHist, px, py);
+            FillTH1(id_ptHist, PC_vTrack_pt[i][j], 1./PC_vTrack_pt[i][j]);
+//            FillTH1(id_ptHist, PC_vTrack_pt[i][j], PC_vTrack_pt[i][j]);
+			FillTH1(id_pzHist, pz);
+			FillTH2(id_pxpyHist, px, py);
         }
     }
 }
