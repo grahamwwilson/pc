@@ -12,33 +12,33 @@ using MyTH2D = ROOT::TThreadedObject<TH2D>;
 
 class histset{
 	
-	public:
+    public:
 //	   double pi =4.0*atan(1.0);
 
-	   histset();	
-	   void init(); 
+       histset();	
+       void init(); 
 
-	   void AnalyzeEntry(myselector& s); 
+       void AnalyzeEntry(myselector& s); 
 	   //bookeeping enumeration: 
        //(if we do this we dont need to worry about hist pointer copies and merging)
-	   enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
+       enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
                        id_rerrHist, id_phierrHist, id_zerrHist,
                        id_r1dHist, id_r1dcutHist, id_r1dlowPUHist, 
                        id_r1dhiPUHist, id_r1dlowPUcutHist, 
                        id_r1dhiPUcutHist, id_rhobpHist, id_mgg1Hist, 
                        numTH1Hist};
-	   enum th2d_ids{id_pxpyHist,id_xyHist,id_rphiHist, id_rzHist,
+       enum th2d_ids{id_pxpyHist,id_xyHist,id_rphiHist, id_rzHist,
                        id_xycutHist, numTH2Hist};
 
 	   //make a big vector and load enumerated histograms onto the vector
        std::vector<MyTH1D*>  TH1Manager{};
- 	   std::vector<MyTH2D*>  TH2Manager{};
+       std::vector<MyTH2D*>  TH2Manager{};
 
 	   //locate the histogram and perform pointer copying 
-	   void FillTH1(int index, double x, double w);
-	   void FillTH2(int index, double x, double y);
+       void FillTH1(int index, double x, double w);
+       void FillTH2(int index, double x, double y);
 	
-	   void WriteHist(); 
+       void WriteHist(); 
 };
 
 histset::histset(){
@@ -54,8 +54,8 @@ histset::histset(){
 }
 void histset::init(){
 //init TH1D
-	TH1Manager.at(id_ptHist) = new MyTH1D("ptHist", "p_{T} Distribution;p_{T};1/p_{T} dN/dp_{T}", 100, 0.0, 5.0);
-	TH1Manager.at(id_pzHist) = new MyTH1D("pzHist", "p_{Z} Distribution;p_{Z};dN/dp_{Z}", 100, 0.0, 5.0);
+    TH1Manager.at(id_ptHist) = new MyTH1D("ptHist", "p_{T} Distribution;p_{T};1/p_{T} dN/dp_{T}", 100, 0.0, 5.0);
+    TH1Manager.at(id_pzHist) = new MyTH1D("pzHist", "p_{Z} Distribution;p_{Z};dN/dp_{Z}", 100, 0.0, 5.0);
 	TH1Manager.at(id_numpcHist) = new MyTH1D("numpcHist", "Number of PC;;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_numpvHist) = new MyTH1D("numpvHist", "Number of PV;;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_rerrHist) = new MyTH1D("rerrHist", "Conversion Radial Error; #Delta R (cm); Entries per 0.05 bin", 40, 0.0, 2.0);
