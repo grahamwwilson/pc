@@ -4,3 +4,4 @@ CMSSW
 *.root
 *.o
 compiledthreads
+*.log

@@ -11,4 +11,6 @@ Or CMSSW: source /cvmfs/cms.cern.ch/cmsset_default.sh
    cmsenv
    cd ..
 
+ (OR on KU HPC    . ~/setup.sh
+
 2. make
