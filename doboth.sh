@@ -2,6 +2,6 @@
 
 ./runmyanalysis.sh
 
-./runmyanalysis.sh mc
+./runmyanalysis.sh mcHPC
 
 exit

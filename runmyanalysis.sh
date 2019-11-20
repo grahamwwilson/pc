@@ -2,7 +2,7 @@
 
 date
 
-INPUT=${1-data}
+INPUT=${1-dataHPC}
 
 INPUTLIST=${INPUT}.list
 
