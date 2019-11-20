@@ -19,7 +19,7 @@ class histset{
        void init(); 
 
        void AnalyzeEntry(myselector& s); 
-	   //bookeeping enumeration: 
+       //bookeeping enumeration: 
        //(if we do this we dont need to worry about hist pointer copies and merging)
        enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
                        id_rerrHist, id_phierrHist, id_zerrHist,
