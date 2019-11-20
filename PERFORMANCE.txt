@@ -1,0 +1,13 @@
+
+Interactive on r17r10n04.
+Wed Nov 20 16:33:48 CST 2019
+['/panfs/pfs.local/work/wilson/gwwilson/DATA0002/Run2018_2021.root', '/panfs/pfs.local/work/wilson/gwwilson/DATA0002/Run2018_2104.root', '/panfs/pfs.local/work/wilson/gwwilson/DATA0002/Run2018_2105.root']
+('from runmacro numFiles == ', 3, ' nthreads == ', '8')
+./compiledthreads 8 "/panfs/pfs.local/work/wilson/gwwilson/DATA0002/Run2018_2021.root" "/panfs/pfs.local/work/wilson/gwwilson/DATA0002/Run2018_2104.root" "/panfs/pfs.local/work/wilson/gwwilson/DATA0002/Run2018_2105.root" 
+Wed Nov 20 16:34:33 CST 2019
+Wed Nov 20 16:34:33 CST 2019
+['/panfs/pfs.local/work/wilson/gwwilson/MC/Run2018_101.root', '/panfs/pfs.local/work/wilson/gwwilson/MC/Run2018_102.root', '/panfs/pfs.local/work/wilson/gwwilson/MC/Run2018_103.root']
+('from runmacro numFiles == ', 3, ' nthreads == ', '8')
+./compiledthreads 8 "/panfs/pfs.local/work/wilson/gwwilson/MC/Run2018_101.root" "/panfs/pfs.local/work/wilson/gwwilson/MC/Run2018_102.root" "/panfs/pfs.local/work/wilson/gwwilson/MC/Run2018_103.root" 
+Wed Nov 20 16:34:55 CST 2019
+
