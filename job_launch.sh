@@ -4,13 +4,13 @@
 #SBATCH --mail-type=ALL                 # Mail events (NONE, BEGIN, END, FAIL, ALL)
 #SBATCH --mail-user=gwwilson@ku.edu     # Where to send mail	
 #SBATCH --ntasks=1                      # Run 1 task on one node
-#SBATCH --cpus-per-task=16              # Number of threads to use
+#SBATCH --cpus-per-task=20              # Number of threads to use
 #SBATCH --mem=2gb                       # Job memory request
 #SBATCH --time=0-06:00:00               # Time limit days-hrs:min:sec
 #SBATCH --output=conversions_%j.log     # Standard output and error log
 
-#VERSION=$1
-#echo 'Version '$VERSION
+VERSION=$1
+echo 'Version '$VERSION
 
 pwd
 hostname
@@ -38,11 +38,10 @@ pwd
 
 echo "Start execution"
 
-./doboth.sh
+./runmyanalysis.sh ${VERSION}
+#./doboth.sh
 
 date
-
-
 
 date
 
