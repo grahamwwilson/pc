@@ -26,6 +26,7 @@ class histset{
                        id_r1dHist, id_r1dcutHist, id_r1dlowPUHist, 
                        id_r1dhiPUHist, id_r1dlowPUcutHist, 
                        id_r1dhiPUcutHist, id_rhobpHist, id_mgg1Hist, 
+                       id_numnopcHist, id_numpvnopcHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,id_xyHist,id_rphiHist, id_rzHist,
                        id_xycutHist, numTH2Hist};
@@ -58,6 +59,8 @@ void histset::init(){
     TH1Manager.at(id_pzHist) = new MyTH1D("pzHist", "p_{Z} Distribution;p_{Z};dN/dp_{Z}", 100, 0.0, 5.0);
 	TH1Manager.at(id_numpcHist) = new MyTH1D("numpcHist", "Number of PC;;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_numpvHist) = new MyTH1D("numpvHist", "Number of PV;;Entries per bin", 100,-0.5, 99.5);
+	TH1Manager.at(id_numnopcHist) = new MyTH1D("numnopcHist", "Number of no PC;;Entries per bin", 100,-0.5, 99.5);
+	TH1Manager.at(id_numpvnopcHist) = new MyTH1D("numpvnopcHist", "Number of PV (no PC);;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_rerrHist) = new MyTH1D("rerrHist", "Conversion Radial Error; #Delta R (cm); Entries per 0.05 bin", 40, 0.0, 2.0);
 	TH1Manager.at(id_phierrHist) = new MyTH1D("phierrHist", "Conversion Azimuthal Error;#Delta #phi; Entries per 0.002 bin",50, 0.0, 0.1);
 	TH1Manager.at(id_zerrHist) = new MyTH1D("zerrHist","Conversion Z Error;#Delta z (cm); Entries per 0.1 bin", 50, 0.0, 5.0);
@@ -153,6 +156,13 @@ void histset::AnalyzeEntry(myselector& s){
 	double varsum_r, varsum_phi; //intermediate calculation variables
 	double rerr,phierr,zerr;//errors
 	double sphi,cphi;
+
+// Skip the MC events with no PCs for now.
+    if(numberOfPC < 1){
+       FillTH1(id_numnopcHist, numberOfPC);
+       FillTH1(id_numpvnopcHist, numberOfPV);
+       return;
+    }
 
 	FillTH1(id_numpcHist, numberOfPC);
 	FillTH1(id_numpvHist, numberOfPV);
@@ -252,16 +262,13 @@ void histset::AnalyzeEntry(myselector& s){
                 //hmggall->Fill(m12);
             }
         }
-        }//end numpc
+    }//end numpc
 		
-
 	for(int i=0; i<PC_vTrack_pt.GetSize(); i++){
         for(int j=0; j<PC_vTrack_pt[i].size(); j++){
-
 			px = PC_vTrack_pt[i][j] * cos( PC_vTrack_phi[i][j] );
 			py = PC_vTrack_pt[i][j] * sin( PC_vTrack_phi[i][j] );
 			pz = PC_vTrack_pt[i][j] * sinh( PC_vTrack_eta[i][j] );
-
             FillTH1(id_ptHist, PC_vTrack_pt[i][j], 1./PC_vTrack_pt[i][j]);
 //            FillTH1(id_ptHist, PC_vTrack_pt[i][j], PC_vTrack_pt[i][j]);
 			FillTH1(id_pzHist, pz);
