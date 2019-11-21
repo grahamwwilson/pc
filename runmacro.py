@@ -20,7 +20,7 @@ nthreads = sys.argv[2]
 if (numFiles == 0 ):
 	numFiles = len(idatafiles)
 print( "from runmacro numFiles == ", numFiles," nthreads == ",nthreads)
-cmd = "./compiledthreads "+str(nthreads)+" "
+cmd = "/home/gwwilson/pc/compiledthreads "+str(nthreads)+" "
  
 for f in idatafiles:
 	if (ifile <= numFiles):

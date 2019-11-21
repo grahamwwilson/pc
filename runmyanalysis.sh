@@ -1,18 +1,31 @@
 #!/bin/sh
+# runmyanalysis.sh
 
 date
 
+CODEDIR=/home/gwwilson/pc
+
 INPUT=${1-dataHPC}
 
-INPUTLIST=${INPUT}.list
+echo ${INPUT}
+
+INPUTLIST=${CODEDIR}/${INPUT}.list
+
+#Execute this from execution directory, so that we can have several output files in parallel
+
+EXEDIR=/home/gwwilson/pc_ExecutionDirectory/${INPUT}
+rm -r ${EXEDIR}
+# Check if it exists. If not make it.
+mkdir ${EXEDIR}
+
+cd ${EXEDIR}
+pwd
 
 #input is: num files, numthreads,  yourdata.list
-#0 is all files, optimal threads is 8
-#python runmacro.py 0 8 "bigmcdata.list"
-python2 runmacro.py 0 20 ${INPUTLIST}
+python2 ${CODEDIR}/runmacro.py 0 20 ${INPUTLIST}
 
 #Need to find some way of having several of these in parallel ...
-mv Outfile.root PC_${INPUT}.root
+cp Outfile.root ${CODEDIR}/PC_${INPUT}.root
 
 date
 
