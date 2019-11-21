@@ -23,8 +23,8 @@ class histset{
        //(if we do this we dont need to worry about hist pointer copies and merging)
        enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
                        id_rerrHist, id_phierrHist, id_zerrHist,
-                       id_r1dHist, id_r1dcutHist, id_r1dlowPUHist, 
-                       id_r1dhiPUHist, id_r1dlowPUcutHist, 
+                       id_r1dHist, id_r1dcutHist, id_r1dlowPUHist, id_r1dmedPUHist,
+                       id_r1dhiPUHist, id_r1dlowPUcutHist, id_r1dmedPUcutHist, 
                        id_r1dhiPUcutHist, id_rhobpHist, id_mgg1Hist, 
                        id_numnopcHist, id_numpvnopcHist,
                        numTH1Hist};
@@ -67,8 +67,10 @@ void histset::init(){
 	TH1Manager.at(id_r1dHist) = new MyTH1D("r1dHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",100, 0.0, 10.0);
 	TH1Manager.at(id_r1dcutHist) = new MyTH1D("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 100, 0.0, 10.0);
 	TH1Manager.at(id_r1dlowPUHist) = new MyTH1D("r1dlowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
+	TH1Manager.at(id_r1dmedPUHist) = new MyTH1D("r1dmedPUHist","Conversion Radius: No Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dhiPUHist) = new MyTH1D("r1dhiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dlowPUcutHist) = new MyTH1D("r1dlowPUcutHist","Conversion Radius: Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
+	TH1Manager.at(id_r1dmedPUcutHist) = new MyTH1D("r1dmedPUcutHist","Conversion Radius: Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dhiPUcutHist) = new MyTH1D("r1dhiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_rhobpHist) = new MyTH1D("rhobpHist","Conversion Radius w.r.t Beam Pipe and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
 	TH1Manager.at(id_mgg1Hist) = new MyTH1D("mgg1Hist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 100, 0.0, 0.25 );
@@ -220,13 +222,20 @@ void histset::AnalyzeEntry(myselector& s){
 		if( numberOfPV <= 16){
 			FillTH1(id_r1dlowPUHist, r);
 			//low PU quality cuts
-			 if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
+			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
 				FillTH1(id_r1dlowPUcutHist, r);
+			}
+		}
+		if( numberOfPV > 16 && numberOfPV < 36){
+			FillTH1(id_r1dmedPUHist, r);
+			//low PU quality cuts
+			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
+				FillTH1(id_r1dmedPUcutHist, r);
 			}
 		}
 		if( numberOfPV >= 36){
 			FillTH1(id_r1dhiPUHist, r);
-			 if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
+			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
 				FillTH1(id_r1dhiPUcutHist,r);
 			}
 		}				
