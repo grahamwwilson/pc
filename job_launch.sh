@@ -9,8 +9,8 @@
 #SBATCH --time=0-06:00:00               # Time limit days-hrs:min:sec
 #SBATCH --output=conversions_%j.log     # Standard output and error log
 
-VERSION=$1
-echo 'Version '$VERSION
+#VERSION=$1
+#echo 'Version '$VERSION
 
 pwd
 hostname
@@ -38,8 +38,8 @@ pwd
 
 echo "Start execution"
 
-./runmyanalysis.sh ${VERSION}
-#./doboth.sh
+#./runmyanalysis.sh ${VERSION}
+./doHPC.sh
 
 date
 
