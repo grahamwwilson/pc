@@ -163,6 +163,10 @@ void histset::AnalyzeEntry(myselector& s){
        FillTH1(id_numpvnopcHist, numberOfPV);
        return;
     }
+    else{     // not sure if this is needed - but may be need to make sure this histogram exists for data.
+       FillTH1(id_numnopcHist, -1);
+       FillTH1(id_numpvnopcHist, -1);
+    }
 
 	FillTH1(id_numpcHist, numberOfPC);
 	FillTH1(id_numpvHist, numberOfPV);
