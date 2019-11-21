@@ -23,13 +23,23 @@ class histset{
        //(if we do this we dont need to worry about hist pointer copies and merging)
        enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
                        id_rerrHist, id_phierrHist, id_zerrHist,
-                       id_r1dHist, id_r1dcutHist, id_r1dlowPUHist, id_r1dmedPUHist,
-                       id_r1dhiPUHist, id_r1dlowPUcutHist, id_r1dmedPUcutHist, 
-                       id_r1dhiPUcutHist, id_rhobpHist, id_mgg1Hist, 
+                       id_r1dHist, id_r1dcutHist, 
+                       id_r1dlowPUHist, id_r1dmedPUHist, id_r1dhiPUHist, 
+                       id_r1dlowPUcutHist, id_r1dmedPUcutHist, id_r1dhiPUcutHist, 
+                       id_r1dwideHist, id_r1dwidecutHist, 
+                       id_r1dwidelowPUHist, id_r1dwidemedPUHist, id_r1dwidehiPUHist, 
+                       id_r1dwidelowPUcutHist, id_r1dwidemedPUcutHist, id_r1dwidehiPUcutHist, 
+                       id_rhobpHist, id_mgg1Hist, 
                        id_numnopcHist, id_numpvnopcHist,
                        numTH1Hist};
-       enum th2d_ids{id_pxpyHist,id_xyHist,id_rphiHist, id_rzHist,
-                       id_xycutHist, numTH2Hist};
+       enum th2d_ids{id_pxpyHist,
+                     id_xyHist,
+                     id_xywideHist,
+                     id_rphiHist, 
+                     id_rzHist,
+                     id_xycutHist,
+                     id_xywidecutHist, 
+                     numTH2Hist};
 
 	   //make a big vector and load enumerated histograms onto the vector
        std::vector<MyTH1D*>  TH1Manager{};
@@ -65,22 +75,32 @@ void histset::init(){
 	TH1Manager.at(id_phierrHist) = new MyTH1D("phierrHist", "Conversion Azimuthal Error;#Delta #phi; Entries per 0.002 bin",50, 0.0, 0.1);
 	TH1Manager.at(id_zerrHist) = new MyTH1D("zerrHist","Conversion Z Error;#Delta z (cm); Entries per 0.1 bin", 50, 0.0, 5.0);
 	TH1Manager.at(id_r1dHist) = new MyTH1D("r1dHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",100, 0.0, 10.0);
+	TH1Manager.at(id_r1dwideHist) = new MyTH1D("r1dwideHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
 	TH1Manager.at(id_r1dcutHist) = new MyTH1D("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 100, 0.0, 10.0);
+	TH1Manager.at(id_r1dwidecutHist) = new MyTH1D("r1dwidecutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dlowPUHist) = new MyTH1D("r1dlowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dmedPUHist) = new MyTH1D("r1dmedPUHist","Conversion Radius: No Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dhiPUHist) = new MyTH1D("r1dhiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
+	TH1Manager.at(id_r1dwidelowPUHist) = new MyTH1D("r1dwidelowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",250,0.,25.);
+	TH1Manager.at(id_r1dwidemedPUHist) = new MyTH1D("r1dwidemedPUHist","Conversion Radius: No Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",250,0.,25.);
+	TH1Manager.at(id_r1dwidehiPUHist) = new MyTH1D("r1dwidehiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",250,0.,25.);
 	TH1Manager.at(id_r1dlowPUcutHist) = new MyTH1D("r1dlowPUcutHist","Conversion Radius: Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dmedPUcutHist) = new MyTH1D("r1dmedPUcutHist","Conversion Radius: Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dhiPUcutHist) = new MyTH1D("r1dhiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
+	TH1Manager.at(id_r1dwidelowPUcutHist) = new MyTH1D("r1dwidelowPUcutHist","Conversion Radius: Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",250,0.,25.);
+	TH1Manager.at(id_r1dwidemedPUcutHist) = new MyTH1D("r1dwidemedPUcutHist","Conversion Radius: Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",250,0.,25.);
+	TH1Manager.at(id_r1dwidehiPUcutHist) = new MyTH1D("r1dwidehiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",250,0.,25.);
 	TH1Manager.at(id_rhobpHist) = new MyTH1D("rhobpHist","Conversion Radius w.r.t Beam Pipe and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
 	TH1Manager.at(id_mgg1Hist) = new MyTH1D("mgg1Hist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 100, 0.0, 0.25 );
 
 // init TH2D
 	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
-	TH2Manager.at(id_xyHist) = new MyTH2D("xyHist", "Conversion Vertices per mm^{2} bin; -PC_x (cm); PC_y (cm)",200,-10.,10.,200,-10.,10.);
+	TH2Manager.at(id_xyHist) = new MyTH2D("xyHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
+	TH2Manager.at(id_xywideHist) = new MyTH2D("xywideHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
 	TH2Manager.at(id_rphiHist) = new MyTH2D("rphiHist", "Conversion Vertices in R-#phi per mm*60mrad bin; R (cm); #phi",100,0.,10.,100,-3.2,3.2);
 	TH2Manager.at(id_rzHist) = new MyTH2D("rzHist", "Conversion Vertices in R-z per mm^{2} bin; PC_z (cm); R (cm)",200,-10.,10.,100,0.,10.);
-	TH2Manager.at(id_xycutHist) = new MyTH2D("xycutHist", "Conversion Vertices per mm^{2} bin; -PC_x (cm); PC_y (cm)",200,-10.,10.,200,-10.,10.);
+	TH2Manager.at(id_xycutHist) = new MyTH2D("xycutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
+	TH2Manager.at(id_xywidecutHist) = new MyTH2D("xywidecutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
 }
 
 void histset::FillTH1(int index, double x, double w=1){
@@ -182,7 +202,8 @@ void histset::AnalyzeEntry(myselector& s){
 		phi = atan2(y, x);
 		theta = PC_fitmomentumOut_theta[i];
 		
-		FillTH2(id_xyHist, -x, y);
+		FillTH2(id_xyHist, x, y);
+		FillTH2(id_xywideHist, x, y);
 		FillTH2(id_rphiHist, r, phi);
 		FillTH2(id_rzHist, z, r);	
 
@@ -209,11 +230,14 @@ void histset::AnalyzeEntry(myselector& s){
 		//make r plots with quality cuts and without
 		
 		FillTH1(id_r1dHist, r);
+		FillTH1(id_r1dwideHist, r);
 
 		//make quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
 			FillTH1(id_r1dcutHist, r);
-			FillTH2(id_xycutHist, x,y);
+			FillTH1(id_r1dwidecutHist, r);
+			FillTH2(id_xycutHist, x, y);
+			FillTH2(id_xywidecutHist, x, y);
 			rho =  sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0)) ;	
 			FillTH1(id_rhobpHist, rho); 
 		}			
@@ -221,22 +245,28 @@ void histset::AnalyzeEntry(myselector& s){
 		//pileup cuts
 		if( numberOfPV <= 16){
 			FillTH1(id_r1dlowPUHist, r);
+			FillTH1(id_r1dwidelowPUHist, r);
 			//low PU quality cuts
 			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
 				FillTH1(id_r1dlowPUcutHist, r);
+				FillTH1(id_r1dwidelowPUcutHist, r);
 			}
 		}
 		if( numberOfPV > 16 && numberOfPV < 36){
 			FillTH1(id_r1dmedPUHist, r);
+			FillTH1(id_r1dwidemedPUHist, r);
 			//low PU quality cuts
 			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
 				FillTH1(id_r1dmedPUcutHist, r);
+				FillTH1(id_r1dwidemedPUcutHist, r);
 			}
 		}
 		if( numberOfPV >= 36){
 			FillTH1(id_r1dhiPUHist, r);
+			FillTH1(id_r1dwidehiPUHist, r);
 			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-				FillTH1(id_r1dhiPUcutHist,r);
+				FillTH1(id_r1dhiPUcutHist, r);
+				FillTH1(id_r1dwidehiPUcutHist, r);
 			}
 		}				
 	}
