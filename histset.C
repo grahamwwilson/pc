@@ -31,6 +31,7 @@ class histset{
                        id_r1dwidelowPUcutHist, id_r1dwidemedPUcutHist, id_r1dwidehiPUcutHist, 
                        id_rhobpHist, id_mgg1Hist, 
                        id_numnopcHist, id_numpvnopcHist,
+                       id_pTHist, id_EHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -93,6 +94,8 @@ void histset::init(){
 	TH1Manager.at(id_r1dwidehiPUcutHist) = new MyTH1D("r1dwidehiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",250,0.,25.);
 	TH1Manager.at(id_rhobpHist) = new MyTH1D("rhobpHist","Conversion Radius w.r.t Beam Pipe and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
 	TH1Manager.at(id_mgg1Hist) = new MyTH1D("mgg1Hist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 100, 0.0, 0.25 );
+	TH1Manager.at(id_pTHist) = new MyTH1D("pTHist","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
+	TH1Manager.at(id_EHist) = new MyTH1D("EHist","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
 
 // init TH2D
 	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
@@ -195,10 +198,18 @@ void histset::AnalyzeEntry(myselector& s){
 	FillTH1(id_numpcHist, numberOfPC);
 	FillTH1(id_numpvHist, numberOfPV);
 
+	auto& PC_fitmomentumOut_pt = s.PC_fitmomentumOut_pt;
+	auto& PC_fitmomentumOut_phi = s.PC_fitmomentumOut_phi;
+
 	for(int i=0; i<PC_x.GetSize(); i++){
 		x = PC_x[i];
 		y = PC_y[i];
 		z = PC_z[i];
+        double px = PC_fitmomentumOut_pt[i]*cos(PC_fitmomentumOut_phi[i]);
+        double py = PC_fitmomentumOut_pt[i]*sin(PC_fitmomentumOut_phi[i]);
+        double pz = PC_fitmomentumOut_pt[i]/tan(PC_fitmomentumOut_theta[i]);
+        double E = sqrt(px*px + py*py + pz*pz);
+        double pt = PC_fitmomentumOut_pt[i]; 
 
 		r = sqrt( x*x + y*y );
 		phi = atan2(y, x);
@@ -243,6 +254,8 @@ void histset::AnalyzeEntry(myselector& s){
 			rho =  sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0)) ;	
 			FillTH1(id_rhobpHist, rho);
             FillTH2(id_npv_rcutHist, r, numberOfPV);
+            FillTH1(id_pTHist, pt);
+            FillTH1(id_EHist,E);
 		}			
 	
 		//pileup cuts
@@ -274,10 +287,9 @@ void histset::AnalyzeEntry(myselector& s){
 		}				
 	}
 
-	auto& PC_fitmomentumOut_pt = s.PC_fitmomentumOut_pt;
-	auto& PC_fitmomentumOut_phi = s.PC_fitmomentumOut_phi;
 
-	//gamma gamma stuff
+
+	//gamma gamma stuff IS THIS LOOP CORRECT?
  	if (numberOfPC>=2){
         for(unsigned int i=0; i<numberOfPC-1; i++){
             double pxi = PC_fitmomentumOut_pt[i]*cos(PC_fitmomentumOut_phi[i]);
@@ -287,7 +299,7 @@ void histset::AnalyzeEntry(myselector& s){
             double xi = PC_x[i];
             double yi = PC_y[i];
             double Ri = sqrt(xi*xi + yi*yi);
-            for(unsigned int j=i; j<numberOfPC; j++){
+            for(unsigned int j=i+1; j<numberOfPC; j++){
                 double pxj = PC_fitmomentumOut_pt[j]*cos(PC_fitmomentumOut_phi[j]);
                 double pyj = PC_fitmomentumOut_pt[j]*sin(PC_fitmomentumOut_phi[j]);
                 double pzj = PC_fitmomentumOut_pt[j]/tan(PC_fitmomentumOut_theta[j]);
