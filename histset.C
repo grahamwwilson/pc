@@ -38,7 +38,8 @@ class histset{
                      id_rphiHist, 
                      id_rzHist,
                      id_xycutHist,
-                     id_xywidecutHist, 
+                     id_xywidecutHist,
+                     id_npv_rcutHist, 
                      numTH2Hist};
 
 	   //make a big vector and load enumerated histograms onto the vector
@@ -101,6 +102,7 @@ void histset::init(){
 	TH2Manager.at(id_rzHist) = new MyTH2D("rzHist", "Conversion Vertices in R-z per mm^{2} bin; PC_z (cm); R (cm)",200,-10.,10.,100,0.,10.);
 	TH2Manager.at(id_xycutHist) = new MyTH2D("xycutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
 	TH2Manager.at(id_xywidecutHist) = new MyTH2D("xywidecutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
+	TH2Manager.at(id_npv_rcutHist) = new MyTH2D("npv_rcutHist", "Conversion Vertices per mm; R (cm); nPV",250,0.0,25.0,100,-0.5,99.5);
 }
 
 void histset::FillTH1(int index, double x, double w=1){
@@ -239,7 +241,8 @@ void histset::AnalyzeEntry(myselector& s){
 			FillTH2(id_xycutHist, x, y);
 			FillTH2(id_xywidecutHist, x, y);
 			rho =  sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0)) ;	
-			FillTH1(id_rhobpHist, rho); 
+			FillTH1(id_rhobpHist, rho);
+            FillTH2(id_npv_rcutHist, r, numberOfPV);
 		}			
 	
 		//pileup cuts
