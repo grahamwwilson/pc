@@ -5,3 +5,4 @@ CMSSW
 *.o
 compiledthreads
 *.log
+*.pdf
