@@ -40,7 +40,8 @@ class histset{
                      id_rzHist,
                      id_xycutHist,
                      id_xywidecutHist,
-                     id_npv_rcutHist, 
+                     id_npv_rcutHist,
+                     id_mgg2Hist, 
                      numTH2Hist};
 
 	   //make a big vector and load enumerated histograms onto the vector
@@ -106,6 +107,7 @@ void histset::init(){
 	TH2Manager.at(id_xycutHist) = new MyTH2D("xycutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
 	TH2Manager.at(id_xywidecutHist) = new MyTH2D("xywidecutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
 	TH2Manager.at(id_npv_rcutHist) = new MyTH2D("npv_rcutHist", "Conversion Vertices per mm; R (cm); nPV",250,0.0,25.0,100,-0.5,99.5);
+	TH2Manager.at(id_mgg2Hist) = new MyTH2D("mgg2Hist","Di-#gamma Mass;Mass (GeV); nPV", 100, 0.0, 0.25, 100, -0.5, 99.5 );
 }
 
 void histset::FillTH1(int index, double x, double w=1){
@@ -201,6 +203,9 @@ void histset::AnalyzeEntry(myselector& s){
 	auto& PC_fitmomentumOut_pt = s.PC_fitmomentumOut_pt;
 	auto& PC_fitmomentumOut_phi = s.PC_fitmomentumOut_phi;
 
+// Probably a good idea to keep track of whether each conversion 
+// candidate passes particular cuts, to ease later code 
+// with gamma-gamma invariant mass
 	for(int i=0; i<PC_x.GetSize(); i++){
 		x = PC_x[i];
 		y = PC_y[i];
@@ -287,8 +292,6 @@ void histset::AnalyzeEntry(myselector& s){
 		}				
 	}
 
-
-
 	//gamma gamma stuff IS THIS LOOP CORRECT?
  	if (numberOfPC>=2){
         for(unsigned int i=0; i<numberOfPC-1; i++){
@@ -313,11 +316,9 @@ void histset::AnalyzeEntry(myselector& s){
                 double yj = PC_y[j];
                 double Rj = sqrt(xj*xj + yj*yj);
                 if (abs(Ri-3.0)<1.0 && abs(Rj-3.0)<1.0&&min(Ei,Ej)>2.0){
-                    //mgg->Fill(m12);
                     FillTH1(id_mgg1Hist, m12);
-                    //hmgg->Fill(m12);
+                    FillTH2(id_mgg2Hist, m12, numberOfPV);
                 }
-                //hmggall->Fill(m12);
             }
         }
     }//end numpc
@@ -328,7 +329,6 @@ void histset::AnalyzeEntry(myselector& s){
 			py = PC_vTrack_pt[i][j] * sin( PC_vTrack_phi[i][j] );
 			pz = PC_vTrack_pt[i][j] * sinh( PC_vTrack_eta[i][j] );
             FillTH1(id_ptHist, PC_vTrack_pt[i][j], 1./PC_vTrack_pt[i][j]);
-//            FillTH1(id_ptHist, PC_vTrack_pt[i][j], PC_vTrack_pt[i][j]);
 			FillTH1(id_pzHist, pz);
 			FillTH2(id_pxpyHist, px, py);
         }
