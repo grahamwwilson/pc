@@ -6,3 +6,4 @@ CMSSW
 compiledthreads
 *.log
 *.pdf
+histset.C1

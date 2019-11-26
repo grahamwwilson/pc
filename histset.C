@@ -29,7 +29,7 @@ class histset{
                        id_r1dwideHist, id_r1dwidecutHist, 
                        id_r1dwidelowPUHist, id_r1dwidemedPUHist, id_r1dwidehiPUHist, 
                        id_r1dwidelowPUcutHist, id_r1dwidemedPUcutHist, id_r1dwidehiPUcutHist, 
-                       id_rhobpHist, id_mgg1Hist, 
+                       id_rhobpHist, id_mggHist, id_mggCutHist,
                        id_numnopcHist, id_numpvnopcHist,
                        id_pTHist, id_EHist,
                        numTH1Hist};
@@ -41,7 +41,8 @@ class histset{
                      id_xycutHist,
                      id_xywidecutHist,
                      id_npv_rcutHist,
-                     id_mgg2Hist, 
+                     id_mgg2Hist,
+                     id_npc_npvHist, 
                      numTH2Hist};
 
 	   //make a big vector and load enumerated histograms onto the vector
@@ -94,7 +95,8 @@ void histset::init(){
 	TH1Manager.at(id_r1dwidemedPUcutHist) = new MyTH1D("r1dwidemedPUcutHist","Conversion Radius: Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",250,0.,25.);
 	TH1Manager.at(id_r1dwidehiPUcutHist) = new MyTH1D("r1dwidehiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",250,0.,25.);
 	TH1Manager.at(id_rhobpHist) = new MyTH1D("rhobpHist","Conversion Radius w.r.t Beam Pipe and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
-	TH1Manager.at(id_mgg1Hist) = new MyTH1D("mgg1Hist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 100, 0.0, 0.25 );
+	TH1Manager.at(id_mggHist) = new MyTH1D("mggHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 100, 0.0, 0.25 );
+	TH1Manager.at(id_mggCutHist) = new MyTH1D("mggCutHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 100, 0.0, 0.25 );
 	TH1Manager.at(id_pTHist) = new MyTH1D("pTHist","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
 	TH1Manager.at(id_EHist) = new MyTH1D("EHist","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
 
@@ -107,6 +109,7 @@ void histset::init(){
 	TH2Manager.at(id_xycutHist) = new MyTH2D("xycutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
 	TH2Manager.at(id_xywidecutHist) = new MyTH2D("xywidecutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
 	TH2Manager.at(id_npv_rcutHist) = new MyTH2D("npv_rcutHist", "Conversion Vertices per mm; R (cm); nPV",250,0.0,25.0,100,-0.5,99.5);
+	TH2Manager.at(id_npc_npvHist) = new MyTH2D("npc_npvHist", " ; nPV; nPC",100,-0.5,99.5,100,-0.5,99.5);
 	TH2Manager.at(id_mgg2Hist) = new MyTH2D("mgg2Hist","Di-#gamma Mass;Mass (GeV); nPV", 100, 0.0, 0.25, 100, -0.5, 99.5 );
 }
 
@@ -199,14 +202,19 @@ void histset::AnalyzeEntry(myselector& s){
 
 	FillTH1(id_numpcHist, numberOfPC);
 	FillTH1(id_numpvHist, numberOfPV);
+	FillTH2(id_npc_npvHist, numberOfPV, numberOfPC);
+
 
 	auto& PC_fitmomentumOut_pt = s.PC_fitmomentumOut_pt;
 	auto& PC_fitmomentumOut_phi = s.PC_fitmomentumOut_phi;
+
+    std::vector<bool> vcuts;
 
 // Probably a good idea to keep track of whether each conversion 
 // candidate passes particular cuts, to ease later code 
 // with gamma-gamma invariant mass
 	for(int i=0; i<PC_x.GetSize(); i++){
+        vcuts.push_back(false);
 		x = PC_x[i];
 		y = PC_y[i];
 		z = PC_z[i];
@@ -252,6 +260,7 @@ void histset::AnalyzeEntry(myselector& s){
 
 		//make quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
+            vcuts[i] = true;
 			FillTH1(id_r1dcutHist, r);
 			FillTH1(id_r1dwidecutHist, r);
 			FillTH2(id_xycutHist, x, y);
@@ -316,8 +325,9 @@ void histset::AnalyzeEntry(myselector& s){
                 double yj = PC_y[j];
                 double Rj = sqrt(xj*xj + yj*yj);
                 if (abs(Ri-3.0)<1.0 && abs(Rj-3.0)<1.0&&min(Ei,Ej)>2.0){
-                    FillTH1(id_mgg1Hist, m12);
+                    FillTH1(id_mggHist, m12);
                     FillTH2(id_mgg2Hist, m12, numberOfPV);
+                    if(vcuts[i]&&vcuts[j])FillTH1(id_mggCutHist, m12);
                 }
             }
         }
@@ -333,5 +343,8 @@ void histset::AnalyzeEntry(myselector& s){
 			FillTH2(id_pxpyHist, px, py);
         }
     }
+//    cout << " vcuts length " << vcuts.size() << endl;
+    vcuts.clear();
+    
 }
 #endif
