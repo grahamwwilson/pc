@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sbatch job_launch.sh dataHPC
-sbatch job_launch.sh mcHPC
+sbatch job_launch.sh testdata
+#sbatch job_launch.sh mcHPC
 
 exit
