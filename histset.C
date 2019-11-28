@@ -13,7 +13,7 @@ using MyTH2D = ROOT::TThreadedObject<TH2D>;
 class histset{
 	
     public:
-//	   double pi =4.0*atan(1.0);
+ 	   double PI =4.0*atan(1.0);
 
        histset();	
        void init(); 
@@ -42,7 +42,7 @@ class histset{
                      id_xywidecutHist,
                      id_npv_rcutHist,
                      id_mgg2Hist,
-                     id_npc_npvHist, 
+                     id_npc_npvHist, id_rhophiHist, 
                      numTH2Hist};
 
 	   //make a big vector and load enumerated histograms onto the vector
@@ -99,7 +99,7 @@ void histset::init(){
 	TH1Manager.at(id_mggCutHist) = new MyTH1D("mggCutHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0,1.0 );
 	TH1Manager.at(id_pTHist) = new MyTH1D("pTHist","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
 	TH1Manager.at(id_EHist) = new MyTH1D("EHist","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
-	TH1Manager.at(id_phiHist) = new MyTH1D("phiHist","Photon Phi;Phi (rad); Entries per bin", 40, -7.0, 7.0 );
+	TH1Manager.at(id_phiHist) = new MyTH1D("phiHist","Photon Phi;Phi (rad); Entries per bin", 40, -PI, PI );
 
 // init TH2D
 	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
@@ -112,6 +112,7 @@ void histset::init(){
 	TH2Manager.at(id_npv_rcutHist) = new MyTH2D("npv_rcutHist", "Conversion Vertices per mm; R (cm); nPV",250,0.0,25.0,100,-0.5,99.5);
 	TH2Manager.at(id_npc_npvHist) = new MyTH2D("npc_npvHist", " ; nPV; nPC",100,-0.5,99.5,100,-0.5,99.5);
 	TH2Manager.at(id_mgg2Hist) = new MyTH2D("mgg2Hist","Di-#gamma Mass;Mass (GeV); nPV", 100, 0.0, 0.25, 100, -0.5, 99.5 );
+	TH2Manager.at(id_rhophiHist) = new MyTH2D("rhophiHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Phi (rad)",100,0.0,5.0,40,-PI,PI);
 }
 
 void histset::FillTH1(int index, double x, double w=1){
@@ -269,6 +270,7 @@ void histset::AnalyzeEntry(myselector& s){
             FillTH1(id_phiHist, phi);
 			rho =  sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0)) ;	
 			FillTH1(id_rhobpHist, rho);
+			FillTH2(id_rhophiHist, rho, phi);
             FillTH2(id_npv_rcutHist, r, numberOfPV);
             FillTH1(id_pTHist, pt);
             FillTH1(id_EHist,E);
