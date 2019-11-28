@@ -31,6 +31,7 @@ class histset{
                        id_r1dwidelowPUcutHist, id_r1dwidemedPUcutHist, id_r1dwidehiPUcutHist, 
                        id_rhobpHist, id_mggHist, id_mggCutHist,
                        id_numnopcHist, id_numpvnopcHist, id_phiHist,
+                       id_mggallHist,
                        id_pTHist, id_EHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
@@ -42,6 +43,7 @@ class histset{
                      id_xywidecutHist,
                      id_npv_rcutHist,
                      id_mgg2Hist,
+                     id_mggRCutHist,
                      id_npc_npvHist, id_rhophiHist, 
                      numTH2Hist};
 
@@ -96,6 +98,7 @@ void histset::init(){
 	TH1Manager.at(id_r1dwidehiPUcutHist) = new MyTH1D("r1dwidehiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",250,0.,25.);
 	TH1Manager.at(id_rhobpHist) = new MyTH1D("rhobpHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
 	TH1Manager.at(id_mggHist) = new MyTH1D("mggHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0, 1.0 );
+	TH1Manager.at(id_mggallHist) = new MyTH1D("mggallHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0, 1.0 );
 	TH1Manager.at(id_mggCutHist) = new MyTH1D("mggCutHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0,1.0 );
 	TH1Manager.at(id_pTHist) = new MyTH1D("pTHist","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
 	TH1Manager.at(id_EHist) = new MyTH1D("EHist","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
@@ -111,7 +114,8 @@ void histset::init(){
 	TH2Manager.at(id_xywidecutHist) = new MyTH2D("xywidecutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
 	TH2Manager.at(id_npv_rcutHist) = new MyTH2D("npv_rcutHist", "Conversion Vertices per mm; R (cm); nPV",250,0.0,25.0,100,-0.5,99.5);
 	TH2Manager.at(id_npc_npvHist) = new MyTH2D("npc_npvHist", " ; nPV; nPC",100,-0.5,99.5,100,-0.5,99.5);
-	TH2Manager.at(id_mgg2Hist) = new MyTH2D("mgg2Hist","Di-#gamma Mass;Mass (GeV); nPV", 100, 0.0, 0.25, 100, -0.5, 99.5 );
+	TH2Manager.at(id_mgg2Hist) = new MyTH2D("mgg2Hist","Di-#gamma Mass;Mass (GeV); nPV", 400, 0.0, 1.0, 100, -0.5, 99.5 );
+	TH2Manager.at(id_mggRCutHist) = new MyTH2D("mggRCutHist","Di-#gamma Mass;Mass (GeV); Radius (cm)", 400, 0.0, 1.0, 25, 0.0, 25.0 );
 	TH2Manager.at(id_rhophiHist) = new MyTH2D("rhophiHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Phi (rad)",100,0.0,5.0,40,-PI,PI);
 }
 
@@ -330,9 +334,15 @@ void histset::AnalyzeEntry(myselector& s){
                 double Rj = sqrt(xj*xj + yj*yj);
                 if (abs(Ri-3.0)<1.0 && abs(Rj-3.0)<1.0&&min(Ei,Ej)>2.0){
                     FillTH1(id_mggHist, m12);
-                    FillTH2(id_mgg2Hist, m12, numberOfPV);
+                    if(vcuts[i]&&vcuts[j])FillTH2(id_mgg2Hist, m12, numberOfPV);
                     if(vcuts[i]&&vcuts[j])FillTH1(id_mggCutHist, m12);
                 }
+                if (vcuts[i]&&vcuts[j]&&min(Ei,Ej)>2.0){
+                    FillTH1(id_mggallHist, m12);
+                    FillTH2(id_mggRCutHist, m12, Ri);
+                    FillTH2(id_mggRCutHist, m12, Rj);
+                }
+
             }
         }
     }//end numpc
