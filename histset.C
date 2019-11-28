@@ -30,7 +30,7 @@ class histset{
                        id_r1dwidelowPUHist, id_r1dwidemedPUHist, id_r1dwidehiPUHist, 
                        id_r1dwidelowPUcutHist, id_r1dwidemedPUcutHist, id_r1dwidehiPUcutHist, 
                        id_rhobpHist, id_mggHist, id_mggCutHist,
-                       id_numnopcHist, id_numpvnopcHist,
+                       id_numnopcHist, id_numpvnopcHist, id_phiHist,
                        id_pTHist, id_EHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
@@ -94,11 +94,12 @@ void histset::init(){
 	TH1Manager.at(id_r1dwidelowPUcutHist) = new MyTH1D("r1dwidelowPUcutHist","Conversion Radius: Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",250,0.,25.);
 	TH1Manager.at(id_r1dwidemedPUcutHist) = new MyTH1D("r1dwidemedPUcutHist","Conversion Radius: Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",250,0.,25.);
 	TH1Manager.at(id_r1dwidehiPUcutHist) = new MyTH1D("r1dwidehiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",250,0.,25.);
-	TH1Manager.at(id_rhobpHist) = new MyTH1D("rhobpHist","Conversion Radius w.r.t Beam Pipe and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
+	TH1Manager.at(id_rhobpHist) = new MyTH1D("rhobpHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
 	TH1Manager.at(id_mggHist) = new MyTH1D("mggHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0, 1.0 );
 	TH1Manager.at(id_mggCutHist) = new MyTH1D("mggCutHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0,1.0 );
 	TH1Manager.at(id_pTHist) = new MyTH1D("pTHist","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
 	TH1Manager.at(id_EHist) = new MyTH1D("EHist","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
+	TH1Manager.at(id_phiHist) = new MyTH1D("phiHist","Photon Phi;Phi (rad); Entries per bin", 40, -7.0, 7.0 );
 
 // init TH2D
 	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
@@ -177,8 +178,8 @@ void histset::AnalyzeEntry(myselector& s){
 
 	double fitprob;
 
-	//beam pipe displacement
-	double x0 =  0.171;
+	//beam pipe displacement (in cm) from Anna's DPF2019 talk
+    double x0 =  0.171;
     double y0 = -0.176;
    	double rho;
 
@@ -265,6 +266,7 @@ void histset::AnalyzeEntry(myselector& s){
 			FillTH1(id_r1dwidecutHist, r);
 			FillTH2(id_xycutHist, x, y);
 			FillTH2(id_xywidecutHist, x, y);
+            FillTH1(id_phiHist, phi);
 			rho =  sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0)) ;	
 			FillTH1(id_rhobpHist, rho);
             FillTH2(id_npv_rcutHist, r, numberOfPV);
