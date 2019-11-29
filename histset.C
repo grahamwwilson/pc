@@ -31,7 +31,7 @@ class histset{
                        id_r1dwidelowPUcutHist, id_r1dwidemedPUcutHist, id_r1dwidehiPUcutHist, 
                        id_rhobpHist, id_mggHist, id_mggCutHist,
                        id_numnopcHist, id_numpvnopcHist, id_phiHist,
-                       id_mggallHist,
+                       id_mggallHist, id_pfitHist, id_zHist, id_costhetaHist,
                        id_pTHist, id_EHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
@@ -80,6 +80,10 @@ void histset::init(){
 	TH1Manager.at(id_rerrHist) = new MyTH1D("rerrHist", "Conversion Radial Error; #Delta R (cm); Entries per 0.05 bin", 40, 0.0, 2.0);
 	TH1Manager.at(id_phierrHist) = new MyTH1D("phierrHist", "Conversion Azimuthal Error;#Delta #phi; Entries per 0.002 bin",50, 0.0, 0.1);
 	TH1Manager.at(id_zerrHist) = new MyTH1D("zerrHist","Conversion Z Error;#Delta z (cm); Entries per 0.1 bin", 50, 0.0, 5.0);
+	TH1Manager.at(id_pfitHist) = new MyTH1D("pfitHist","Photon Conversions;Fit probability; ", 100, 0.0, 1.0);
+	TH1Manager.at(id_zHist) = new MyTH1D("zHist","Photon Conversions; z (cm); ", 200, -25.0, 25.0);
+	TH1Manager.at(id_costhetaHist) = new MyTH1D("costhetaHist","Photon Conversions; cos(theta); ", 200, -1.0, 1.0);
+	TH1Manager.at(id_pfitHist) = new MyTH1D("pfitHist","Photon Conversions;Fit probability; ", 100, 0.0, 1.0);
 	TH1Manager.at(id_r1dHist) = new MyTH1D("r1dHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",100, 0.0, 10.0);
 	TH1Manager.at(id_r1dwideHist) = new MyTH1D("r1dwideHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
 	TH1Manager.at(id_r1dcutHist) = new MyTH1D("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 100, 0.0, 10.0);
@@ -233,8 +237,6 @@ void histset::AnalyzeEntry(myselector& s){
 		r = sqrt( x*x + y*y );
 		phi = atan2(y, x);
 		theta = PC_fitmomentumOut_theta[i];
-		
-	
 
 		vxx = PC_vtx_sigmaxx[i];
 		vxy = PC_vtx_sigmaxy[i];
@@ -261,6 +263,10 @@ void histset::AnalyzeEntry(myselector& s){
            FillTH1(id_rerrHist, rerr);
            FillTH1(id_phierrHist, phierr);
            FillTH1(id_zerrHist, zerr);
+           FillTH1(id_pfitHist, fitprob);
+           FillTH1(id_zHist, z);
+           FillTH1(id_costhetaHist, cos(theta));
+         
     	   FillTH2(id_xyHist, x, y);
            FillTH2(id_xywideHist, x, y);
            FillTH2(id_rphiHist, r, phi);
