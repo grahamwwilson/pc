@@ -20,7 +20,7 @@ class histset{
 
        void AnalyzeEntry(myselector& s); 
        //bookeeping enumeration: 
-       //(if we do this we dont need to worry about hist pointer copies and merging)
+       //(if we do this we don't need to worry about hist pointer copies and merging)
        enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
                        id_rerrHist, id_phierrHist, id_zerrHist,
                        id_r1dHist, id_r1dcutHist, 
@@ -234,10 +234,7 @@ void histset::AnalyzeEntry(myselector& s){
 		phi = atan2(y, x);
 		theta = PC_fitmomentumOut_theta[i];
 		
-		FillTH2(id_xyHist, x, y);
-		FillTH2(id_xywideHist, x, y);
-		FillTH2(id_rphiHist, r, phi);
-		FillTH2(id_rzHist, z, r);	
+	
 
 		vxx = PC_vtx_sigmaxx[i];
 		vxy = PC_vtx_sigmaxy[i];
@@ -254,15 +251,21 @@ void histset::AnalyzeEntry(myselector& s){
 		phierr = sqrt(varsum_phi)/r;
 		zerr = sqrt(vzz);
 
-		FillTH1(id_rerrHist, rerr);
-		FillTH1(id_phierrHist, phierr);
-		FillTH1(id_zerrHist, zerr);
-
 	 	fitprob = TMath::Prob(PC_vtx_chi2[i], 3);
 		//make r plots with quality cuts and without
-		
-		FillTH1(id_r1dHist, r);
-		FillTH1(id_r1dwideHist, r);
+
+// Apply fiducial cuts to all candidates
+		if(abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
+           FillTH1(id_r1dHist, r);
+           FillTH1(id_r1dwideHist, r);
+           FillTH1(id_rerrHist, rerr);
+           FillTH1(id_phierrHist, phierr);
+           FillTH1(id_zerrHist, zerr);
+    	   FillTH2(id_xyHist, x, y);
+           FillTH2(id_xywideHist, x, y);
+           FillTH2(id_rphiHist, r, phi);
+           FillTH2(id_rzHist, z, r);
+        }
 
 		//make quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
@@ -309,7 +312,8 @@ void histset::AnalyzeEntry(myselector& s){
 		}				
 	}
 
-	//gamma gamma stuff IS THIS LOOP CORRECT?
+	//gamma gamma stuff IS THIS LOOP CORRECT
+    // Can also speed this up a bit ...
  	if (numberOfPC>=2){
         for(unsigned int i=0; i<numberOfPC-1; i++){
             double pxi = PC_fitmomentumOut_pt[i]*cos(PC_fitmomentumOut_phi[i]);
