@@ -33,6 +33,7 @@ class histset{
                        id_numnopcHist, id_numpvnopcHist, id_phiHist,
                        id_mggallHist, id_pfitHist, id_zHist, id_costhetaHist,
                        id_pTHist, id_EHist,
+                       id_pTHist2, id_EHist2, id_phiHist2,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -107,6 +108,9 @@ void histset::init(){
 	TH1Manager.at(id_pTHist) = new MyTH1D("pTHist","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
 	TH1Manager.at(id_EHist) = new MyTH1D("EHist","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
 	TH1Manager.at(id_phiHist) = new MyTH1D("phiHist","Photon Phi;Phi (rad); Entries per bin", 40, -PI, PI );
+	TH1Manager.at(id_pTHist2) = new MyTH1D("pTHist2","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
+	TH1Manager.at(id_EHist2) = new MyTH1D("EHist2","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
+	TH1Manager.at(id_phiHist2) = new MyTH1D("phiHist2","Photon Phi;Phi (rad); Entries per bin", 40, -PI, PI );
 
 // init TH2D
 	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
@@ -265,12 +269,14 @@ void histset::AnalyzeEntry(myselector& s){
            FillTH1(id_zerrHist, zerr);
            FillTH1(id_pfitHist, fitprob);
            FillTH1(id_zHist, z);
-           FillTH1(id_costhetaHist, cos(theta));
-         
+           FillTH1(id_costhetaHist, cos(theta));      
     	   FillTH2(id_xyHist, x, y);
            FillTH2(id_xywideHist, x, y);
            FillTH2(id_rphiHist, r, phi);
            FillTH2(id_rzHist, z, r);
+           FillTH1(id_pTHist2, pt);
+           FillTH1(id_EHist2,E);
+           FillTH1(id_phiHist2, phi);
         }
 
 		//make quality cuts
