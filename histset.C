@@ -34,7 +34,7 @@ class histset{
                        id_mggallHist, id_pfitHist, id_zHist, id_costhetaHist,
                        id_pTHist, id_EHist,
                        id_pTHist2, id_EHist2, id_phiHist2, id_runHist,
-                       id_isdataHist, id_nPUHist,
+                       id_isdataHist, id_nPUHist, id_PUHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -115,6 +115,7 @@ void histset::init(){
 	TH1Manager.at(id_runHist) = new MyTH1D("runHist",";Run Number; Events per bin", 5000, 320500.5, 325500.5);
 	TH1Manager.at(id_isdataHist) = new MyTH1D("isdataHist",";isData; Events per bin", 2, -0.5, 1.5);
 	TH1Manager.at(id_nPUHist) = new MyTH1D("nPUHist",";nPU (MC truth); Events per bin", 100, -0.5, 99.5);
+	TH1Manager.at(id_PUHist) = new MyTH1D("PUDistributionHist",";PU (MC); Events per bin", 400, -0.5, 99.5);
 
 // init TH2D
 	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
@@ -195,9 +196,13 @@ void histset::AnalyzeEntry(myselector& s){
 	auto numberOfPC = *(s.numberOfPC);
 	auto numberOfPV = *(s.numberOfPV);
 
+	auto& PC_fitmomentumOut_pt = s.PC_fitmomentumOut_pt;
+	auto& PC_fitmomentumOut_phi = s.PC_fitmomentumOut_phi;
+
 	double px,py,pz;
 	double x,y,z;
 	double r,theta,phi;
+    double rho,phip;
 	
 	const double RERRCUT = 0.25;
 	const double COSTCUT = 0.85;
@@ -207,10 +212,11 @@ void histset::AnalyzeEntry(myselector& s){
 	double fitprob;
 
 	//beam pipe displacement (in cm) from Anna's DPF2019 talk
-    double x0 =  0.171;
-    double y0 = -0.176;
-   	double rho;
-
+    const double x0data =  0.171;
+    const double y0data = -0.176;
+    const double x0mc =  0.0;
+    const double y0mc =  0.0;
+    double x0,y0;
 
 	//error calcs
 	double vxx,vxy,vyy,vzz; //variances
@@ -220,8 +226,15 @@ void histset::AnalyzeEntry(myselector& s){
 
     FillTH1(id_runHist, runNumber);
     FillTH1(id_isdataHist, isRealData);
-    if(!isRealData){
-// MC
+    if(isRealData){
+       x0 = x0data;
+       y0 = y0data;
+    }
+    else
+    {
+// MC  
+       x0 = x0mc;
+       y0 = y0mc;
        FillTH1(id_nPUHist, nMCPU);
     }
 
@@ -240,9 +253,15 @@ void histset::AnalyzeEntry(myselector& s){
 	FillTH1(id_numpvHist, numberOfPV);
 	FillTH2(id_npc_npvHist, numberOfPV, numberOfPC);
 
-
-	auto& PC_fitmomentumOut_pt = s.PC_fitmomentumOut_pt;
-	auto& PC_fitmomentumOut_phi = s.PC_fitmomentumOut_phi;
+// Pileup values (here assume first 12 are in-time, next 4 are out-of-time?)
+    if(!isRealData){
+       int sum1 = 0;
+       for(int i=0; i<16; i++){
+           sum1 += mcpu[i];
+//std::accumulate(mcpu.begin(), mcpu.end(), 0);
+       }
+       FillTH1(id_PUHist, double(sum1)/16.0);
+    }
 
     std::vector<bool> vcuts;
 
@@ -263,6 +282,9 @@ void histset::AnalyzeEntry(myselector& s){
 		r = sqrt( x*x + y*y );
 		phi = atan2(y, x);
 		theta = PC_fitmomentumOut_theta[i];
+
+		rho  =  sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0)) ;
+        phip =  atan2(y-y0, x-x0);
 
 		vxx = PC_vtx_sigmaxx[i];
 		vxy = PC_vtx_sigmaxy[i];
@@ -308,10 +330,9 @@ void histset::AnalyzeEntry(myselector& s){
 			FillTH1(id_r1dwidecutHist, r);
 			FillTH2(id_xycutHist, x, y);
 			FillTH2(id_xywidecutHist, x, y);
-            FillTH1(id_phiHist, phi);
-			rho =  sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0)) ;	
+            FillTH1(id_phiHist, phi);	
 			FillTH1(id_rhobpHist, rho);
-			FillTH2(id_rhophiHist, rho, phi);
+			FillTH2(id_rhophiHist, rho, phip);
             FillTH2(id_npv_rcutHist, r, numberOfPV);
             FillTH1(id_pTHist, pt);
             FillTH1(id_EHist,E);
