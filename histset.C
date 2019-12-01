@@ -33,7 +33,8 @@ class histset{
                        id_numnopcHist, id_numpvnopcHist, id_phiHist,
                        id_mggallHist, id_pfitHist, id_zHist, id_costhetaHist,
                        id_pTHist, id_EHist,
-                       id_pTHist2, id_EHist2, id_phiHist2,
+                       id_pTHist2, id_EHist2, id_phiHist2, id_runHist,
+                       id_isdataHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -111,6 +112,8 @@ void histset::init(){
 	TH1Manager.at(id_pTHist2) = new MyTH1D("pTHist2","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
 	TH1Manager.at(id_EHist2) = new MyTH1D("EHist2","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
 	TH1Manager.at(id_phiHist2) = new MyTH1D("phiHist2","Photon Phi;Phi (rad); Entries per bin", 40, -PI, PI );
+	TH1Manager.at(id_runHist) = new MyTH1D("runHist",";Run Number; Events per bin", 5000, 320500.5, 325500.5);
+	TH1Manager.at(id_isdataHist) = new MyTH1D("isdataHist",";isData; Events per bin", 2, -0.5, 1.5);
 
 // init TH2D
 	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
@@ -175,6 +178,16 @@ void histset::AnalyzeEntry(myselector& s){
 	auto& PC_y = s.PC_y;
 	auto& PC_z = s.PC_z;
 
+// New variables
+    auto& PC_mpair = s.PC_pairInvariantMass;
+    auto& PC_cottheta = s.PC_pairCotThetaSeparation;
+    auto& PC_dist = s.PC_distOfMinimumApproach;
+    auto& PC_dphi = s.PC_dPhiTracksAtVtx;
+    auto isRealData = *(s.isRealData);
+    auto lumiSection = *(s.lumiSection);
+    auto& mcpu = s.MC_PUInfo_numberOfInteractions; 
+    auto runNumber = *(s.runNumber);
+
 	auto& PC_vtx_chi2 = s.PC_vtx_chi2;
 
 	auto numberOfPC = *(s.numberOfPC);
@@ -202,6 +215,9 @@ void histset::AnalyzeEntry(myselector& s){
 	double varsum_r, varsum_phi; //intermediate calculation variables
 	double rerr,phierr,zerr;//errors
 	double sphi,cphi;
+
+    FillTH1(id_runHist, runNumber);
+    FillTH1(id_isdataHist, isRealData);
 
 // Skip the MC events with no PCs for now.
     if(numberOfPC < 1){

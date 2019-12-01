@@ -1,4 +1,4 @@
-void myplotcomp(string histtype="zerrHist", float ymax=360000000.0, float ymin=1.0e5)
+void myplotcomp(string histtype="zHist", float ymax=3500000.0, float ymin=0.0, float xlmin = 0.58, float ylmin = 0.66)
 {
 
 TCanvas *c1 = new TCanvas("c1","multipads",800,600);
@@ -44,7 +44,7 @@ cout << "Scale = " << scale << endl;
 //scale=ratio;  // Overwrite with PV based one.
 hm->Scale(scale);
 
-hd->GetYaxis()->SetTitle("Conversion vertices per mm");
+hd->GetYaxis()->SetTitle("   ");
 hd->SetTitle(" ");
 
 hd->SetLineColor(kBlue);
@@ -61,13 +61,13 @@ hm->Print();
 // Also need a legend ...
 const float dx=0.28;
 const float dy=0.20;
-float xlmin = 0.58;
-float ylmin = 0.66;
+//float xlmin = 0.58;
+//float ylmin = 0.66;
 TLegend* leg = new TLegend(xlmin,ylmin,xlmin+dx,ylmin+dy);
 leg->SetLineWidth(2);
 leg->SetTextFont(62);
 leg->SetTextSize(0.05);
-leg->SetHeader("16 < n_{PV} < 36","C");
+//leg->SetHeader("16 < n_{PV} < 36","C");
 leg->AddEntry(hd,"2018 Data","l");
 leg->AddEntry(hm,"2018 MC","l");
 leg->SetBorderSize(0);                          // Include border
