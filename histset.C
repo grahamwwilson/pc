@@ -7,6 +7,7 @@
 #include "TTreeReader.h"
 #include "TTreeReaderValue.h"
 #include "myselector.C"
+#include "myweights.h"
 using MyTH1D = ROOT::TThreadedObject<TH1D>;
 using MyTH2D = ROOT::TThreadedObject<TH2D>;
 
@@ -22,11 +23,12 @@ class histset{
        //bookeeping enumeration: 
        //(if we do this we don't need to worry about hist pointer copies and merging)
        enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
+                       id_numpvWHist,
                        id_rerrHist, id_phierrHist, id_zerrHist,
                        id_r1dHist, id_r1dcutHist, 
                        id_r1dlowPUHist, id_r1dmedPUHist, id_r1dhiPUHist, 
                        id_r1dlowPUcutHist, id_r1dmedPUcutHist, id_r1dhiPUcutHist, 
-                       id_r1dwideHist, id_r1dwidecutHist, 
+                       id_r1dwideHist, id_r1dwidecutHist, id_r1dwidecutWHist,
                        id_r1dwidelowPUHist, id_r1dwidemedPUHist, id_r1dwidehiPUHist, 
                        id_r1dwidelowPUcutHist, id_r1dwidemedPUcutHist, id_r1dwidehiPUcutHist, 
                        id_rhobpHist, id_mggHist, id_mggCutHist,
@@ -77,6 +79,7 @@ void histset::init(){
     TH1Manager.at(id_pzHist) = new MyTH1D("pzHist", "p_{Z} Distribution;p_{Z};dN/dp_{Z}", 100, 0.0, 5.0);
 	TH1Manager.at(id_numpcHist) = new MyTH1D("numpcHist", "Number of PC;;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_numpvHist) = new MyTH1D("numpvHist", "Number of PV;;Entries per bin", 100,-0.5, 99.5);
+	TH1Manager.at(id_numpvWHist) = new MyTH1D("numpvWHist", "Number of PV;;Entries per bin", 200,-0.5, 199.5);
 	TH1Manager.at(id_numnopcHist) = new MyTH1D("numnopcHist", "Number of no PC;;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_numpvnopcHist) = new MyTH1D("numpvnopcHist", "Number of PV (no PC);;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_rerrHist) = new MyTH1D("rerrHist", "Conversion Radial Error; #Delta R (cm); Entries per 0.05 bin", 40, 0.0, 2.0);
@@ -90,6 +93,7 @@ void histset::init(){
 	TH1Manager.at(id_r1dwideHist) = new MyTH1D("r1dwideHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
 	TH1Manager.at(id_r1dcutHist) = new MyTH1D("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 100, 0.0, 10.0);
 	TH1Manager.at(id_r1dwidecutHist) = new MyTH1D("r1dwidecutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+	TH1Manager.at(id_r1dwidecutWHist) = new MyTH1D("r1dwidecutWHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dlowPUHist) = new MyTH1D("r1dlowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dmedPUHist) = new MyTH1D("r1dmedPUHist","Conversion Radius: No Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dhiPUHist) = new MyTH1D("r1dhiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
@@ -223,18 +227,27 @@ void histset::AnalyzeEntry(myselector& s){
 	double varsum_r, varsum_phi; //intermediate calculation variables
 	double rerr,phierr,zerr;//errors
 	double sphi,cphi;
+    
+    double PUwt;
 
     FillTH1(id_runHist, runNumber);
     FillTH1(id_isdataHist, isRealData);
     if(isRealData){
        x0 = x0data;
        y0 = y0data;
+       PUwt = 1.0;
     }
     else
     {
 // MC  
        x0 = x0mc;
        y0 = y0mc;
+       if(numberOfPV<100){
+          PUwt = wt[numberOfPV];
+       }
+       else{
+          PUwt = wt[100];
+       }
        FillTH1(id_nPUHist, nMCPU);
     }
 
@@ -251,6 +264,7 @@ void histset::AnalyzeEntry(myselector& s){
 
 	FillTH1(id_numpcHist, numberOfPC);
 	FillTH1(id_numpvHist, numberOfPV);
+	FillTH1(id_numpvWHist, numberOfPV, PUwt);
 	FillTH2(id_npc_npvHist, numberOfPV, numberOfPC);
 
 // Pileup values (here assume first 12 are in-time, next 4 are out-of-time?)
@@ -328,6 +342,7 @@ void histset::AnalyzeEntry(myselector& s){
             vcuts[i] = true;
 			FillTH1(id_r1dcutHist, r);
 			FillTH1(id_r1dwidecutHist, r);
+			FillTH1(id_r1dwidecutWHist, r, PUwt);
 			FillTH2(id_xycutHist, x, y);
 			FillTH2(id_xywidecutHist, x, y);
             FillTH1(id_phiHist, phi);	
