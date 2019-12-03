@@ -1,4 +1,4 @@
-void myplotcomp(string histtype="numpvHist", float ymax=16000000.0, float ymin=100.0, float xlmin = 0.58, float ylmin = 0.66)
+void myplotcomp(string histtype="rhobpHist", float ymax=5000000.0, float ymin=0.0, float xlmin = 0.12, float ylmin = 0.66)
 {
 
 TCanvas *c1 = new TCanvas("c1","multipads",800,600);
@@ -51,8 +51,8 @@ c1->SetTicks(1,1);
 //scale=ratio;  // Overwrite with PV based one.
 hm->Scale(scale);
 
-hd->GetXaxis()->SetTitle("Number of Primary Vertices");
-hd->GetYaxis()->SetTitle("Events per bin");
+hd->GetXaxis()->SetTitle("Rho (cm)");
+hd->GetYaxis()->SetTitle("Conversions per bin");
 hd->SetTitle(" ");
 
 hd->SetLineColor(kBlue);
@@ -81,7 +81,7 @@ leg->AddEntry(hm,"2018 MC","l");
 leg->SetBorderSize(0);                          // Include border
 leg->Draw();
 
-   TLatex * tex = new TLatex(0.11,0.91,"CMS Work in progress");
+   TLatex * tex = new TLatex(0.18,0.91,"CMS Work in progress");
    tex->SetNDC();
    tex->SetTextFont(61);
    tex->SetTextSize(0.035);

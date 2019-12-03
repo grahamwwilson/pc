@@ -118,6 +118,7 @@ void histset::init(){
 	TH1Manager.at(id_phiHist2) = new MyTH1D("phiHist2","Photon Phi;Phi (rad); Entries per bin", 40, -PI, PI );
 	TH1Manager.at(id_runHist) = new MyTH1D("runHist",";Run Number; Events per bin", 5000, 320500.5, 325500.5);
 	TH1Manager.at(id_isdataHist) = new MyTH1D("isdataHist",";isData; Events per bin", 2, -0.5, 1.5);
+// These two are only relevant if MC
 	TH1Manager.at(id_nPUHist) = new MyTH1D("nPUHist",";nPU (MC truth); Events per bin", 100, -0.5, 99.5);
 	TH1Manager.at(id_PUHist) = new MyTH1D("PUDistributionHist",";PU (MC); Events per bin", 400, -0.5, 99.5);
 
@@ -236,6 +237,8 @@ void histset::AnalyzeEntry(myselector& s){
        x0 = x0data;
        y0 = y0data;
        PUwt = 1.0;
+//Fix
+       FillTH1(id_nPUHist, 1.0);
     }
     else
     {
@@ -272,9 +275,12 @@ void histset::AnalyzeEntry(myselector& s){
        int sum1 = 0;
        for(int i=0; i<16; i++){
            sum1 += mcpu[i];
-//std::accumulate(mcpu.begin(), mcpu.end(), 0);
        }
        FillTH1(id_PUHist, double(sum1)/16.0);
+    }
+    else{
+// Fix for data
+       FillTH1(id_PUHist, 0.0);
     }
 
     std::vector<bool> vcuts;
