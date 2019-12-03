@@ -57,7 +57,7 @@ class histset{
 
 	   //locate the histogram and perform pointer copying 
        void FillTH1(int index, double x, double w);
-       void FillTH2(int index, double x, double y);
+       void FillTH2(int index, double x, double y, double w);
 	
        void WriteHist(); 
 };
@@ -137,15 +137,15 @@ void histset::init(){
 	TH2Manager.at(id_rhophiHist) = new MyTH2D("rhophiHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Phi (rad)",100,0.0,5.0,40,-PI,PI);
 }
 
-void histset::FillTH1(int index, double x, double w=1){
+void histset::FillTH1(int index, double x, double w=1.0){
 	//we must make pointer copies for performance reasons when trying to fill a histogram
 	auto myhist = TH1Manager.at(index)->Get();
 	myhist->Fill(x,w);
 }
 
-void histset::FillTH2(int index, double x, double y){
+void histset::FillTH2(int index, double x, double y, double w=1.0){
 	auto myhist = TH2Manager.at(index)->Get();
-	myhist->Fill(x,y);
+	myhist->Fill(x,y,w);
 }
 
 void histset::WriteHist(){
@@ -179,8 +179,6 @@ void histset::AnalyzeEntry(myselector& s){
 	auto& PC_vtx_sigmayy = s.PC_vtx_sigmayy;
 	auto& PC_vtx_sigmazz = s.PC_vtx_sigmazz;
 
-	auto& PC_fitmomentumOut_theta = s.PC_fitmomentumOut_theta;
-
 	auto& PC_x = s.PC_x;
 	auto& PC_y = s.PC_y;
 	auto& PC_z = s.PC_z;
@@ -203,6 +201,8 @@ void histset::AnalyzeEntry(myselector& s){
 
 	auto& PC_fitmomentumOut_pt = s.PC_fitmomentumOut_pt;
 	auto& PC_fitmomentumOut_phi = s.PC_fitmomentumOut_phi;
+	auto& PC_fitmomentumOut_theta = s.PC_fitmomentumOut_theta;
+//	auto& PC_fitmomentumOut_mass = s.PC_fitmomentumOut_mass;
 
 	double px,py,pz;
 	double x,y,z;
