@@ -7,3 +7,5 @@ compiledthreads
 *.log
 *.pdf
 histset.C1
+SlimTree
+Performance.ods
