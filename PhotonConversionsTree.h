@@ -384,17 +384,17 @@ void PhotonConversionsTree::Init(TTree *tree)
    fChain->SetBranchAddress("runNumber", &runNumber, &b_runNumber);
    fChain->SetBranchAddress("lumiSection", &lumiSection, &b_lumiSection);
    fChain->SetBranchAddress("numberOfPV", &numberOfPV, &b_numberOfPV);
-   fChain->SetBranchAddress("PV_x", &PV_x, &b_PV_x);
+/* fChain->SetBranchAddress("PV_x", &PV_x, &b_PV_x);
    fChain->SetBranchAddress("PV_y", &PV_y, &b_PV_y);
    fChain->SetBranchAddress("PV_z", &PV_z, &b_PV_z);
    fChain->SetBranchAddress("PV_xError", &PV_xError, &b_PV_xError);
    fChain->SetBranchAddress("PV_yError", &PV_yError, &b_PV_yError);
    fChain->SetBranchAddress("PV_zError", &PV_zError, &b_PV_zError);
-   fChain->SetBranchAddress("PV_isFake", &PV_isFake, &b_PV_isFake);
+   fChain->SetBranchAddress("PV_isFake", &PV_isFake, &b_PV_isFake); */
    fChain->SetBranchAddress("numberOfMC_PUInfo", &numberOfMC_PUInfo, &b_numberOfMC_PUInfo);
-   fChain->SetBranchAddress("MC_PUInfo_bunchCrossing", &MC_PUInfo_bunchCrossing, &b_MC_PUInfo_bunchCrossing);
+// fChain->SetBranchAddress("MC_PUInfo_bunchCrossing", &MC_PUInfo_bunchCrossing, &b_MC_PUInfo_bunchCrossing);
    fChain->SetBranchAddress("MC_PUInfo_numberOfInteractions", &MC_PUInfo_numberOfInteractions, &b_MC_PUInfo_numberOfInteractions);
-   fChain->SetBranchAddress("BS_x", &BS_x, &b_BS_x);
+/* fChain->SetBranchAddress("BS_x", &BS_x, &b_BS_x);
    fChain->SetBranchAddress("BS_y", &BS_y, &b_BS_y);
    fChain->SetBranchAddress("BS_z", &BS_z, &b_BS_z);
    fChain->SetBranchAddress("BS_zSigma", &BS_zSigma, &b_BS_zSigma);
@@ -429,15 +429,15 @@ void PhotonConversionsTree::Init(TTree *tree)
    fChain->SetBranchAddress("MC_TrkV_associationPC_deltaR2d", &MC_TrkV_associationPC_deltaR2d, &b_MC_TrkV_associationPC_deltaR2d);
    fChain->SetBranchAddress("MC_TrkV_associationPC_deltaR3d", &MC_TrkV_associationPC_deltaR3d, &b_MC_TrkV_associationPC_deltaR3d);
    fChain->SetBranchAddress("MC_TrkV_associationPC_deltaR3dPerpendicular", &MC_TrkV_associationPC_deltaR3dPerpendicular, &b_MC_TrkV_associationPC_deltaR3dPerpendicular);
-   fChain->SetBranchAddress("MC_TrkV_associationPC_deltaR3dParallel", &MC_TrkV_associationPC_deltaR3dParallel, &b_MC_TrkV_associationPC_deltaR3dParallel);
+   fChain->SetBranchAddress("MC_TrkV_associationPC_deltaR3dParallel", &MC_TrkV_associationPC_deltaR3dParallel, &b_MC_TrkV_associationPC_deltaR3dParallel); */
    fChain->SetBranchAddress("numberOfPC", &numberOfPC, &b_numberOfPC);
    fChain->SetBranchAddress("PC_x", &PC_x, &b_PC_x);
    fChain->SetBranchAddress("PC_y", &PC_y, &b_PC_y);
    fChain->SetBranchAddress("PC_z", &PC_z, &b_PC_z);
-   fChain->SetBranchAddress("PC_momentumOut_pt", &PC_momentumOut_pt, &b_PC_momentumOut_pt);
+/* fChain->SetBranchAddress("PC_momentumOut_pt", &PC_momentumOut_pt, &b_PC_momentumOut_pt);
    fChain->SetBranchAddress("PC_momentumOut_phi", &PC_momentumOut_phi, &b_PC_momentumOut_phi);
    fChain->SetBranchAddress("PC_momentumOut_theta", &PC_momentumOut_theta, &b_PC_momentumOut_theta);
-   fChain->SetBranchAddress("PC_momentumOut_numberOfTracks", &PC_momentumOut_numberOfTracks, &b_PC_momentumOut_numberOfTracks);
+   fChain->SetBranchAddress("PC_momentumOut_numberOfTracks", &PC_momentumOut_numberOfTracks, &b_PC_momentumOut_numberOfTracks); */
    fChain->SetBranchAddress("PC_fitmomentumOut_pt", &PC_fitmomentumOut_pt, &b_PC_fitmomentumOut_pt);
    fChain->SetBranchAddress("PC_fitmomentumOut_phi", &PC_fitmomentumOut_phi, &b_PC_fitmomentumOut_phi);
    fChain->SetBranchAddress("PC_fitmomentumOut_theta", &PC_fitmomentumOut_theta, &b_PC_fitmomentumOut_theta);
@@ -447,20 +447,20 @@ void PhotonConversionsTree::Init(TTree *tree)
    fChain->SetBranchAddress("PC_distOfMinimumApproach", &PC_distOfMinimumApproach, &b_PC_distOfMinimumApproach);
    fChain->SetBranchAddress("PC_dPhiTracksAtVtx", &PC_dPhiTracksAtVtx, &b_PC_dPhiTracksAtVtx);
    fChain->SetBranchAddress("PC_vtx_chi2", &PC_vtx_chi2, &b_PC_vtx_chi2);
-   fChain->SetBranchAddress("PC_vtx_ndof", &PC_vtx_ndof, &b_PC_vtx_ndof);
-   fChain->SetBranchAddress("PC_vtx_normalizedChi2", &PC_vtx_normalizedChi2, &b_PC_vtx_normalizedChi2);
+// fChain->SetBranchAddress("PC_vtx_ndof", &PC_vtx_ndof, &b_PC_vtx_ndof);
+// fChain->SetBranchAddress("PC_vtx_normalizedChi2", &PC_vtx_normalizedChi2, &b_PC_vtx_normalizedChi2);
    fChain->SetBranchAddress("PC_vtx_sigmaxx", &PC_vtx_sigmaxx, &b_PC_vtx_sigmaxx);
    fChain->SetBranchAddress("PC_vtx_sigmayy", &PC_vtx_sigmayy, &b_PC_vtx_sigmayy);
    fChain->SetBranchAddress("PC_vtx_sigmazz", &PC_vtx_sigmazz, &b_PC_vtx_sigmazz);
    fChain->SetBranchAddress("PC_vtx_sigmaxy", &PC_vtx_sigmaxy, &b_PC_vtx_sigmaxy);
-   fChain->SetBranchAddress("PC_vtx_sigmaxz", &PC_vtx_sigmaxz, &b_PC_vtx_sigmaxz);
-   fChain->SetBranchAddress("PC_vtx_sigmayz", &PC_vtx_sigmayz, &b_PC_vtx_sigmayz);
-   fChain->SetBranchAddress("PC_vTrack_algo", &PC_vTrack_algo, &b_PC_vTrack_algo);
-   fChain->SetBranchAddress("PC_vTrack_charge", &PC_vTrack_charge, &b_PC_vTrack_charge);
+// fChain->SetBranchAddress("PC_vtx_sigmaxz", &PC_vtx_sigmaxz, &b_PC_vtx_sigmaxz);
+// fChain->SetBranchAddress("PC_vtx_sigmayz", &PC_vtx_sigmayz, &b_PC_vtx_sigmayz);
+// fChain->SetBranchAddress("PC_vTrack_algo", &PC_vTrack_algo, &b_PC_vTrack_algo);
+// fChain->SetBranchAddress("PC_vTrack_charge", &PC_vTrack_charge, &b_PC_vTrack_charge);
    fChain->SetBranchAddress("PC_vTrack_pt", &PC_vTrack_pt, &b_PC_vTrack_pt);
    fChain->SetBranchAddress("PC_vTrack_eta", &PC_vTrack_eta, &b_PC_vTrack_eta);
    fChain->SetBranchAddress("PC_vTrack_phi", &PC_vTrack_phi, &b_PC_vTrack_phi);
-   fChain->SetBranchAddress("PC_vTrack_chi2", &PC_vTrack_chi2, &b_PC_vTrack_chi2);
+/* fChain->SetBranchAddress("PC_vTrack_chi2", &PC_vTrack_chi2, &b_PC_vTrack_chi2);
    fChain->SetBranchAddress("PC_vTrack_normalizedChi2", &PC_vTrack_normalizedChi2, &b_PC_vTrack_normalizedChi2);
    fChain->SetBranchAddress("PC_vTrack_rho", &PC_vTrack_rho, &b_PC_vTrack_rho);
    fChain->SetBranchAddress("PC_vTrack_numberOfValidHits", &PC_vTrack_numberOfValidHits, &b_PC_vTrack_numberOfValidHits);
@@ -473,7 +473,7 @@ void PhotonConversionsTree::Init(TTree *tree)
    fChain->SetBranchAddress("PC_vTrack_closestDzPVIdx_dz", &PC_vTrack_closestDzPVIdx_dz, &b_PC_vTrack_closestDzPVIdx_dz);
    fChain->SetBranchAddress("PC_fTrack_pt", &PC_fTrack_pt, &b_PC_fTrack_pt);
    fChain->SetBranchAddress("PC_fTrack_eta", &PC_fTrack_eta, &b_PC_fTrack_eta);
-   fChain->SetBranchAddress("PC_fTrack_phi", &PC_fTrack_phi, &b_PC_fTrack_phi);
+   fChain->SetBranchAddress("PC_fTrack_phi", &PC_fTrack_phi, &b_PC_fTrack_phi); */
    Notify();
 }
 

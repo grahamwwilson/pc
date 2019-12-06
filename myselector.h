@@ -29,7 +29,7 @@ public :
    // Readers to access the data (delete the ones you do not need).
    // Now have commented out ones that are not used.
    TTreeReaderValue<Bool_t> isRealData = {fReader, "isRealData"};
-//   TTreeReaderValue<UInt_t> eventNumber = {fReader, "eventNumber"};
+   TTreeReaderValue<UInt_t> eventNumber = {fReader, "eventNumber"};
    TTreeReaderValue<UInt_t> runNumber = {fReader, "runNumber"};
    TTreeReaderValue<UInt_t> lumiSection = {fReader, "lumiSection"};
    TTreeReaderValue<UInt_t> numberOfPV = {fReader, "numberOfPV"};
@@ -78,16 +78,15 @@ public :
    TTreeReaderArray<double> MC_TrkV_associationPC_deltaR2d = {fReader, "MC_TrkV_associationPC_deltaR2d"};
    TTreeReaderArray<double> MC_TrkV_associationPC_deltaR3d = {fReader, "MC_TrkV_associationPC_deltaR3d"};
    TTreeReaderArray<double> MC_TrkV_associationPC_deltaR3dPerpendicular = {fReader, "MC_TrkV_associationPC_deltaR3dPerpendicular"};
-   TTreeReaderArray<double> MC_TrkV_associationPC_deltaR3dParallel = {fReader, "MC_TrkV_associationPC_deltaR3dParallel"};
-*/
+   TTreeReaderArray<double> MC_TrkV_associationPC_deltaR3dParallel = {fReader, "MC_TrkV_associationPC_deltaR3dParallel"}; */
    TTreeReaderValue<UInt_t> numberOfPC = {fReader, "numberOfPC"};
    TTreeReaderArray<double> PC_x = {fReader, "PC_x"};
    TTreeReaderArray<double> PC_y = {fReader, "PC_y"};
    TTreeReaderArray<double> PC_z = {fReader, "PC_z"};
-//   TTreeReaderArray<double> PC_momentumOut_pt = {fReader, "PC_momentumOut_pt"};
-//   TTreeReaderArray<double> PC_momentumOut_phi = {fReader, "PC_momentumOut_phi"};
-//   TTreeReaderArray<double> PC_momentumOut_theta = {fReader, "PC_momentumOut_theta"};
-//   TTreeReaderArray<unsigned int> PC_momentumOut_numberOfTracks = {fReader, "PC_momentumOut_numberOfTracks"};
+/*   TTreeReaderArray<double> PC_momentumOut_pt = {fReader, "PC_momentumOut_pt"};
+   TTreeReaderArray<double> PC_momentumOut_phi = {fReader, "PC_momentumOut_phi"};
+   TTreeReaderArray<double> PC_momentumOut_theta = {fReader, "PC_momentumOut_theta"};
+   TTreeReaderArray<unsigned int> PC_momentumOut_numberOfTracks = {fReader, "PC_momentumOut_numberOfTracks"};   */
    TTreeReaderArray<double> PC_fitmomentumOut_pt = {fReader, "PC_fitmomentumOut_pt"};
    TTreeReaderArray<double> PC_fitmomentumOut_phi = {fReader, "PC_fitmomentumOut_phi"};
    TTreeReaderArray<double> PC_fitmomentumOut_theta = {fReader, "PC_fitmomentumOut_theta"};
@@ -110,14 +109,14 @@ public :
    TTreeReaderArray<vector<double>> PC_vTrack_pt = {fReader, "PC_vTrack_pt"};
    TTreeReaderArray<vector<double>> PC_vTrack_eta = {fReader, "PC_vTrack_eta"};
    TTreeReaderArray<vector<double>> PC_vTrack_phi = {fReader, "PC_vTrack_phi"};
-//   TTreeReaderArray<vector<double>> PC_vTrack_chi2 = {fReader, "PC_vTrack_chi2"};
-//   TTreeReaderArray<vector<double>> PC_vTrack_normalizedChi2 = {fReader, "PC_vTrack_normalizedChi2"};
-//   TTreeReaderArray<vector<double>> PC_vTrack_rho = {fReader, "PC_vTrack_rho"};
-//   TTreeReaderArray<vector<unsigned int>> PC_vTrack_numberOfValidHits = {fReader, "PC_vTrack_numberOfValidHits"};
-//   TTreeReaderArray<vector<unsigned int>> PC_vTrack_numberOfExpectedOuterHits = {fReader, "PC_vTrack_numberOfExpectedOuterHits"};
-//   TTreeReaderArray<vector<unsigned int>> PC_vTrack_closestDxyPVIdx = {fReader, "PC_vTrack_closestDxyPVIdx"};
-//   TTreeReaderArray<vector<double>> PC_vTrack_closestDxyPVIdx_dxy = {fReader, "PC_vTrack_closestDxyPVIdx_dxy"};
-/*   TTreeReaderArray<vector<double>> PC_vTrack_closestDxyPVIdx_dz = {fReader, "PC_vTrack_closestDxyPVIdx_dz"};
+/*   TTreeReaderArray<vector<double>> PC_vTrack_chi2 = {fReader, "PC_vTrack_chi2"};
+   TTreeReaderArray<vector<double>> PC_vTrack_normalizedChi2 = {fReader, "PC_vTrack_normalizedChi2"};
+   TTreeReaderArray<vector<double>> PC_vTrack_rho = {fReader, "PC_vTrack_rho"};
+   TTreeReaderArray<vector<unsigned int>> PC_vTrack_numberOfValidHits = {fReader, "PC_vTrack_numberOfValidHits"};
+   TTreeReaderArray<vector<unsigned int>> PC_vTrack_numberOfExpectedOuterHits = {fReader, "PC_vTrack_numberOfExpectedOuterHits"};
+   TTreeReaderArray<vector<unsigned int>> PC_vTrack_closestDxyPVIdx = {fReader, "PC_vTrack_closestDxyPVIdx"};
+   TTreeReaderArray<vector<double>> PC_vTrack_closestDxyPVIdx_dxy = {fReader, "PC_vTrack_closestDxyPVIdx_dxy"};
+   TTreeReaderArray<vector<double>> PC_vTrack_closestDxyPVIdx_dz = {fReader, "PC_vTrack_closestDxyPVIdx_dz"};
    TTreeReaderArray<vector<unsigned int>> PC_vTrack_closestDzPVIdx = {fReader, "PC_vTrack_closestDzPVIdx"};
    TTreeReaderArray<vector<double>> PC_vTrack_closestDzPVIdx_dxy = {fReader, "PC_vTrack_closestDzPVIdx_dxy"};
    TTreeReaderArray<vector<double>> PC_vTrack_closestDzPVIdx_dz = {fReader, "PC_vTrack_closestDzPVIdx_dz"};
