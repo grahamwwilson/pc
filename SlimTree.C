@@ -20,17 +20,23 @@ using namespace std;
 #include "PhotonConversionsTree.h"
 
 void produceReducedTree(PhotonConversionsTree& selector, std::string ofilename){
-	//copy branches to output file	
-	auto ofile =  new TFile(ofilename.c_str(), "RECREATE");
-	auto reducedTree = selector.fChain->CloneTree();
+    //copy branches to output file	
+    auto ofile =  new TFile(ofilename.c_str(), "RECREATE");
+    auto reducedTree = selector.fChain->CloneTree();
     reducedTree->Print();
-	reducedTree->Write();
-	ofile->Write();
-	ofile->Close();
+    reducedTree->Write();
+    ofile->Write();
+    ofile->Close();
     cout << "output file written" << endl;
 }
 
-int main(){
+int main(int argc, char *argv[]){
+
+   // Display each command-line argument.
+   cout << "Command-line arguments: " << endl;
+   for( int i = 0; i < argc; i++ )
+        cout << "  argv[" << i << "]   "
+                << argv[i] << endl;
 
    TChain* chain;
  
