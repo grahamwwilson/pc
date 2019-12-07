@@ -12,6 +12,7 @@
 #include "TTreeReader.h"
 #include "TTreeReaderValue.h"
 #include <vector>
+#include <string>
 #include "TFile.h"
 #include "histset.C"
 #include "myselector.C"
@@ -20,6 +21,16 @@
 
 int main(int argc, char *argv[])
 {
+
+// Need to make it digest both the original trees 
+// and the slimmed trees at least for now.
+// Code assumes that all files that are included at any one time 
+// have the same tree name.
+
+// Original name
+   std::string treestring = "MyNtupleMaking/PhotonConversionsTree";
+   std::string filestring;
+   std::string searchstring = "_R1.root";
 
    //set nthreads from first input argument
    int nthreads = std::atoi (argv[1]);
@@ -31,7 +42,12 @@ int main(int argc, char *argv[])
    //load up the list of files to be processed
    std::vector<std::string_view> ifilelist{};
    for(int i=2; i<argc; i++){
+      filestring = argv[i];
       std::cout << "File " << argv[i] << endl;
+      if(filestring.find(searchstring) != std::string::npos){
+// searchstring found. Update the name for the _R1 slimmed versions.
+         treestring = "PhotonConversionsTree";
+      }
 	  ifilelist.push_back(std::string_view(argv[i]));
    }
 	
@@ -40,7 +56,8 @@ int main(int argc, char *argv[])
 
   //TODO make tree name input argument argv[2]
 //   ROOT::TTreeProcessorMT tp(ifilelist,"MyNtupleMaking/PhotonConversionsTree");
-   ROOT::TTreeProcessorMT tp(ifilelist,"PhotonConversionsTree");
+//   ROOT::TTreeProcessorMT tp(ifilelist,"PhotonConversionsTree");
+    ROOT::TTreeProcessorMT tp(ifilelist,treestring);
    // Define the function that will process a subrange of the tree.
    // The function must receive only one parameter, a TTreeReader,
    // and it must be thread safe. To enforce the latter requirement,
