@@ -153,15 +153,31 @@ void histset::WriteHist(){
 	TFile* outfile = new TFile("Outfile.root", "RECREATE");
 
 	for(int i=0; i<numTH1Hist; i++){
-		auto histmerged = TH1Manager.at(i)->Merge();
-		TH1D* h = (TH1D*) histmerged->Clone();
-		outfile->WriteObject(h, h->GetName() );
+	//do a check for entries, merge isn't safe for empty histograms
+        auto hptr = TH1Manager.at(i)->Get();
+	    if(hptr->GetEntries() > 0){	
+           auto histmerged = TH1Manager.at(i)->Merge();
+           TH1D* h = (TH1D*) histmerged->Clone();
+		   outfile->WriteObject(h, h->GetName() );
+        }
+        else{
+           auto h = TH1Manager.at(i)->Get()->Clone();
+           outfile->WriteObject(h, h->GetName() );
+        }
 	}
 
 	for(int i=0; i<numTH2Hist; i++){
-		auto histmerged = TH2Manager.at(i)->Merge();
-		TH2D* h = (TH2D*) histmerged->Clone();
-		outfile->WriteObject(h, h->GetName() );
+	//do a check for entries, merge isn't safe for empty histograms
+        auto hptr = TH2Manager.at(i)->Get();
+	    if(hptr->GetEntries() > 0){
+           auto histmerged = TH2Manager.at(i)->Merge();
+           TH2D* h = (TH2D*) histmerged->Clone();
+		   outfile->WriteObject(h, h->GetName() );
+        }
+        else{
+           auto h = TH2Manager.at(i)->Get()->Clone();
+           outfile->WriteObject(h, h->GetName() );
+        }
 	}	
 }
 
