@@ -238,7 +238,7 @@ void histset::AnalyzeEntry(myselector& s){
        y0 = y0data;
        PUwt = 1.0;
 //Fix
-       FillTH1(id_nPUHist, 1.0);
+//       FillTH1(id_nPUHist, 1.0);
     }
     else
     {
@@ -280,7 +280,7 @@ void histset::AnalyzeEntry(myselector& s){
     }
     else{
 // Fix for data
-       FillTH1(id_PUHist, 0.0);
+//       FillTH1(id_PUHist, 0.0);
     }
 
     std::vector<bool> vcuts;
