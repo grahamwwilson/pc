@@ -38,14 +38,19 @@ int main(int argc, char *argv[]){
         cout << "  argv[" << i << "]   "
                 << argv[i] << endl;
 
+   std::string ifilename = argv[1];
+   std::string ofilename = argv[2];
+
    TChain* chain;
  
    chain = (TChain*) new TChain("MyNtupleMaking/PhotonConversionsTree");	  
-   chain->Add("Run2018_1210_SecondCopy.root");
+//   chain->Add("Run2018_1210_SecondCopy.root");
+   chain->Add(ifilename.c_str());
    chain->Print();
  
    PhotonConversionsTree *tree = new PhotonConversionsTree(chain);
 
-   produceReducedTree(*tree,"OutputTree.root");
+//   produceReducedTree(*tree,"OutputTree.root");
+   produceReducedTree(*tree,ofilename);
   
 }
