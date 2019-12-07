@@ -1,12 +1,9 @@
-//#include "TROOT.h"
-//
 #ifndef PARTREE
 #define PARTREE
 
 #include "TH1D.h"
 #include "TH2D.h"
 #include "ROOT/TThreadedObject.hxx"
-//#include "ROOT/Math/GenVector/LorentzVector.h"
 #include "Math/GenVector/LorentzVector.h"
 
 #include "ROOT/TTreeProcessorMT.hxx"
@@ -20,11 +17,6 @@
 #include "myselector.C"
 
 #include <iostream>
-//#include "mytreevalues.c"
-//#include "TLorentzVector.h"
-//storage for threaded objects
-//std::vector<ROOT::TThreadedObject<TH1F> > th1vec{};
-//std::vector<ROOT::TThreadedObject<TH2F> > th2vec{};
 
 int main(int argc, char *argv[])
 {
@@ -46,7 +38,8 @@ int main(int argc, char *argv[])
    histset h;
 
   //TODO make tree name input argument argv[2]
-   ROOT::TTreeProcessorMT tp(ifilelist,"MyNtupleMaking/PhotonConversionsTree");
+//   ROOT::TTreeProcessorMT tp(ifilelist,"MyNtupleMaking/PhotonConversionsTree");
+   ROOT::TTreeProcessorMT tp(ifilelist,"PhotonConversionsTree");
    // Define the function that will process a subrange of the tree.
    // The function must receive only one parameter, a TTreeReader,
    // and it must be thread safe. To enforce the latter requirement,
