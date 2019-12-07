@@ -31,7 +31,8 @@ int main(int argc, char *argv[])
    //load up the list of files to be processed
    std::vector<std::string_view> ifilelist{};
    for(int i=2; i<argc; i++){
-	ifilelist.push_back(std::string_view(argv[i]));
+      std::cout << "File " << argv[i] << endl;
+	  ifilelist.push_back(std::string_view(argv[i]));
    }
 	
    //Create our ThreadedHistograms and Analysis Class
