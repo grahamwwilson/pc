@@ -9,7 +9,7 @@ sbatch job_launch.sh DataW-HPC1
 sbatch job_launch.sh DataW-HPC2
 
 # 2 MC jobs
-sbatch job_launch.sh MCW-HPCA
-sbatch job_launch.sh MCW-HPCB
+#sbatch job_launch.sh MCW-HPCA
+#sbatch job_launch.sh MCW-HPCB
 
 exit
