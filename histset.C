@@ -245,16 +245,14 @@ void histset::AnalyzeEntry(myselector& s){
 	double rerr,phierr,zerr;//errors
 	double sphi,cphi;
     
-    double PUwt;
+    double wtPU;
 
     FillTH1(id_runHist, runNumber);
     FillTH1(id_isdataHist, isRealData);
     if(isRealData){
        x0 = x0data;
        y0 = y0data;
-       PUwt = 1.0;
-//Fix
-//       FillTH1(id_nPUHist, 1.0);
+       wtPU = 1.0;
     }
     else
     {
@@ -262,10 +260,10 @@ void histset::AnalyzeEntry(myselector& s){
        x0 = x0mc;
        y0 = y0mc;
        if(numberOfPV<100){
-          PUwt = wt[numberOfPV];
+          wtPU = wt[numberOfPV];
        }
        else{
-          PUwt = wt[100];
+          wtPU = wt[100];
        }
        FillTH1(id_nPUHist, nMCPU);
     }
@@ -281,10 +279,10 @@ void histset::AnalyzeEntry(myselector& s){
        FillTH1(id_numpvnopcHist, -1);
     }
 
-	FillTH1(id_numpcHist, numberOfPC);
+	FillTH1(id_numpcHist, numberOfPC, wtPU);
 	FillTH1(id_numpvHist, numberOfPV);
-	FillTH1(id_numpvWHist, numberOfPV, PUwt);
-	FillTH2(id_npc_npvHist, numberOfPV, numberOfPC);
+	FillTH1(id_numpvWHist, numberOfPV, wtPU);
+	FillTH2(id_npc_npvHist, numberOfPV, numberOfPC, wtPU);
 
 // Pileup values (here assume first 12 are in-time, next 4 are out-of-time?)
     if(!isRealData){
@@ -293,10 +291,6 @@ void histset::AnalyzeEntry(myselector& s){
            sum1 += mcpu[i];
        }
        FillTH1(id_PUHist, double(sum1)/16.0);
-    }
-    else{
-// Fix for data
-//       FillTH1(id_PUHist, 0.0);
     }
 
     std::vector<bool> vcuts;
@@ -342,64 +336,64 @@ void histset::AnalyzeEntry(myselector& s){
 
 // Apply fiducial cuts to all candidates
 		if(abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-           FillTH1(id_r1dHist, r);
-           FillTH1(id_r1dwideHist, r);
-           FillTH1(id_rerrHist, rerr);
-           FillTH1(id_phierrHist, phierr);
-           FillTH1(id_zerrHist, zerr);
-           FillTH1(id_pfitHist, fitprob);
-           FillTH1(id_zHist, z);
-           FillTH1(id_costhetaHist, cos(theta));      
-    	   FillTH2(id_xyHist, x, y);
-           FillTH2(id_xywideHist, x, y);
-           FillTH2(id_rphiHist, r, phi);
-           FillTH2(id_rzHist, z, r);
-           FillTH1(id_pTHist2, pt);
-           FillTH1(id_EHist2,E);
-           FillTH1(id_phiHist2, phi);
+           FillTH1(id_r1dHist, r, wtPU);
+           FillTH1(id_r1dwideHist, r, wtPU);
+           FillTH1(id_rerrHist, rerr, wtPU);
+           FillTH1(id_phierrHist, phierr), wtPU;
+           FillTH1(id_zerrHist, zerr, wtPU);
+           FillTH1(id_pfitHist, fitprob, wtPU);
+           FillTH1(id_zHist, z, wtPU);
+           FillTH1(id_costhetaHist, cos(theta), wtPU);      
+    	   FillTH2(id_xyHist, x, y, wtPU);
+           FillTH2(id_xywideHist, x, y), wtPU;
+           FillTH2(id_rphiHist, r, phi, wtPU);
+           FillTH2(id_rzHist, z, r, wtPU);
+           FillTH1(id_pTHist2, pt, wtPU);
+           FillTH1(id_EHist2,E,wtPU);
+           FillTH1(id_phiHist2, phi,wtPU);
         }
 
 		//make quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
             vcuts[i] = true;
-			FillTH1(id_r1dcutHist, r);
+			FillTH1(id_r1dcutHist, r, wtPU);
 			FillTH1(id_r1dwidecutHist, r);
-			FillTH1(id_r1dwidecutWHist, r, PUwt);
-			FillTH2(id_xycutHist, x, y);
-			FillTH2(id_xywidecutHist, x, y);
-            FillTH1(id_phiHist, phi);	
-			FillTH1(id_rhobpHist, rho);
-			FillTH2(id_rhophiHist, rho, phip);
-            FillTH2(id_npv_rcutHist, r, numberOfPV);
-            FillTH1(id_pTHist, pt);
-            FillTH1(id_EHist,E);
+			FillTH1(id_r1dwidecutWHist, r, wtPU);
+			FillTH2(id_xycutHist, x, y, wtPU);
+			FillTH2(id_xywidecutHist, x, y, wtPU);
+            FillTH1(id_phiHist, phi, wtPU);	
+			FillTH1(id_rhobpHist, rho, wtPU);
+			FillTH2(id_rhophiHist, rho, phip, wtPU);
+            FillTH2(id_npv_rcutHist, r, numberOfPV, wtPU);
+            FillTH1(id_pTHist, pt, wtPU);
+            FillTH1(id_EHist,E, wtPU);
 		}			
 	
 		//pileup cuts
 		if( numberOfPV <= 16){
-			FillTH1(id_r1dlowPUHist, r);
-			FillTH1(id_r1dwidelowPUHist, r);
+			FillTH1(id_r1dlowPUHist, r, wtPU);
+			FillTH1(id_r1dwidelowPUHist, r, wtPU) ;
 			//low PU quality cuts
 			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-				FillTH1(id_r1dlowPUcutHist, r);
-				FillTH1(id_r1dwidelowPUcutHist, r);
+				FillTH1(id_r1dlowPUcutHist, r, wtPU);
+				FillTH1(id_r1dwidelowPUcutHist, r, wtPU);
 			}
 		}
 		if( numberOfPV > 16 && numberOfPV < 36){
-			FillTH1(id_r1dmedPUHist, r);
-			FillTH1(id_r1dwidemedPUHist, r);
+			FillTH1(id_r1dmedPUHist, r, wtPU);
+			FillTH1(id_r1dwidemedPUHist, r, wtPU);
 			//low PU quality cuts
 			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-				FillTH1(id_r1dmedPUcutHist, r);
-				FillTH1(id_r1dwidemedPUcutHist, r);
+				FillTH1(id_r1dmedPUcutHist, r, wtPU);
+				FillTH1(id_r1dwidemedPUcutHist, r, wtPU);
 			}
 		}
 		if( numberOfPV >= 36){
-			FillTH1(id_r1dhiPUHist, r);
-			FillTH1(id_r1dwidehiPUHist, r);
+			FillTH1(id_r1dhiPUHist, r, wtPU);
+			FillTH1(id_r1dwidehiPUHist, r, wtPU);
 			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-				FillTH1(id_r1dhiPUcutHist, r);
-				FillTH1(id_r1dwidehiPUcutHist, r);
+				FillTH1(id_r1dhiPUcutHist, r, wtPU);
+				FillTH1(id_r1dwidehiPUcutHist, r, wtPU);
 			}
 		}				
 	}
@@ -429,14 +423,14 @@ void histset::AnalyzeEntry(myselector& s){
                 double yj = PC_y[j];
                 double Rj = sqrt(xj*xj + yj*yj);
                 if (abs(Ri-3.0)<1.0 && abs(Rj-3.0)<1.0&&min(Ei,Ej)>2.0){
-                    FillTH1(id_mggHist, m12);
-                    if(vcuts[i]&&vcuts[j])FillTH2(id_mgg2Hist, m12, numberOfPV);
-                    if(vcuts[i]&&vcuts[j])FillTH1(id_mggCutHist, m12);
+                    FillTH1(id_mggHist, m12, wtPU);
+                    if(vcuts[i]&&vcuts[j])FillTH2(id_mgg2Hist, m12, numberOfPV, wtPU);
+                    if(vcuts[i]&&vcuts[j])FillTH1(id_mggCutHist, m12, wtPU);
                 }
                 if (vcuts[i]&&vcuts[j]&&min(Ei,Ej)>2.0){
-                    FillTH1(id_mggallHist, m12);
-                    FillTH2(id_mggRCutHist, m12, Ri);
-                    FillTH2(id_mggRCutHist, m12, Rj);
+                    FillTH1(id_mggallHist, m12, wtPU);
+                    FillTH2(id_mggRCutHist, m12, Ri, wtPU);
+                    FillTH2(id_mggRCutHist, m12, Rj, wtPU);
                 }
 
             }
@@ -448,9 +442,9 @@ void histset::AnalyzeEntry(myselector& s){
 			px = PC_vTrack_pt[i][j] * cos( PC_vTrack_phi[i][j] );
 			py = PC_vTrack_pt[i][j] * sin( PC_vTrack_phi[i][j] );
 			pz = PC_vTrack_pt[i][j] * sinh( PC_vTrack_eta[i][j] );
-            FillTH1(id_ptHist, PC_vTrack_pt[i][j], 1./PC_vTrack_pt[i][j]);
-			FillTH1(id_pzHist, pz);
-			FillTH2(id_pxpyHist, px, py);
+            FillTH1(id_ptHist, PC_vTrack_pt[i][j], wtPU/PC_vTrack_pt[i][j]);
+			FillTH1(id_pzHist, pz, wtPU);
+			FillTH2(id_pxpyHist, px, py, wtPU);
         }
     }
 //    cout << " vcuts length " << vcuts.size() << endl;
