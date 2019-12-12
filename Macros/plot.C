@@ -1,4 +1,5 @@
-void myplotcomp(string histtype="numpvWHist", float ymax=20000000.0, float ymin=0.1, float xlmin = 0.56, float ylmin = 0.66)
+void plot(string histtype="rerrHist", float ymax=20000000.0, 
+          float ymin=0.1, float xlmin = 0.56, float ylmin = 0.66)
 {
 
 TCanvas *c1 = new TCanvas("c1","multipads",800,600);
@@ -9,8 +10,8 @@ TFile *fm = new TFile("../PC_MCHPC.root");
 TH1D * hd = (TH1D*)fd->Get(histtype.c_str());
 TH1D * hm = (TH1D*)fm->Get(histtype.c_str());
 
-TH1D * hdpv = (TH1D*)fd->Get("numpvHist");
-TH1D * hmpv = (TH1D*)fm->Get("numpvHist");
+TH1D * hdpv = (TH1D*)fd->Get("numpvWHist");
+TH1D * hmpv = (TH1D*)fm->Get("numpvWHist");
 
 hd->Print();
 hm->Print();

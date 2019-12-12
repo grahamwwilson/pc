@@ -339,18 +339,18 @@ void histset::AnalyzeEntry(myselector& s){
            FillTH1(id_r1dHist, r, wtPU);
            FillTH1(id_r1dwideHist, r, wtPU);
            FillTH1(id_rerrHist, rerr, wtPU);
-           FillTH1(id_phierrHist, phierr), wtPU;
+           FillTH1(id_phierrHist, phierr, wtPU);
            FillTH1(id_zerrHist, zerr, wtPU);
            FillTH1(id_pfitHist, fitprob, wtPU);
            FillTH1(id_zHist, z, wtPU);
            FillTH1(id_costhetaHist, cos(theta), wtPU);      
     	   FillTH2(id_xyHist, x, y, wtPU);
-           FillTH2(id_xywideHist, x, y), wtPU;
+           FillTH2(id_xywideHist, x, y, wtPU);
            FillTH2(id_rphiHist, r, phi, wtPU);
            FillTH2(id_rzHist, z, r, wtPU);
            FillTH1(id_pTHist2, pt, wtPU);
-           FillTH1(id_EHist2,E,wtPU);
-           FillTH1(id_phiHist2, phi,wtPU);
+           FillTH1(id_EHist2, E, wtPU);
+           FillTH1(id_phiHist2, phi, wtPU);
         }
 
 		//make quality cuts
