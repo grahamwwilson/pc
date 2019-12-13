@@ -1,4 +1,4 @@
-void plot(string histtype="rerrHist", float ymax=20000000.0, 
+void plot(string histtype="rhobpHist", float ymax=20000000.0, 
           float ymin=0.1, float xlmin = 0.56, float ylmin = 0.66)
 {
 
@@ -14,7 +14,9 @@ TH1D * hdpv = (TH1D*)fd->Get("numpvWHist");
 TH1D * hmpv = (TH1D*)fm->Get("numpvWHist");
 
 hd->Print();
+cout << hd->Integral() << endl;
 hm->Print();
+cout << hm->Integral() << endl;
 
 double scale = double(hd->GetEntries())/double(hm->GetEntries());
 //double scale = 3.19688/2.48492;
@@ -90,6 +92,7 @@ leg->Draw();
    tex->Draw();
 
 // Create include file with the histogram data
+/*
    ofstream outfile;
    string outfilename = "myweights.h2";
    outfile.open(outfilename);
@@ -110,6 +113,7 @@ leg->Draw();
    outfile << "};" << endl;
 
    outfile.close();
+*/
 
 c1->Print((histtype+".pdf").c_str());
 

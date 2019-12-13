@@ -18,6 +18,7 @@ class histset{
 
        histset();	
        void init(); 
+       void setweightoption(); 
 
        void AnalyzeEntry(myselector& s); 
        //bookeeping enumeration: 
@@ -71,11 +72,30 @@ histset::histset(){
     TH2Manager=Manager2;
 
     init();
+    setweightoption();
 
 }
+
+void histset::setweightoption(){
+
+	for(int i=0; i<numTH1Hist; i++){
+        auto hptr = TH1Manager.at(i)->Get();
+        hptr->Sumw2(1);
+    }
+
+	for(int i=0; i<numTH2Hist; i++){
+        auto hptr = TH2Manager.at(i)->Get();
+        hptr->Sumw2(1);
+    }
+
+}
+
 void histset::init(){
 //init TH1D
     TH1Manager.at(id_ptHist) = new MyTH1D("ptHist", "p_{T} Distribution;p_{T};1/p_{T} dN/dp_{T}", 100, 0.0, 5.0);
+//    auto hptr = TH1Manager.at(id_ptHist)->Get();
+//    hptr->Sumw2(1);
+
     TH1Manager.at(id_pzHist) = new MyTH1D("pzHist", "p_{Z} Distribution;p_{Z};dN/dp_{Z}", 100, 0.0, 5.0);
 	TH1Manager.at(id_numpcHist) = new MyTH1D("numpcHist", "Number of PC;;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_numpvHist) = new MyTH1D("numpvHist", "Number of PV;;Entries per bin", 100,-0.5, 99.5);
