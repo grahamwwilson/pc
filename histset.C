@@ -141,9 +141,9 @@ void histset::init(){
 	TH1Manager.at(id_runHist) = new MyTH1D("runHist",";Run Number; Events per bin", 5000, 320500.5, 325500.5);
 	TH1Manager.at(id_isdataHist) = new MyTH1D("isdataHist",";isData; Events per bin", 2, -0.5, 1.5);
 	TH1Manager.at(id_dminHist) = new MyTH1D("dminHist",";dmin; Conversions per bin", 200, -1.0, 1.0);
-	TH1Manager.at(id_dphiHist) = new MyTH1D("dphiHist",";dphi; Conversions per bin", 320, -3.2, 3.2);
-	TH1Manager.at(id_dcotthetaHist) = new MyTH1D("dcotthetaHist",";dcottheta; Conversions per bin", 200, -2.0, 2.0);
-	TH1Manager.at(id_mpairHist) = new MyTH1D("mpairHist",";mpair (GeV); Conversions per bin", 101, -0.01, 1.0);
+	TH1Manager.at(id_dphiHist) = new MyTH1D("dphiHist",";dphi; Conversions per bin", 200, -0.8, 0.8);
+	TH1Manager.at(id_dcotthetaHist) = new MyTH1D("dcotthetaHist",";dcottheta; Conversions per bin", 200, -0.5, 0.5);
+	TH1Manager.at(id_mpairHist) = new MyTH1D("mpairHist",";mpair (GeV); Conversions per bin", 52, -0.005, 0.255);
 // These two are only relevant if MC
 	TH1Manager.at(id_nPUHist) = new MyTH1D("nPUHist",";nPU (MC truth); Events per bin", 100, -0.5, 99.5);
 	TH1Manager.at(id_PUHist) = new MyTH1D("PUDistributionHist",";PU (MC); Events per bin", 400, -0.5, 99.5);
@@ -252,7 +252,7 @@ void histset::AnalyzeEntry(myselector& s){
 	double r,theta,phi;
     double rho,phip;
 	
-	const double RERRCUT = 0.50;
+	const double RERRCUT = 0.25;
 	const double COSTCUT = 0.85;
 	const double ZCUT = 25.0;
 	const double FITPROBCUT = 0.010;
@@ -393,7 +393,14 @@ void histset::AnalyzeEntry(myselector& s){
     auto& PC_dphi = s.PC_dPhiTracksAtVtx; */
            FillTH1(id_dminHist, PC_dmin[i], wtPU);
            FillTH1(id_dphiHist, PC_dphi[i], wtPU);
-           FillTH1(id_mpairHist, PC_mpair[i], wtPU);
+           if(PC_mpair[i]<0.25){
+              FillTH1(id_mpairHist, PC_mpair[i], wtPU);
+           }
+           else{
+//Fill overflow bin
+              FillTH1(id_mpairHist, 0.2501, wtPU);
+           }
+
            FillTH1(id_dcotthetaHist, PC_dcottheta[i], wtPU);
         }
 
