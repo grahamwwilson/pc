@@ -37,7 +37,8 @@ class histset{
                        id_mggallHist, id_pfitHist, id_zHist, id_costhetaHist,
                        id_pTHist, id_EHist,
                        id_pTHist2, id_EHist2, id_phiHist2, id_runHist,
-                       id_isdataHist, id_nPUHist, id_PUHist,
+                       id_isdataHist, id_nPUHist, id_PUHist, id_wtHist,
+                       id_wwtHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -80,22 +81,21 @@ void histset::setweightoption(){
 
 	for(int i=0; i<numTH1Hist; i++){
         auto hptr = TH1Manager.at(i)->Get();
-        hptr->Sumw2(1);
+        hptr->Sumw2(kTRUE);
     }
 
 	for(int i=0; i<numTH2Hist; i++){
         auto hptr = TH2Manager.at(i)->Get();
-        hptr->Sumw2(1);
+        hptr->Sumw2(kTRUE);
     }
 
 }
 
 void histset::init(){
 //init TH1D
+    TH1Manager.at(id_wtHist) = new MyTH1D("wtHist", "Weight Distribution; Weight; Events per bin", 100, 0.0, 10.0);
+    TH1Manager.at(id_wwtHist) = new MyTH1D("wwtHist", "Weighted weight Distribution; Weight; Weighted events per bin", 100, 0.0, 10.0);
     TH1Manager.at(id_ptHist) = new MyTH1D("ptHist", "p_{T} Distribution;p_{T};1/p_{T} dN/dp_{T}", 100, 0.0, 5.0);
-//    auto hptr = TH1Manager.at(id_ptHist)->Get();
-//    hptr->Sumw2(1);
-
     TH1Manager.at(id_pzHist) = new MyTH1D("pzHist", "p_{Z} Distribution;p_{Z};dN/dp_{Z}", 100, 0.0, 5.0);
 	TH1Manager.at(id_numpcHist) = new MyTH1D("numpcHist", "Number of PC;;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_numpvHist) = new MyTH1D("numpvHist", "Number of PV;;Entries per bin", 100,-0.5, 99.5);
@@ -298,6 +298,10 @@ void histset::AnalyzeEntry(myselector& s){
        FillTH1(id_numnopcHist, -1);
        FillTH1(id_numpvnopcHist, -1);
     }
+
+// First check the weight distribution
+    FillTH1(id_wtHist, wtPU);
+    FillTH1(id_wwtHist, wtPU, wtPU);
 
 	FillTH1(id_numpcHist, numberOfPC, wtPU);
 	FillTH1(id_numpvHist, numberOfPV);
