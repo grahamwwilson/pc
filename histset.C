@@ -38,7 +38,8 @@ class histset{
                        id_pTHist, id_EHist,
                        id_pTHist2, id_EHist2, id_phiHist2, id_runHist,
                        id_isdataHist, id_nPUHist, id_PUHist, id_wtHist,
-                       id_wwtHist, id_numpvUWHist,
+                       id_wwtHist, id_numpvUWHist, 
+                       id_dminHist, id_dphiHist, id_mpairHist, id_dcotthetaHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -139,6 +140,10 @@ void histset::init(){
 	TH1Manager.at(id_phiHist2) = new MyTH1D("phiHist2","Photon Phi;Phi (rad); Entries per bin", 40, -PI, PI );
 	TH1Manager.at(id_runHist) = new MyTH1D("runHist",";Run Number; Events per bin", 5000, 320500.5, 325500.5);
 	TH1Manager.at(id_isdataHist) = new MyTH1D("isdataHist",";isData; Events per bin", 2, -0.5, 1.5);
+	TH1Manager.at(id_dminHist) = new MyTH1D("dminHist",";dmin; Conversions per bin", 200, -1.0, 1.0);
+	TH1Manager.at(id_dphiHist) = new MyTH1D("dphiHist",";dphi; Conversions per bin", 320, -3.2, 3.2);
+	TH1Manager.at(id_dcotthetaHist) = new MyTH1D("dcotthetaHist",";dcottheta; Conversions per bin", 200, -2.0, 2.0);
+	TH1Manager.at(id_mpairHist) = new MyTH1D("mpairHist",";mpair (GeV); Conversions per bin", 101, -0.01, 1.0);
 // These two are only relevant if MC
 	TH1Manager.at(id_nPUHist) = new MyTH1D("nPUHist",";nPU (MC truth); Events per bin", 100, -0.5, 99.5);
 	TH1Manager.at(id_PUHist) = new MyTH1D("PUDistributionHist",";PU (MC); Events per bin", 400, -0.5, 99.5);
@@ -222,9 +227,10 @@ void histset::AnalyzeEntry(myselector& s){
 
 // New variables
     auto& PC_mpair = s.PC_pairInvariantMass;
-    auto& PC_cottheta = s.PC_pairCotThetaSeparation;
-    auto& PC_dist = s.PC_distOfMinimumApproach;
+    auto& PC_dcottheta = s.PC_pairCotThetaSeparation;
+    auto& PC_dmin = s.PC_distOfMinimumApproach;
     auto& PC_dphi = s.PC_dPhiTracksAtVtx;
+
     auto isRealData = *(s.isRealData);
     auto lumiSection = *(s.lumiSection);
     auto& mcpu = s.MC_PUInfo_numberOfInteractions; 
@@ -246,14 +252,14 @@ void histset::AnalyzeEntry(myselector& s){
 	double r,theta,phi;
     double rho,phip;
 	
-	const double RERRCUT = 0.25;
+	const double RERRCUT = 0.50;
 	const double COSTCUT = 0.85;
 	const double ZCUT = 25.0;
 	const double FITPROBCUT = 0.010;
 
 // Scale MC to data based on number 
 // of events with at least 1 conversion
-    const double NFACTOR = 3.68068361;
+    const double NFACTOR = 3.68068361*1.00000128;
 
 	double fitprob;
 
@@ -381,6 +387,14 @@ void histset::AnalyzeEntry(myselector& s){
            FillTH1(id_pTHist2, pt, wtPU);
            FillTH1(id_EHist2, E, wtPU);
            FillTH1(id_phiHist2, phi, wtPU);
+/*    auto& PC_mpair = s.PC_pairInvariantMass;
+    auto& PC_dcottheta = s.PC_pairCotThetaSeparation;
+    auto& PC_dmin = s.PC_distOfMinimumApproach;
+    auto& PC_dphi = s.PC_dPhiTracksAtVtx; */
+           FillTH1(id_dminHist, PC_dmin[i], wtPU);
+           FillTH1(id_dphiHist, PC_dphi[i], wtPU);
+           FillTH1(id_mpairHist, PC_mpair[i], wtPU);
+           FillTH1(id_dcotthetaHist, PC_dcottheta[i], wtPU);
         }
 
 		//make quality cuts
@@ -462,7 +476,6 @@ void histset::AnalyzeEntry(myselector& s){
                     FillTH2(id_mggRCutHist, m12, Ri, wtPU);
                     FillTH2(id_mggRCutHist, m12, Rj, wtPU);
                 }
-
             }
         }
     }//end numpc

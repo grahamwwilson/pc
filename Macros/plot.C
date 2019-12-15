@@ -1,5 +1,5 @@
-void plot(string histtype="rhobpHist", float ymax=20000000.0, 
-          float ymin=0.1, float xlmin = 0.56, float ylmin = 0.66)
+void plot(string histtype="rhobpHist", float ymax=5000000.0, 
+          float ymin=0.1, float xlmin = 0.16, float ylmin = 0.66)
 {
 
 TCanvas *c1 = new TCanvas("c1","multipads",800,600);
@@ -10,20 +10,20 @@ TFile *fm = new TFile("../PC_MCHPC.root");
 TH1D * hd = (TH1D*)fd->Get(histtype.c_str());
 TH1D * hm = (TH1D*)fm->Get(histtype.c_str());
 
-TH1D * hdpv = (TH1D*)fd->Get("numpvWHist");
-TH1D * hmpv = (TH1D*)fm->Get("numpvWHist");
+//TH1D * hdpv = (TH1D*)fd->Get("numpvWHist");
+//TH1D * hmpv = (TH1D*)fm->Get("numpvWHist");
 
 hd->Print();
 cout << hd->Integral() << endl;
 hm->Print();
 cout << hm->Integral() << endl;
 
-double scale = double(hd->GetEntries())/double(hm->GetEntries());
+//double scale = double(hd->GetEntries())/double(hm->GetEntries());
 //double scale = 3.19688/2.48492;
-cout << "Scale = " << scale << endl;
+//cout << "Scale = " << scale << endl;
 
+/*
 vector<double> weights;
-
 // Find total number of interactions from PVs 
 long int npvdtotal = 0;
 long int npvmtotal = 0;
@@ -41,6 +41,7 @@ for (int kmult=1; kmult<=99;kmult++){
 }
 double ratio = double(npvdtotal)/double(npvmtotal);
 cout << "Ratio = " << ratio << endl;
+*/
 
 hd->GetYaxis()->SetTitleOffset(1.4);
 hd->SetMaximum(ymax);
@@ -50,9 +51,8 @@ hm->SetStats(kFALSE);
 
 c1->SetTicks(1,1);
 
-
 //scale=ratio;  // Overwrite with PV based one.
-hm->Scale(scale);
+//hm->Scale(scale);
 
 //hd->GetXaxis()->SetTitle("Rho (cm)");
 //hd->GetYaxis()->SetTitle("Conversions per bin");
