@@ -38,7 +38,7 @@ class histset{
                        id_pTHist, id_EHist,
                        id_pTHist2, id_EHist2, id_phiHist2, id_runHist,
                        id_isdataHist, id_nPUHist, id_PUHist, id_wtHist,
-                       id_wwtHist,
+                       id_wwtHist, id_numpvUWHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -93,13 +93,14 @@ void histset::setweightoption(){
 
 void histset::init(){
 //init TH1D
-    TH1Manager.at(id_wtHist) = new MyTH1D("wtHist", "Weight Distribution; Weight; Events per bin", 100, 0.0, 10.0);
-    TH1Manager.at(id_wwtHist) = new MyTH1D("wwtHist", "Weighted weight Distribution; Weight; Weighted events per bin", 100, 0.0, 10.0);
+    TH1Manager.at(id_wtHist) = new MyTH1D("wtHist", "Weight Distribution; Weight; Events per bin", 1000, 0.0, 10.0);
+    TH1Manager.at(id_wwtHist) = new MyTH1D("wwtHist", "Weighted weight Distribution; Weight; Weighted events per bin", 1000, 0.0, 10.0);
     TH1Manager.at(id_ptHist) = new MyTH1D("ptHist", "p_{T} Distribution;p_{T};1/p_{T} dN/dp_{T}", 100, 0.0, 5.0);
     TH1Manager.at(id_pzHist) = new MyTH1D("pzHist", "p_{Z} Distribution;p_{Z};dN/dp_{Z}", 100, 0.0, 5.0);
 	TH1Manager.at(id_numpcHist) = new MyTH1D("numpcHist", "Number of PC;;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_numpvHist) = new MyTH1D("numpvHist", "Number of PV;;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_numpvWHist) = new MyTH1D("numpvWHist", "Number of PV;;Entries per bin", 200,-0.5, 199.5);
+	TH1Manager.at(id_numpvUWHist) = new MyTH1D("numpvUWHist", "Number of PV;;Entries per bin", 200,-0.5, 199.5);
 	TH1Manager.at(id_numnopcHist) = new MyTH1D("numnopcHist", "Number of no PC;;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_numpvnopcHist) = new MyTH1D("numpvnopcHist", "Number of PV (no PC);;Entries per bin", 100,-0.5, 99.5);
 	TH1Manager.at(id_rerrHist) = new MyTH1D("rerrHist", "Conversion Radial Error; #Delta R (cm); Entries per 0.05 bin", 40, 0.0, 2.0);
@@ -250,6 +251,10 @@ void histset::AnalyzeEntry(myselector& s){
 	const double ZCUT = 25.0;
 	const double FITPROBCUT = 0.010;
 
+// Scale MC to data based on number 
+// of events with at least 1 conversion
+    const double NFACTOR = 3.68068361;
+
 	double fitprob;
 
 	//beam pipe displacement (in cm) from Anna's DPF2019 talk
@@ -280,10 +285,10 @@ void histset::AnalyzeEntry(myselector& s){
        x0 = x0mc;
        y0 = y0mc;
        if(numberOfPV<100){
-          wtPU = wt[numberOfPV];
+          wtPU = wt[numberOfPV]*NFACTOR;
        }
        else{
-          wtPU = wt[100];
+          wtPU = wt[100]*NFACTOR;
        }
        FillTH1(id_nPUHist, nMCPU);
     }
@@ -305,6 +310,7 @@ void histset::AnalyzeEntry(myselector& s){
 
 	FillTH1(id_numpcHist, numberOfPC, wtPU);
 	FillTH1(id_numpvHist, numberOfPV);
+	FillTH1(id_numpvUWHist, numberOfPV);
 	FillTH1(id_numpvWHist, numberOfPV, wtPU);
 	FillTH2(id_npc_npvHist, numberOfPV, numberOfPC, wtPU);
 
