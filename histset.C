@@ -259,6 +259,7 @@ void histset::AnalyzeEntry(myselector& s){
 	const double COSTCUT = 0.85;
 	const double ZCUT = 25.0;
 	const double FITPROBCUT = 0.010;
+    const double MASSCUT = 0.15;
 
 // Scale MC to data based on number 
 // of events with at least 1 conversion
@@ -408,7 +409,8 @@ void histset::AnalyzeEntry(myselector& s){
         }
 
 		//make quality cuts
-		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
+		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
+                && fitprob > FITPROBCUT && PC_mpair[i] < MASSCUT){
             vcuts[i] = true;
 			FillTH1(id_r1dcutHist, r, wtPU);
 			FillTH1(id_r1dwidecutHist, r);
