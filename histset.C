@@ -40,6 +40,7 @@ class histset{
                        id_isdataHist, id_nPUHist, id_PUHist, id_wtHist,
                        id_wwtHist, id_numpvUWHist, 
                        id_dminHist, id_dphiHist, id_mpairHist, id_dcotthetaHist,
+                       id_r1dwidecutDHist, id_r1dwidecutDDHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -115,6 +116,8 @@ void histset::init(){
 	TH1Manager.at(id_r1dwideHist) = new MyTH1D("r1dwideHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
 	TH1Manager.at(id_r1dcutHist) = new MyTH1D("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 100, 0.0, 10.0);
 	TH1Manager.at(id_r1dwidecutHist) = new MyTH1D("r1dwidecutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+	TH1Manager.at(id_r1dwidecutDHist) = new MyTH1D("r1dwidecutDHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+	TH1Manager.at(id_r1dwidecutDDHist) = new MyTH1D("r1dwidecutDDHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dwidecutWHist) = new MyTH1D("r1dwidecutWHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dlowPUHist) = new MyTH1D("r1dlowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dmedPUHist) = new MyTH1D("r1dmedPUHist","Conversion Radius: No Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
@@ -410,6 +413,13 @@ void histset::AnalyzeEntry(myselector& s){
 			FillTH1(id_r1dcutHist, r, wtPU);
 			FillTH1(id_r1dwidecutHist, r);
 			FillTH1(id_r1dwidecutWHist, r, wtPU);
+            if(PC_dmin[i]>-998.0){
+   			   FillTH1(id_r1dwidecutDHist, r, wtPU);
+            }
+            if(PC_dmin[i]>0.0){
+   			   FillTH1(id_r1dwidecutDDHist, r, wtPU);
+            }
+
 			FillTH2(id_xycutHist, x, y, wtPU);
 			FillTH2(id_xywidecutHist, x, y, wtPU);
             FillTH1(id_phiHist, phi, wtPU);	
