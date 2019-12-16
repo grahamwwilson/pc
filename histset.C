@@ -155,7 +155,7 @@ void histset::init(){
 	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
 	TH2Manager.at(id_xyHist) = new MyTH2D("xyHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
 	TH2Manager.at(id_xywideHist) = new MyTH2D("xywideHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
-	TH2Manager.at(id_rphiHist) = new MyTH2D("rphiHist", "Conversion Vertices in R-#phi per mm*60mrad bin; R (cm); #phi",100,0.,10.,100,-3.2,3.2);
+	TH2Manager.at(id_rphiHist) = new MyTH2D("rphiHist", "Conversion Vertices in R-#phi per mm*60mrad bin; R (cm); #phi",250,0.0,25.0,40,-PI,PI);
 	TH2Manager.at(id_rzHist) = new MyTH2D("rzHist", "Conversion Vertices in R-z per mm^{2} bin; PC_z (cm); R (cm)",200,-10.,10.,100,0.,10.);
 	TH2Manager.at(id_xycutHist) = new MyTH2D("xycutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
 	TH2Manager.at(id_xywidecutHist) = new MyTH2D("xywidecutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
@@ -386,7 +386,7 @@ void histset::AnalyzeEntry(myselector& s){
            FillTH1(id_costhetaHist, cos(theta), wtPU);      
     	   FillTH2(id_xyHist, x, y, wtPU);
            FillTH2(id_xywideHist, x, y, wtPU);
-           FillTH2(id_rphiHist, r, phi, wtPU);
+//           FillTH2(id_rphiHist, r, phi, wtPU);
            FillTH2(id_rzHist, z, r, wtPU);
            FillTH1(id_pTHist2, pt, wtPU);
            FillTH1(id_EHist2, E, wtPU);
@@ -410,7 +410,7 @@ void histset::AnalyzeEntry(myselector& s){
 
 		//make quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
-                && fitprob > FITPROBCUT && PC_mpair[i] < MASSCUT){
+                && fitprob > FITPROBCUT ){
             vcuts[i] = true;
 			FillTH1(id_r1dcutHist, r, wtPU);
 			FillTH1(id_r1dwidecutHist, r);
@@ -421,6 +421,8 @@ void histset::AnalyzeEntry(myselector& s){
             if(PC_dmin[i]>0.0){
    			   FillTH1(id_r1dwidecutDDHist, r, wtPU);
             }
+
+           FillTH2(id_rphiHist, r, phi, wtPU);
 
 			FillTH2(id_xycutHist, x, y, wtPU);
 			FillTH2(id_xywidecutHist, x, y, wtPU);

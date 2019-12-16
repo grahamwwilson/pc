@@ -1,8 +1,10 @@
 void plot(string histtype="rhobpHist", float ymax=5000000.0, 
-          float ymin=0.1, float xlmin = 0.16, float ylmin = 0.66)
+          float ymin=0.1, float xlmin = 0.16, float ylmin = 0.66, 
+          bool logscale = false)
 {
 
 TCanvas *c1 = new TCanvas("c1","multipads",800,600);
+if(logscale)c1->SetLogy(1);
 
 TFile *fd = new TFile("../PC_DataHPC.root");
 TFile *fm = new TFile("../PC_MCHPC.root");
@@ -115,6 +117,11 @@ leg->Draw();
    outfile.close();
 */
 
+if(logscale){
+c1->Print((histtype+"_Log.pdf").c_str());
+}
+else{
 c1->Print((histtype+".pdf").c_str());
+}
 
 }
