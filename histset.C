@@ -30,6 +30,7 @@ class histset{
                        id_r1dlowPUHist, id_r1dmedPUHist, id_r1dhiPUHist, 
                        id_r1dlowPUcutHist, id_r1dmedPUcutHist, id_r1dhiPUcutHist, 
                        id_r1dwideHist, id_r1dwidecutHist, id_r1dwidecutWHist,
+                       id_r1dwidecutPSHist,
                        id_r1dwidelowPUHist, id_r1dwidemedPUHist, id_r1dwidehiPUHist, 
                        id_r1dwidelowPUcutHist, id_r1dwidemedPUcutHist, id_r1dwidehiPUcutHist, 
                        id_rhobpHist, id_mggHist, id_mggCutHist,
@@ -119,6 +120,7 @@ void histset::init(){
 	TH1Manager.at(id_r1dwidecutDHist) = new MyTH1D("r1dwidecutDHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dwidecutDDHist) = new MyTH1D("r1dwidecutDDHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dwidecutWHist) = new MyTH1D("r1dwidecutWHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+	TH1Manager.at(id_r1dwidecutPSHist) = new MyTH1D("r1dwidecutPSHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dlowPUHist) = new MyTH1D("r1dlowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dmedPUHist) = new MyTH1D("r1dmedPUHist","Conversion Radius: No Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dhiPUHist) = new MyTH1D("r1dhiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
@@ -254,6 +256,7 @@ void histset::AnalyzeEntry(myselector& s){
 	double x,y,z;
 	double r,theta,phi;
     double rho,phip;
+    double rps;
 	
 	const double RERRCUT = 0.25;
 	const double COSTCUT = 0.85;
@@ -267,12 +270,27 @@ void histset::AnalyzeEntry(myselector& s){
 
 	double fitprob;
 
+// We now have various "centers" to compare to for radial coordinates.
+
 	//beam pipe displacement (in cm) from Anna's DPF2019 talk
-    const double x0data =  0.171;
-    const double y0data = -0.176;
-    const double x0mc =  0.0;
-    const double y0mc =  0.0;
-    double x0,y0;
+    const double x0bpdata =  0.171;
+    const double y0bpdata = -0.176;
+    const double x0bpmc = 0.0;
+    const double y0bpmc = 0.0;
+
+    //BPIX center displacement (in cm) (Anna's 16-Dec-2019 talk page 3)
+    const double x0data =  0.086;
+    const double y0data = -0.102;
+    const double x0mc = 0.0;
+    const double y0mc = 0.0;
+
+    //Pixel support displacement (in cm) (Anna's December talk page 4)
+    const double x0psdata = -0.080;
+    const double y0psdata = -0.318;
+    const double x0psmc = 0.0;
+    const double y0psmc = 0.0;
+
+    double x0,y0,x0bp,y0bp,x0ps,y0ps;
 
 	//error calcs
 	double vxx,vxy,vyy,vzz; //variances
@@ -285,15 +303,24 @@ void histset::AnalyzeEntry(myselector& s){
     FillTH1(id_runHist, runNumber);
     FillTH1(id_isdataHist, isRealData);
     if(isRealData){
+       x0bp = x0bpdata;
+       y0bp = y0bpdata;
        x0 = x0data;
        y0 = y0data;
+       x0ps = x0psdata;
+       y0ps = y0psdata;
        wtPU = 1.0;
     }
     else
     {
 // MC  
+       x0bp = x0bpmc;
+       y0bp = y0bpmc;
        x0 = x0mc;
        y0 = y0mc;
+       x0ps = x0psmc;
+       y0ps = y0psmc;
+
        if(numberOfPV<100){
           wtPU = wt[numberOfPV]*NFACTOR;
        }
@@ -349,12 +376,14 @@ void histset::AnalyzeEntry(myselector& s){
         double E = sqrt(px*px + py*py + pz*pz);
         double pt = PC_fitmomentumOut_pt[i]; 
 
-		r = sqrt( x*x + y*y );
-		phi = atan2(y, x);
+		r = sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) );
+		phi = atan2(y-y0, x-x0);
 		theta = PC_fitmomentumOut_theta[i];
 
-		rho  =  sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0)) ;
-        phip =  atan2(y-y0, x-x0);
+		rho  =  sqrt( (x-x0bp)*(x-x0bp) + (y-y0bp)*(y-y0bp)) ;
+        phip =  atan2(y-y0bp, x-x0bp);
+
+		rps = sqrt( (x-x0ps)*(x-x0ps) + (y-y0ps)*(y-y0ps) );
 
 		vxx = PC_vtx_sigmaxx[i];
 		vxy = PC_vtx_sigmaxy[i];
@@ -415,6 +444,7 @@ void histset::AnalyzeEntry(myselector& s){
 			FillTH1(id_r1dcutHist, r, wtPU);
 			FillTH1(id_r1dwidecutHist, r);
 			FillTH1(id_r1dwidecutWHist, r, wtPU);
+			FillTH1(id_r1dwidecutPSHist, rps, wtPU);
             if(PC_dmin[i]>-998.0){
    			   FillTH1(id_r1dwidecutDHist, r, wtPU);
             }
@@ -422,7 +452,7 @@ void histset::AnalyzeEntry(myselector& s){
    			   FillTH1(id_r1dwidecutDDHist, r, wtPU);
             }
 
-           FillTH2(id_rphiHist, r, phi, wtPU);
+            FillTH2(id_rphiHist, r, phi, wtPU);
 
 			FillTH2(id_xycutHist, x, y, wtPU);
 			FillTH2(id_xywidecutHist, x, y, wtPU);

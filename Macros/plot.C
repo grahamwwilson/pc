@@ -1,6 +1,6 @@
 void plot(string histtype="rhobpHist", float ymax=5000000.0, 
           float ymin=0.1, float xlmin = 0.16, float ylmin = 0.66, 
-          bool logscale = false)
+          bool logscale = false, string xtitle=" ", string ytitle = " ")
 {
 
 TCanvas *c1 = new TCanvas("c1","multipads",800,600);
@@ -58,6 +58,10 @@ c1->SetTicks(1,1);
 
 //hd->GetXaxis()->SetTitle("Rho (cm)");
 //hd->GetYaxis()->SetTitle("Conversions per bin");
+
+hd->GetXaxis()->SetTitle(xtitle.c_str());
+hd->GetYaxis()->SetTitle(ytitle.c_str());
+
 hd->SetTitle(" ");
 
 hd->SetLineColor(kBlue);
