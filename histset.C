@@ -33,7 +33,7 @@ class histset{
                        id_r1dwidecutPSHist,
                        id_r1dwidelowPUHist, id_r1dwidemedPUHist, id_r1dwidehiPUHist, 
                        id_r1dwidelowPUcutHist, id_r1dwidemedPUcutHist, id_r1dwidehiPUcutHist, 
-                       id_rhobpHist, id_mggHist, id_mggCutHist,
+                       id_rhobpHist, id_rbpHist, id_mggHist, id_mggCutHist,
                        id_numnopcHist, id_numpvnopcHist, id_phiHist,
                        id_mggallHist, id_pfitHist, id_zHist, id_costhetaHist,
                        id_pTHist, id_EHist,
@@ -42,6 +42,7 @@ class histset{
                        id_wwtHist, id_numpvUWHist, 
                        id_dminHist, id_dphiHist, id_mpairHist, id_dcotthetaHist,
                        id_r1dwidecutDHist, id_r1dwidecutDDHist,
+                       id_r1dwidecutNomHist, id_rnomHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -121,6 +122,7 @@ void histset::init(){
 	TH1Manager.at(id_r1dwidecutDDHist) = new MyTH1D("r1dwidecutDDHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dwidecutWHist) = new MyTH1D("r1dwidecutWHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dwidecutPSHist) = new MyTH1D("r1dwidecutPSHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+	TH1Manager.at(id_r1dwidecutNomHist) = new MyTH1D("r1dwidecutNomHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dlowPUHist) = new MyTH1D("r1dlowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dmedPUHist) = new MyTH1D("r1dmedPUHist","Conversion Radius: No Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
 	TH1Manager.at(id_r1dhiPUHist) = new MyTH1D("r1dhiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
@@ -134,6 +136,8 @@ void histset::init(){
 	TH1Manager.at(id_r1dwidemedPUcutHist) = new MyTH1D("r1dwidemedPUcutHist","Conversion Radius: Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",250,0.,25.);
 	TH1Manager.at(id_r1dwidehiPUcutHist) = new MyTH1D("r1dwidehiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",250,0.,25.);
 	TH1Manager.at(id_rhobpHist) = new MyTH1D("rhobpHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
+	TH1Manager.at(id_rbpHist) = new MyTH1D("rbpHist","Conversion Radius w.r.t BPIX Center and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
+	TH1Manager.at(id_rnomHist) = new MyTH1D("rnomHist","Conversion Radius w.r.t Nominal Center and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
 	TH1Manager.at(id_mggHist) = new MyTH1D("mggHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0, 1.0 );
 	TH1Manager.at(id_mggallHist) = new MyTH1D("mggallHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0, 1.0 );
 	TH1Manager.at(id_mggCutHist) = new MyTH1D("mggCutHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0,1.0 );
@@ -257,6 +261,7 @@ void histset::AnalyzeEntry(myselector& s){
 	double r,theta,phi;
     double rho,phip;
     double rps;
+    double rnominal;
 	
 	const double RERRCUT = 0.25;
 	const double COSTCUT = 0.85;
@@ -289,6 +294,8 @@ void histset::AnalyzeEntry(myselector& s){
     const double y0psdata = -0.318;
     const double x0psmc = 0.0;
     const double y0psmc = 0.0;
+
+    //Also nominal - where all (x,y) coordinates are referred to (0,0).
 
     double x0,y0,x0bp,y0bp,x0ps,y0ps;
 
@@ -385,6 +392,8 @@ void histset::AnalyzeEntry(myselector& s){
 
 		rps = sqrt( (x-x0ps)*(x-x0ps) + (y-y0ps)*(y-y0ps) );
 
+        rnominal = sqrt( x*x + y*y );
+
 		vxx = PC_vtx_sigmaxx[i];
 		vxy = PC_vtx_sigmaxy[i];
 		vyy = PC_vtx_sigmayy[i];
@@ -445,6 +454,7 @@ void histset::AnalyzeEntry(myselector& s){
 			FillTH1(id_r1dwidecutHist, r);
 			FillTH1(id_r1dwidecutWHist, r, wtPU);
 			FillTH1(id_r1dwidecutPSHist, rps, wtPU);
+			FillTH1(id_r1dwidecutNomHist, rnominal, wtPU);
             if(PC_dmin[i]>-998.0){
    			   FillTH1(id_r1dwidecutDHist, r, wtPU);
             }
@@ -458,6 +468,8 @@ void histset::AnalyzeEntry(myselector& s){
 			FillTH2(id_xywidecutHist, x, y, wtPU);
             FillTH1(id_phiHist, phi, wtPU);	
 			FillTH1(id_rhobpHist, rho, wtPU);
+			FillTH1(id_rbpHist, r, wtPU);
+            FillTH1(id_rnomHist, rnominal, wtPU);
 			FillTH2(id_rhophiHist, rho, phip, wtPU);
             FillTH2(id_npv_rcutHist, r, numberOfPV, wtPU);
             FillTH1(id_pTHist, pt, wtPU);
