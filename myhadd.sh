@@ -15,12 +15,12 @@ date
 . ~/setup.sh
 
 date
-rm PC_MCHPC.root
-hadd PC_MCHPC.root PC_MCW-HPCA_R${MODE}.root PC_MCW-HPCB_R${MODE}.root
+rm PC_MCHPC_R${MODE}.root
+hadd PC_MCHPC_R${MODE}.root PC_MCW-HPCA_R${MODE}.root PC_MCW-HPCB_R${MODE}.root
 
 date
-rm PC_DataHPC.root
-hadd PC_DataHPC.root \
+rm PC_DataHPC_R${MODE}.root
+hadd PC_DataHPC_R${MODE}.root \
      PC_DataPA-HPC0A_R${MODE}.root PC_DataPA-HPC0B_R${MODE}.root PC_DataPA-HPC0C_R${MODE}.root \
      PC_DataPAW-HPC1A_R${MODE}.root PC_DataPAW-HPC1B_R${MODE}.root \
      PC_DataW-HPC1_R${MODE}.root PC_DataW-HPC2_R${MODE}.root
