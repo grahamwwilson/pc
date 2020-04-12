@@ -43,6 +43,7 @@ class histset{
                        id_dminHist, id_dphiHist, id_mpairHist, id_dcotthetaHist,
                        id_r1dwidecutDHist, id_r1dwidecutDDHist,
                        id_r1dwidecutNomHist, id_rnomHist,
+                       id_asym1Hist, id_asym2Hist, id_asym4Hist, id_asym8Hist, id_asym16Hist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -157,6 +158,24 @@ void histset::init(){
 	TH1Manager.at(id_nPUHist) = new MyTH1D("nPUHist",";nPU (MC truth); Events per bin", 100, -0.5, 99.5);
 	TH1Manager.at(id_PUHist) = new MyTH1D("PUDistributionHist",";PU (MC); Events per bin", 400, -0.5, 99.5);
 
+/*    asym = new TH1D("asym", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    asymcut0 = new TH1D("asymcut0", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    asymcut1 = new TH1D("asymcut1", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    asymcut2 = new TH1D("asymcut2", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    asymcut3 = new TH1D("asymcut3", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    asymcut4 = new TH1D("asymcut4", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0); */
+
+    TH1Manager.at(id_asym1Hist) = new MyTH1D("asym1", "Photon pT > 1 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    TH1Manager.at(id_asym2Hist) = new MyTH1D("asym2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    TH1Manager.at(id_asym4Hist) = new MyTH1D("asym4", "Photon pT > 4 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    TH1Manager.at(id_asym8Hist) = new MyTH1D("asym8", "Photon pT > 8 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    TH1Manager.at(id_asym16Hist) = new MyTH1D("asym16", "Photon pT > 16 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+
+/*    asym2 = new TH1D("asym2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    asym4 = new TH1D("asym4", "Photon pT > 4 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    asym8 = new TH1D("asym8", "Photon pT > 8 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    asym16 = new TH1D("asym16", "Photon pT > 16 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0); */
+
 // init TH2D
 	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
 	TH2Manager.at(id_xyHist) = new MyTH2D("xyHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
@@ -255,6 +274,9 @@ void histset::AnalyzeEntry(myselector& s){
 	auto& PC_fitmomentumOut_phi = s.PC_fitmomentumOut_phi;
 	auto& PC_fitmomentumOut_theta = s.PC_fitmomentumOut_theta;
 //	auto& PC_fitmomentumOut_mass = s.PC_fitmomentumOut_mass;
+
+//Also needed for asymmetry
+    auto& PC_vTrack_charge = s.PC_vTrack_charge;
 
 	double px,py,pz;
 	double x,y,z;
@@ -474,8 +496,18 @@ void histset::AnalyzeEntry(myselector& s){
             FillTH2(id_npv_rcutHist, r, numberOfPV, wtPU);
             FillTH1(id_pTHist, pt, wtPU);
             FillTH1(id_EHist,E, wtPU);
-// include asymmetry distributions
-
+// calculate asymmetry
+            double pt0 = PC_vTrack_pt[i][0];
+            double pt1 = PC_vTrack_pt[i][1];
+            double q0 = PC_vTrack_charge[i][0];
+            double q1 = PC_vTrack_charge[i][1];
+            double ptasym = pt0/(pt0+pt1);
+            if (q0<0.5) ptasym = 1.0-ptasym;
+            if(pt>1.0)FillTH1(id_asym1Hist,ptasym);
+            if(pt>2.0)FillTH1(id_asym2Hist,ptasym);
+            if(pt>4.0)FillTH1(id_asym4Hist,ptasym);
+            if(pt>8.0)FillTH1(id_asym8Hist,ptasym);
+            if(pt>16.0)FillTH1(id_asym16Hist,ptasym);
 		}			
 	
 		//pileup cuts
