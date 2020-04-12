@@ -1,5 +1,5 @@
 #!/bin/sh
 
-scp -p gwwilson@hpc.crc.ku.edu:~/pc/PC_test*R1.root .
+scp -p gwwilson@hpc.crc.ku.edu:~/pc/PC_test*R0.root .
 
 exit
