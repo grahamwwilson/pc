@@ -474,6 +474,8 @@ void histset::AnalyzeEntry(myselector& s){
             FillTH2(id_npv_rcutHist, r, numberOfPV, wtPU);
             FillTH1(id_pTHist, pt, wtPU);
             FillTH1(id_EHist,E, wtPU);
+// include asymmetry distributions
+
 		}			
 	
 		//pileup cuts
