@@ -45,12 +45,13 @@ class histset{
                        id_r1dwidecutNomHist, id_rnomHist,
                        id_asym1Hist, id_asym2Hist, id_asym4Hist, id_asym8Hist, id_asym16Hist,
                        id_q0Hist, id_q1Hist, id_qtotHist,
+                       id_zcutHist, id_zcutHist2, id_rendcapHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
                      id_xywideHist,
                      id_rphiHist, 
-                     id_rzHist, id_rzHist2,
+                     id_rzHist, id_rzHist2, id_rzHist3, id_rzHist4,
                      id_xycutHist,
                      id_xywidecutHist, id_xywidecutHist2,
                      id_npv_rcutHist,
@@ -118,7 +119,10 @@ void histset::init(){
 	TH1Manager.at(id_pfitHist) = new MyTH1D("pfitHist","Photon Conversions;Fit probability; ", 100, 0.0, 1.0);
 	TH1Manager.at(id_r1dHist) = new MyTH1D("r1dHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",100, 0.0, 10.0);
 	TH1Manager.at(id_r1dwideHist) = new MyTH1D("r1dwideHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
+	TH1Manager.at(id_zcutHist) = new MyTH1D("zcutHist","Photon Conversions; z (cm); ", 250, -25.0, 25.0);
+	TH1Manager.at(id_zcutHist2) = new MyTH1D("zcutHist2","Photon Conversions; z (cm); ", 500, -50.0, 50.0);
 	TH1Manager.at(id_r1dcutHist) = new MyTH1D("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 100, 0.0, 10.0);
+	TH1Manager.at(id_rendcapHist) = new MyTH1D("rendcapHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dwidecutHist) = new MyTH1D("r1dwidecutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dwidecutDHist) = new MyTH1D("r1dwidecutDHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
 	TH1Manager.at(id_r1dwidecutDDHist) = new MyTH1D("r1dwidecutDDHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
@@ -187,6 +191,8 @@ void histset::init(){
 	TH2Manager.at(id_rphiHist) = new MyTH2D("rphiHist", "Conversion Vertices in R-#phi per mm*60mrad bin; R (cm); #phi",250,0.0,25.0,40,-PI,PI);
 	TH2Manager.at(id_rzHist) = new MyTH2D("rzHist", "Conversion Vertices in R-z per mm^{2} bin; PC_z (cm); R (cm)",200,-10.,10.,100,0.,10.);
 	TH2Manager.at(id_rzHist2) = new MyTH2D("rzHist2", "Conversion Vertices in R-z per mm^{2} bin; |z| (cm); R (cm)",250,25.0,50.0,250,0.0,25.0);
+	TH2Manager.at(id_rzHist3) = new MyTH2D("rzHist3", "Conversion Vertices in R-z per mm^{2} bin; |z| (cm); R (cm)",250,25.0,50.0,250,0.0,25.0);
+	TH2Manager.at(id_rzHist4) = new MyTH2D("rzHist4", "Conversion Vertices in R-z per mm^{2} bin; |z| (cm); R (cm)",250,25.0,50.0,250,0.0,25.0);
 	TH2Manager.at(id_xycutHist) = new MyTH2D("xycutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
 	TH2Manager.at(id_xywidecutHist) = new MyTH2D("xywidecutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
 	TH2Manager.at(id_xywidecutHist2) = new MyTH2D("xywidecutHist2", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
@@ -478,6 +484,7 @@ void histset::AnalyzeEntry(myselector& s){
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
                 && fitprob > FITPROBCUT ){
             vcuts[i] = true;
+			FillTH1(id_zcutHist, z, wtPU);
 			FillTH1(id_r1dcutHist, r, wtPU);
 			FillTH1(id_r1dwidecutHist, r);
 			FillTH1(id_r1dwidecutWHist, r, wtPU);
@@ -525,6 +532,10 @@ void histset::AnalyzeEntry(myselector& s){
                 && fitprob > FITPROBCUT ){
 			FillTH2(id_xywidecutHist2, x, y, wtPU);
 			FillTH2(id_rzHist2, abs(z), r, wtPU);
+            if(z>0.0)FillTH2(id_rzHist3, abs(z), r, wtPU);
+            if(z<0.0)FillTH2(id_rzHist4, abs(z), r, wtPU);
+			FillTH1(id_rendcapHist, r, wtPU);
+			FillTH1(id_zcutHist2, z, wtPU);
         }
 	
 		//pileup cuts
