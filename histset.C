@@ -44,6 +44,7 @@ class histset{
                        id_r1dwidecutDHist, id_r1dwidecutDDHist,
                        id_r1dwidecutNomHist, id_rnomHist,
                        id_asym1Hist, id_asym2Hist, id_asym4Hist, id_asym8Hist, id_asym16Hist,
+                       id_q0Hist, id_q1Hist, id_qtotHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -157,6 +158,9 @@ void histset::init(){
 // These two are only relevant if MC
 	TH1Manager.at(id_nPUHist) = new MyTH1D("nPUHist",";nPU (MC truth); Events per bin", 100, -0.5, 99.5);
 	TH1Manager.at(id_PUHist) = new MyTH1D("PUDistributionHist",";PU (MC); Events per bin", 400, -0.5, 99.5);
+	TH1Manager.at(id_q0Hist) = new MyTH1D("q0Hist","; q0; Events per bin", 5, -2.5, 2.5);
+	TH1Manager.at(id_q1Hist) = new MyTH1D("q1Hist","; q1; Events per bin", 5, -2.5, 2.5);
+	TH1Manager.at(id_qtotHist) = new MyTH1D("qtotHist","; qtot; Events per bin", 5, -2.5, 2.5);
 
 /*    asym = new TH1D("asym", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     asymcut0 = new TH1D("asymcut0", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
@@ -499,15 +503,20 @@ void histset::AnalyzeEntry(myselector& s){
 // calculate asymmetry
             double pt0 = PC_vTrack_pt[i][0];
             double pt1 = PC_vTrack_pt[i][1];
-            double q0 = PC_vTrack_charge[i][0];
-            double q1 = PC_vTrack_charge[i][1];
+            int q0 = PC_vTrack_charge[i][0];
+            int q1 = PC_vTrack_charge[i][1];
+            int qtot = q0+q1;
+// Check charges
+            FillTH1(id_q0Hist, q0, wtPU);
+            FillTH1(id_q1Hist, q1, wtPU);
+            FillTH1(id_qtotHist, qtot, wtPU);
             double ptasym = pt0/(pt0+pt1);
-            if (q0<0.5) ptasym = 1.0-ptasym;
-            if(pt>1.0)FillTH1(id_asym1Hist,ptasym);
-            if(pt>2.0)FillTH1(id_asym2Hist,ptasym);
-            if(pt>4.0)FillTH1(id_asym4Hist,ptasym);
-            if(pt>8.0)FillTH1(id_asym8Hist,ptasym);
-            if(pt>16.0)FillTH1(id_asym16Hist,ptasym);
+            if (q0<0) ptasym = 1.0-ptasym;
+            if(pt>1.0)FillTH1(id_asym1Hist, ptasym, wtPU);
+            if(pt>2.0)FillTH1(id_asym2Hist, ptasym, wtPU);
+            if(pt>4.0)FillTH1(id_asym4Hist, ptasym, wtPU);
+            if(pt>8.0)FillTH1(id_asym8Hist, ptasym, wtPU);
+            if(pt>16.0)FillTH1(id_asym16Hist, ptasym, wtPU);
 		}			
 	
 		//pileup cuts
