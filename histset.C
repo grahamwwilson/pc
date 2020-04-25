@@ -50,9 +50,9 @@ class histset{
                      id_xyHist,
                      id_xywideHist,
                      id_rphiHist, 
-                     id_rzHist,
+                     id_rzHist, id_rzHist2,
                      id_xycutHist,
-                     id_xywidecutHist,
+                     id_xywidecutHist, id_xywidecutHist2,
                      id_npv_rcutHist,
                      id_mgg2Hist,
                      id_mggRCutHist,
@@ -186,8 +186,10 @@ void histset::init(){
 	TH2Manager.at(id_xywideHist) = new MyTH2D("xywideHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
 	TH2Manager.at(id_rphiHist) = new MyTH2D("rphiHist", "Conversion Vertices in R-#phi per mm*60mrad bin; R (cm); #phi",250,0.0,25.0,40,-PI,PI);
 	TH2Manager.at(id_rzHist) = new MyTH2D("rzHist", "Conversion Vertices in R-z per mm^{2} bin; PC_z (cm); R (cm)",200,-10.,10.,100,0.,10.);
+	TH2Manager.at(id_rzHist2) = new MyTH2D("rzHist2", "Conversion Vertices in R-z per mm^{2} bin; |z| (cm); R (cm)",250,25.0,50.0,250,0.0,25.0);
 	TH2Manager.at(id_xycutHist) = new MyTH2D("xycutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
 	TH2Manager.at(id_xywidecutHist) = new MyTH2D("xywidecutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
+	TH2Manager.at(id_xywidecutHist2) = new MyTH2D("xywidecutHist2", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
 	TH2Manager.at(id_npv_rcutHist) = new MyTH2D("npv_rcutHist", "Conversion Vertices per mm; R (cm); nPV",250,0.0,25.0,100,-0.5,99.5);
 	TH2Manager.at(id_npc_npvHist) = new MyTH2D("npc_npvHist", " ; nPV; nPC",100,-0.5,99.5,100,-0.5,99.5);
 	TH2Manager.at(id_mgg2Hist) = new MyTH2D("mgg2Hist","Di-#gamma Mass;Mass (GeV); nPV", 400, 0.0, 1.0, 100, -0.5, 99.5 );
@@ -517,7 +519,13 @@ void histset::AnalyzeEntry(myselector& s){
             if(pt>4.0)FillTH1(id_asym4Hist, ptasym, wtPU);
             if(pt>8.0)FillTH1(id_asym8Hist, ptasym, wtPU);
             if(pt>16.0)FillTH1(id_asym16Hist, ptasym, wtPU);
-		}			
+		}
+/// Endcap plots
+		if( rerr < RERRCUT && abs(z) > ZCUT && abs(z) < 50.0 && abs(cos(theta)) < COSTCUT 
+                && fitprob > FITPROBCUT ){
+			FillTH2(id_xywidecutHist2, x, y, wtPU);
+			FillTH2(id_rzHist2, abs(z), r, wtPU);
+        }
 	
 		//pileup cuts
 		if( numberOfPV <= 16){
