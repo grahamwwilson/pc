@@ -53,3 +53,8 @@
     auto& PC_vTrack0_charge = s.Conv_Tk0_charge;
     auto& PC_vTrack1_charge = s.Conv_Tk1_charge;
 
+// New variables - April 2020.
+    auto& PC_vTrack0_nBefore = s.Conv_nHitsBeforeVtx_Tk0;
+    auto& PC_vTrack1_nBefore = s.Conv_nHitsBeforeVtx_Tk1;
+    auto& PC_nSharedHits = s.Conv_nSharedHits;
+

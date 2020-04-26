@@ -254,6 +254,7 @@ void histset2::AnalyzeEntry(convsel& s){
 
 	double px,py,pz;
 	double x,y,z;
+    int nBefore0,nBefore1;
 	double r,theta,phi;
     double rho,phip;
     double rps;
@@ -375,6 +376,8 @@ void histset2::AnalyzeEntry(convsel& s){
 		x = PC_x[i];
 		y = PC_y[i];
 		z = PC_z[i];
+        nBefore0 = PC_vTrack0_nBefore[i];
+        nBefore1 = PC_vTrack1_nBefore[i];
 /*
         double px = PC_fitmomentumOut_pt[i]*cos(PC_fitmomentumOut_phi[i]);
         double py = PC_fitmomentumOut_pt[i]*sin(PC_fitmomentumOut_phi[i]);
@@ -454,7 +457,7 @@ void histset2::AnalyzeEntry(convsel& s){
 
 		//make quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
-                && fitprob > FITPROBCUT ){
+                && fitprob > FITPROBCUT && std::max(nBefore0,nBefore1)==0 ){
             vcuts[i] = true;
 			FillTH1(id_zcutHist, z, wtPU);
 			FillTH1(id_r1dcutHist, r, wtPU);
