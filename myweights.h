@@ -5,7 +5,7 @@
 // Element 0 is set to 1.0
 // Element 100 and above is set to 2.0
 //
-vector<double> wt{
+std::vector<double> wt{
       1.0,
     13.1836 ,     8.15241 ,     5.64666 ,     3.98579 ,     3.22428 , 
      2.6955 ,     2.41378 ,     2.21145 ,     2.05275 ,     1.93677 , 
