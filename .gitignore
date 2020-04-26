@@ -5,6 +5,7 @@ CMSSW
 *.root
 *.o
 compiledthreads
+compiledThreads2
 *.log
 *.pdf
 histset.C1
