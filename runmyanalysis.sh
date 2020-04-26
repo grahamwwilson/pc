@@ -9,7 +9,7 @@ INPUT=${1-dataHPC}
 
 echo ${INPUT}
 
-INPUTLIST=${CODEDIR}/${INPUT}.list
+INPUTLIST=${CODEDIR}/Lists/${INPUT}.list
 
 #Execute this from execution directory, so that we can have several output files in parallel
 

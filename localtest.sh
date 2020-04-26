@@ -11,7 +11,7 @@ INPUT=${1-mytest}
 
 echo ${INPUT}
 
-INPUTLIST=${CODEDIR}/${INPUT}.list
+INPUTLIST=${CODEDIR}/Lists/${INPUT}.list
 
 #Execute this from execution directory, so that we can have several output files in parallel
 
@@ -25,7 +25,7 @@ pwd
 
 #input is: num files, numthreads,  yourdata.list
 # Note any change to the thread count needs to also be in the job description file ..
-python2 ${CODEDIR}/runmacrolocal.py 0 2 ${INPUTLIST}
+python2 ${CODEDIR}/runmacrolocal.py 0 1 ${INPUTLIST}
 
 #Need to find some way of having several of these in parallel ...
 cp Outfile.root ${CODEDIR}/PC_${INPUT}.root
