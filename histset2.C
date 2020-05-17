@@ -389,7 +389,7 @@ void histset2::AnalyzeEntry(convsel& s){
         double py = PC_Py[i];
         double pz = PC_Pz[i];
         double E  = PC_E[i];
-        double pt = sqrt(PC_Px[i]*PC_Px[i] + PC_Py[i]*PC_Py[i]);
+        double pt = sqrt(px*px + py*py);
 
 		r = sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) );
 		phi = atan2(y-y0, x-x0);

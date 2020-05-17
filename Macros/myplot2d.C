@@ -1,10 +1,13 @@
-void myplot2d(string histtype="xywideHist", float ymax=3000000.0, float ymin=900.0)
+void myplot2d(string histtype="xywidecutHist", float ymax=3000000.0, float ymin=900.0)
 {
 
 TCanvas *c1 = new TCanvas("c1","multipads",900,900);
 
-TFile *fd = new TFile("../PC_DataHPC.root");
-TFile *fm = new TFile("../PC_MCHPC.root");
+//TFile *fd = new TFile("../PC_DataHPC.root");
+//TFile *fm = new TFile("../PC_MCHPC.root");
+
+TFile *fd = new TFile("../PC_data.root");
+TFile *fm = new TFile("../PC_mc.root");
 
 TH1D * hd = (TH1D*)fd->Get(histtype.c_str());
 //TH1D * hd = (TH1D*)fm->Get(histtype.c_str());

@@ -1,4 +1,4 @@
-void plot(string histtype="rhobpHist", float ymax=5000000.0, 
+void plot2(string histtype="rhobpHist", float ymax=5000000.0, 
           float ymin=0.1, float xlmin = 0.16, float ylmin = 0.66, 
           bool logscale = false, string xtitle=" ", string ytitle = " ")
 {
@@ -25,9 +25,11 @@ hd->Print();
 cout << hd->Integral() << endl;
 hm->Print();
 cout << hm->Integral() << endl;
+double myratio=hd->Integral()/hm->Integral();
+cout << "myratio: " << myratio << endl;
 
 //double scale = double(hd->GetEntries())/double(hm->GetEntries());
-//double scale = 3.19688/2.48492;
+double scale = myratio;
 //cout << "Scale = " << scale << endl;
 
 /*
@@ -60,7 +62,7 @@ hm->SetStats(kFALSE);
 c1->SetTicks(1,1);
 
 //scale=ratio;  // Overwrite with PV based one.
-//hm->Scale(scale);
+hm->Scale(scale);
 
 //hd->GetXaxis()->SetTitle("Rho (cm)");
 //hd->GetYaxis()->SetTitle("Conversions per bin");
@@ -91,8 +93,8 @@ leg->SetLineWidth(2);
 leg->SetTextFont(62);
 leg->SetTextSize(0.05);
 //leg->SetHeader("16 < n_{PV} < 36","C");
-leg->AddEntry(hd,"2018 Data","l");
-leg->AddEntry(hm,"2018 MC","l");
+leg->AddEntry(hd,"2018C Data","l");
+leg->AddEntry(hm,"2017 MC","l");
 leg->SetBorderSize(0);                          // Include border
 leg->Draw();
 
@@ -102,6 +104,13 @@ leg->Draw();
    tex->SetTextSize(0.035);
    tex->SetLineWidth(2);
    tex->Draw();
+
+   TLatex * tex2 = new TLatex(0.20,0.19,"Normalized to equal areas");
+   tex2->SetNDC();
+   tex2->SetTextFont(41);
+   tex2->SetTextSize(0.03);
+   tex2->SetLineWidth(2);
+   tex2->Draw();
 
 // Create include file with the histogram data
 /*
