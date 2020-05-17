@@ -46,7 +46,8 @@ class histset2{
                        id_dminHist, id_dphiHist, id_mpairHist, id_dcotthetaHist,
                        id_r1dwidecutDHist, id_r1dwidecutDDHist,
                        id_r1dwidecutNomHist, id_rnomHist,
-                       id_asym1Hist, id_asym2Hist, id_asym4Hist, id_asym8Hist, id_asym16Hist,
+                       id_xplus1Hist, id_xplus2Hist, id_xplus4Hist, id_xplus8Hist, id_xplus16Hist,
+                       id_alpha1Hist, id_alpha2Hist, id_alpha4Hist, id_alpha8Hist, id_alpha16Hist,
                        id_q0Hist, id_q1Hist, id_qtotHist,
                        id_zcutHist, id_zcutHist2, id_rendcapHist,
                        id_conversionCandidateMassHist,
@@ -182,11 +183,17 @@ void histset2::init(){
     asymcut3 = new TH1D("asymcut3", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     asymcut4 = new TH1D("asymcut4", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0); */
 
-    TH1Manager.at(id_asym1Hist) = new MyTH1D("asym1", "Photon pT > 1 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    TH1Manager.at(id_asym2Hist) = new MyTH1D("asym2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    TH1Manager.at(id_asym4Hist) = new MyTH1D("asym4", "Photon pT > 4 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    TH1Manager.at(id_asym8Hist) = new MyTH1D("asym8", "Photon pT > 8 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    TH1Manager.at(id_asym16Hist) = new MyTH1D("asym16", "Photon pT > 16 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    TH1Manager.at(id_xplus1Hist) = new MyTH1D("xplus1", "Photon pT > 1 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    TH1Manager.at(id_xplus2Hist) = new MyTH1D("xplus2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    TH1Manager.at(id_xplus4Hist) = new MyTH1D("xplus4", "Photon pT > 4 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    TH1Manager.at(id_xplus8Hist) = new MyTH1D("xplus8", "Photon pT > 8 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+    TH1Manager.at(id_xplus16Hist) = new MyTH1D("xplus16", "Photon pT > 16 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
+
+    TH1Manager.at(id_alpha1Hist) = new MyTH1D("alpha1", "Photon pT > 1 GeV; AP alpha; Entries per 0.02 bin", 100, -1.0, 1.0);
+    TH1Manager.at(id_alpha2Hist) = new MyTH1D("alpha2", "Photon pT > 2 GeV; AP alpha; Entries per 0.02 bin", 100, -1.0, 1.0);
+    TH1Manager.at(id_alpha4Hist) = new MyTH1D("alpha4", "Photon pT > 4 GeV; AP alpha; Entries per 0.02 bin", 100, -1.0, 1.0);
+    TH1Manager.at(id_alpha8Hist) = new MyTH1D("alpha8", "Photon pT > 8 GeV; AP alpha; Entries per 0.02 bin", 100, -1.0, 1.0);
+    TH1Manager.at(id_alpha16Hist) = new MyTH1D("alpha16", "Photon pT > 16 GeV; AP alpha; Entries per 0.02 bin", 100, -1.0, 1.0);
 
     TH1Manager.at(id_conversionCandidateMassHist) = new MyTH1D("conversionCandidateMassHist","e+e- Pair Mass; Mass (GeV); Conversions per bin",200,0.0,1.0);
     TH1Manager.at(id_conversionCandidateMassHist2) = new MyTH1D("conversionCandidateMassHist2","e+e- Pair Mass; Mass (GeV); Conversions per bin",100,0.0,0.1);
@@ -194,7 +201,7 @@ void histset2::init(){
     TH1Manager.at(id_AP_pTminHist) = new MyTH1D("AP_pTminHist","Armenteros-Podolanski pT; Minimum pT (GeV); Conversions per bin",200,0.0,0.1);
     TH1Manager.at(id_AP_pTmaxHist) = new MyTH1D("AP_pTmaxHist","Armenteros-Podolanski pT; Maximum pT (GeV); Conversions per bin",200,0.0,0.1);
     TH1Manager.at(id_AP_pTaveHist) = new MyTH1D("AP_pTaveHist","Armenteros-Podolanski pT; Average pT (GeV); Conversions per bin",200,0.0,0.1);
-    TH1Manager.at(id_AP_alphaHist) = new MyTH1D("AP_alphaHist","Armenteros-Podolanski alpha; (pL+ - pL-)/(pL+ + pL-); Conversions per bin",200,-1.0,1.0);
+    TH1Manager.at(id_AP_alphaHist) = new MyTH1D("AP_alphaHist","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
 
 /*    asym2 = new TH1D("asym2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     asym4 = new TH1D("asym4", "Photon pT > 4 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
@@ -590,13 +597,20 @@ void histset2::AnalyzeEntry(convsel& s){
             FillTH1(id_q1Hist, q1, wtPU);
             FillTH1(id_qtotHist, qtot, wtPU);
             double ptasym = (pt0-pt1)/(pt0+pt1);
-            if (q0<0) ptasym = 1.0-ptasym;
+            if (q0<0) ptasym = -ptasym;
             double xplus = (1.0 + ptasym)/2.0;
-            if(pt>1.0)FillTH1(id_asym1Hist, xplus, wtPU);
-            if(pt>2.0)FillTH1(id_asym2Hist, xplus, wtPU);
-            if(pt>4.0)FillTH1(id_asym4Hist, xplus, wtPU);
-            if(pt>8.0)FillTH1(id_asym8Hist, xplus, wtPU);
-            if(pt>16.0)FillTH1(id_asym16Hist, xplus, wtPU);
+            if(pt>1.0)FillTH1(id_xplus1Hist, xplus, wtPU);
+            if(pt>2.0)FillTH1(id_xplus2Hist, xplus, wtPU);
+            if(pt>4.0)FillTH1(id_xplus4Hist, xplus, wtPU);
+            if(pt>8.0)FillTH1(id_xplus8Hist, xplus, wtPU);
+            if(pt>16.0)FillTH1(id_xplus16Hist, xplus, wtPU);
+
+            if(pt>1.0)FillTH1(id_alpha1Hist, APalpha, wtPU);
+            if(pt>2.0)FillTH1(id_alpha2Hist, APalpha, wtPU);
+            if(pt>4.0)FillTH1(id_alpha4Hist, APalpha, wtPU);
+            if(pt>8.0)FillTH1(id_alpha8Hist, APalpha, wtPU);
+            if(pt>16.0)FillTH1(id_alpha16Hist, APalpha, wtPU);
+
 		}
 /// Endcap plots
 		if( rerr < RERRCUT && abs(z) > ZCUT && abs(z) < 50.0 && abs(cos(theta)) < COSTCUT 
