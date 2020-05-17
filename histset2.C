@@ -8,6 +8,8 @@
 #include "TTreeReaderValue.h"
 #include "convsel.C"
 #include "myweights.h"
+#include "Math/Vector3D.h"
+#include "Math/Vector4D.h"
 //#include <vector>
 using MyTH1D = ROOT::TThreadedObject<TH1D>;
 using MyTH2D = ROOT::TThreadedObject<TH2D>;
@@ -47,6 +49,11 @@ class histset2{
                        id_asym1Hist, id_asym2Hist, id_asym4Hist, id_asym8Hist, id_asym16Hist,
                        id_q0Hist, id_q1Hist, id_qtotHist,
                        id_zcutHist, id_zcutHist2, id_rendcapHist,
+                       id_conversionCandidateMassHist,
+                       id_conversionCandidateMassHist2,
+                       id_lambdaCandidateMassHist,
+                       id_AP_pTminHist, id_AP_pTmaxHist, id_AP_pTaveHist,
+                       id_AP_alphaHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -58,7 +65,8 @@ class histset2{
                      id_npv_rcutHist,
                      id_mgg2Hist,
                      id_mggRCutHist,
-                     id_npc_npvHist, id_rhophiHist, 
+                     id_npc_npvHist, id_rhophiHist,
+                     id_AP_pT_alphaHist,
                      numTH2Hist};
 
 	   //make a big vector and load enumerated histograms onto the vector
@@ -180,6 +188,14 @@ void histset2::init(){
     TH1Manager.at(id_asym8Hist) = new MyTH1D("asym8", "Photon pT > 8 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     TH1Manager.at(id_asym16Hist) = new MyTH1D("asym16", "Photon pT > 16 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
 
+    TH1Manager.at(id_conversionCandidateMassHist) = new MyTH1D("conversionCandidateMassHist","e+e- Pair Mass; Mass (GeV); Conversions per bin",200,0.0,1.0);
+    TH1Manager.at(id_conversionCandidateMassHist2) = new MyTH1D("conversionCandidateMassHist2","e+e- Pair Mass; Mass (GeV); Conversions per bin",100,0.0,0.1);
+    TH1Manager.at(id_lambdaCandidateMassHist) = new MyTH1D("lambdaCandidateMassHist","Lamda Candidate Mass; Mass (GeV); Conversions per bin",300,1.0,2.5);
+    TH1Manager.at(id_AP_pTminHist) = new MyTH1D("AP_pTminHist","Armenteros-Podolanski pT; Minimum pT (GeV); Conversions per bin",200,0.0,0.1);
+    TH1Manager.at(id_AP_pTmaxHist) = new MyTH1D("AP_pTmaxHist","Armenteros-Podolanski pT; Maximum pT (GeV); Conversions per bin",200,0.0,0.1);
+    TH1Manager.at(id_AP_pTaveHist) = new MyTH1D("AP_pTaveHist","Armenteros-Podolanski pT; Average pT (GeV); Conversions per bin",200,0.0,0.1);
+    TH1Manager.at(id_AP_alphaHist) = new MyTH1D("AP_alphaHist","Armenteros-Podolanski alpha; (pL+ - pL-)/(pL+ + pL-); Conversions per bin",200,-1.0,1.0);
+
 /*    asym2 = new TH1D("asym2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     asym4 = new TH1D("asym4", "Photon pT > 4 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     asym8 = new TH1D("asym8", "Photon pT > 8 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
@@ -202,6 +218,8 @@ void histset2::init(){
 	TH2Manager.at(id_mgg2Hist) = new MyTH2D("mgg2Hist","Di-#gamma Mass;Mass (GeV); nPV", 400, 0.0, 1.0, 100, -0.5, 99.5 );
 	TH2Manager.at(id_mggRCutHist) = new MyTH2D("mggRCutHist","Di-#gamma Mass;Mass (GeV); Radius (cm)", 400, 0.0, 1.0, 25, 0.0, 25.0 );
 	TH2Manager.at(id_rhophiHist) = new MyTH2D("rhophiHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Phi (rad)",100,0.0,5.0,40,-PI,PI);
+//                    id_AP_pT_alphaHist,
+	TH2Manager.at(id_AP_pT_alphaHist) = new MyTH2D("AP_pT_alphaHist","Armenteros-Podolanski Plot; alpha; pT (GeV)",200,-1.0,1.0,200,0.0,0.22);
 }
 
 void histset2::FillTH1(int index, double x, double w=1.0){
@@ -253,7 +271,12 @@ void histset2::AnalyzeEntry(convsel& s){
     #include "mylocaltree.h"     //All the variable incantations needed
 
 	double px,py,pz;
+    double px0p,py0p,pz0p;
+    double px1p,py1p,pz1p;
+    double pt0,pt1,tanl0,tanl1,phi0,phi1,qR0,qR1;
 	double x,y,z;
+    double x0p,y0p,z0p;
+    double x1p,y1p,z1p;
     int nBefore0,nBefore1;
 	double r,theta,phi;
     double rho,phip;
@@ -265,6 +288,11 @@ void histset2::AnalyzeEntry(convsel& s){
 	const double ZCUT = 25.0;
 	const double FITPROBCUT = 0.010;
     const double MASSCUT = 0.15;
+
+    const double MASS_ELECTRON = 0.5109989461e-3;
+    const double MASS_PION = 139.57061e-3;
+//    const double MASS_KAON = 493.677e-3;
+    const double MASS_PROTON = 938.272081e-3;
 
 // Scale MC to data based on number 
 // of events with at least 1 conversion
@@ -372,54 +400,105 @@ void histset2::AnalyzeEntry(convsel& s){
 // candidate passes particular cuts, to ease later code 
 // with gamma-gamma invariant mass
 	for(int i=0; i<PC_x.GetSize(); i++){
+
         vcuts.push_back(false);
 		x = PC_x[i];
 		y = PC_y[i];
 		z = PC_z[i];
         nBefore0 = PC_vTrack0_nBefore[i];
         nBefore1 = PC_vTrack1_nBefore[i];
-/*
-        double px = PC_fitmomentumOut_pt[i]*cos(PC_fitmomentumOut_phi[i]);
-        double py = PC_fitmomentumOut_pt[i]*sin(PC_fitmomentumOut_phi[i]);
-        double pz = PC_fitmomentumOut_pt[i]/tan(PC_fitmomentumOut_theta[i]);
-        double E = sqrt(px*px + py*py + pz*pz);
-        double pt = PC_fitmomentumOut_pt[i]; 
-*/
+
+// Swim each track from inner hit to the conversion vertex - see convsel.C code
+        pt0 = sqrt(Tk0_px[i]*Tk0_px[i] + Tk0_py[i]*Tk0_py[i]);
+        tanl0 = Tk0_pz[i]/pt0;
+        phi0 = atan2(Tk0_py[i],Tk0_px[i]);
+        qR0 = double(PC_vTrack0_charge[i])*100.0*pt0/(0.2998*3.80); //in cm
+        double A0 =  2.0*qR0*( (Tk0_y[i]-y)*cos(phi0) - (Tk0_x[i]-x)*sin(phi0) - qR0 );
+        double B0 = -2.0*qR0*( (Tk0_y[i]-y)*sin(phi0) + (Tk0_x[i]-x)*cos(phi0) );
+        double alp0 = atan2(B0/A0,1.0);
+        px0p = pt0*cos(phi0 + alp0);
+        py0p = pt0*sin(phi0 + alp0);
+        pz0p = Tk0_pz[i];
+// Also swim the track position
+        x0p = Tk0_x[i] + qR0*( (1.0-cos(alp0))*sin(phi0) - sin(alp0)*cos(phi0) );
+        y0p = Tk0_y[i] - qR0*( (1.0-cos(alp0))*cos(phi0) + sin(alp0)*sin(phi0) );
+        z0p = Tk0_z[i] - qR0*tanl0*alp0;
+        ROOT::Math::XYZVector xyzv0 = ROOT::Math::XYZVector(px0p,py0p,pz0p);
+
+// Swim each track from inner hit to the conversion vertex - see convsel.C code
+        pt1 = sqrt(Tk1_px[i]*Tk1_px[i] + Tk1_py[i]*Tk1_py[i]);
+        tanl1 = Tk1_pz[i]/pt1;
+        phi1 = atan2(Tk1_py[i],Tk1_px[i]);
+        qR1 = double(PC_vTrack1_charge[i])*100.0*pt1/(0.2998*3.80); //in cm
+        double A1 =  2.0*qR1*( (Tk1_y[i]-y)*cos(phi1) - (Tk1_x[i]-x)*sin(phi1) - qR1 );
+        double B1 = -2.0*qR1*( (Tk1_y[i]-y)*sin(phi1) + (Tk1_x[i]-x)*cos(phi1) );
+        double alp1 = atan2(B1/A1,1.0);
+        px1p = pt1*cos(phi1 + alp1);
+        py1p = pt1*sin(phi1 + alp1);
+        pz1p = Tk1_pz[i];
+// Also swim the track position
+        x1p = Tk1_x[i] + qR1*( (1.0-cos(alp1))*sin(phi1) - sin(alp1)*cos(phi1) );
+        y1p = Tk1_y[i] - qR1*( (1.0-cos(alp1))*cos(phi1) + sin(alp1)*sin(phi1) );
+        z1p = Tk1_z[i] - qR1*tanl1*alp1;
+        ROOT::Math::XYZVector xyzv1 = ROOT::Math::XYZVector(px1p,py1p,pz1p);
+
         double px = PC_Px[i];
         double py = PC_Py[i];
         double pz = PC_Pz[i];
         double E  = PC_E[i];
         double pt = sqrt(px*px + py*py);
+        ROOT::Math::XYZVector xyzv = ROOT::Math::XYZVector(px,py,pz);
+
+// calculate asymmetry
+        int q0 = PC_vTrack0_charge[i];
+        int q1 = PC_vTrack1_charge[i];
+
+        ROOT::Math::XYZVector vcross0 = xyzv.Cross(xyzv0);
+        ROOT::Math::XYZVector vcross1 = xyzv.Cross(xyzv1);
+        double APpT0 = sqrt(vcross0.Mag2())/sqrt(xyzv.Mag2());
+        double APpT1 = sqrt(vcross1.Mag2())/sqrt(xyzv.Mag2());
+        double pL0 = xyzv0.Dot(xyzv)/sqrt(xyzv.Mag2());
+        double pL1 = xyzv1.Dot(xyzv)/sqrt(xyzv.Mag2());
+        double APalpha = (pL0 - pL1)/(pL0 + pL1);
+        if (q0<0) APalpha = -APalpha;
 
 		r = sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) );
 		phi = atan2(y-y0, x-x0);
-//		theta = PC_fitmomentumOut_theta[i];
         theta = atan2(pt,pz);
-
 		rho  =  sqrt( (x-x0bp)*(x-x0bp) + (y-y0bp)*(y-y0bp)) ;
         phip =  atan2(y-y0bp, x-x0bp);
-
 		rps = sqrt( (x-x0ps)*(x-x0ps) + (y-y0ps)*(y-y0ps) );
-
         rnominal = sqrt( x*x + y*y );
-
 		vxx = PC_vtx_sigmaxx[i];
 		vxy = PC_vtx_sigmaxy[i];
 		vyy = PC_vtx_sigmayy[i];
 		vzz = PC_vtx_sigmazz[i];
-
 		cphi = cos(phi);
 		sphi = sin(phi);
-
 		// This is the correct one
 		varsum_r   = cphi*cphi*vxx + 2.0*sphi*cphi*vxy + sphi*sphi*vyy;
 		varsum_phi = sphi*sphi*vxx - 2.0*sphi*cphi*vxy + cphi*cphi*vyy;
 		rerr = sqrt(varsum_r);
 		phierr = sqrt(varsum_phi)/r;
 		zerr = sqrt(vzz);
-
 	 	fitprob = TMath::Prob(PC_vtx_chi2[i], 3);
-		//make r plots with quality cuts and without
+
+        ROOT::Math::PxPyPzMVector v0,v0pi,v0p,v1,v1pi,v1p;
+        v0 = ROOT::Math::PxPyPzMVector( px0p, py0p, pz0p, MASS_ELECTRON );
+        v0pi = ROOT::Math::PxPyPzMVector( px0p, py0p, pz0p, MASS_PION );
+        v0p  = ROOT::Math::PxPyPzMVector( px0p, py0p, pz0p, MASS_PROTON );
+        v1   = ROOT::Math::PxPyPzMVector( px1p, py1p, pz1p, MASS_ELECTRON );
+        v1pi = ROOT::Math::PxPyPzMVector( px1p, py1p, pz1p, MASS_PION );
+        v1p  = ROOT::Math::PxPyPzMVector( px1p, py1p, pz1p, MASS_PROTON );
+        ROOT::Math::PxPyPzMVector vpair, vpairpipi, vpairpip, vpairppi;
+        vpair += v0;
+        vpair += v1;
+        vpairpipi += v0pi;
+        vpairpipi += v1pi;
+        vpairpip  += v0pi;
+        vpairpip  += v1p;
+        vpairppi  += v0p;
+        vpairppi  += v1pi;
 
 // Apply fiducial cuts to all candidates
 		if(abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
@@ -458,7 +537,27 @@ void histset2::AnalyzeEntry(convsel& s){
 		//make quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
                 && fitprob > FITPROBCUT && std::max(nBefore0,nBefore1)==0 ){
+/*
+    TH1Manager.at(id_conversionCandidateMassHist) = new MyTH1D("conversionCandidateMassHist","e+e- Pair Mass; Mass (GeV); Conversions per bin",200,0.0,1.0);
+    TH1Manager.at(id_conversionCandidateMassHist2) = new MyTH1D("conversionCandidateMassHist2","e+e- Pair Mass; Mass (GeV); Conversions per bin",100,0.0,0.1);
+    TH1Manager.at(id_lambdaCandidateMassHist) = new MyTH1D("lambdaCandidateMassHist","Lamda Candidate Mass; Mass (GeV); Conversions per bin",300,1.0,2.5);
+    TH1Manager.at(id_AP_pTminHist) = new MyTH1D("AP_pTminHist","Armenteros-Podolanski pT; Minimum pT (GeV); Conversions per bin",200,0.0,0.1);
+    TH1Manager.at(id_AP_pTmaxHist) = new MyTH1D("AP_pTmaxHist","Armenteros-Podolanski pT; Maximum pT (GeV); Conversions per bin",200,0.0,0.1);
+    TH1Manager.at(id_AP_pTaveHist) = new MyTH1D("AP_pTaveHist","Armenteros-Podolanski pT; Average pT (GeV); Conversions per bin",200,0.0,0.1);
+    TH1Manager.at(id_AP_alphaHist) = new MyTH1D("AP_alphaHist","Armenteros-Podolanski alpha; (pL+ - pL-)/(pL+ + pL-); Conversions per bin",200,-1.0,1.0);
+*/
             vcuts[i] = true;
+
+            FillTH1(id_conversionCandidateMassHist, vpair.M(), wtPU);
+            FillTH1(id_conversionCandidateMassHist2, vpair.M(), wtPU);
+            FillTH1(id_lambdaCandidateMassHist, vpairpip.M(), wtPU);
+            FillTH1(id_lambdaCandidateMassHist, vpairppi.M(), wtPU);
+            FillTH1(id_AP_pTminHist, std::min(APpT0,APpT1), wtPU);
+            FillTH1(id_AP_pTmaxHist, std::max(APpT0,APpT1), wtPU);
+            FillTH1(id_AP_pTaveHist, 0.5*(APpT0+APpT1), wtPU);
+            FillTH1(id_AP_alphaHist, APalpha, wtPU);
+            FillTH2(id_AP_pT_alphaHist, APalpha, std::min(APpT0,APpT1), wtPU);
+
 			FillTH1(id_zcutHist, z, wtPU);
 			FillTH1(id_r1dcutHist, r, wtPU);
 			FillTH1(id_r1dwidecutHist, r);
@@ -484,23 +583,20 @@ void histset2::AnalyzeEntry(convsel& s){
             FillTH2(id_npv_rcutHist, r, numberOfPV, wtPU);
             FillTH1(id_pTHist, pt, wtPU);
             FillTH1(id_EHist,E, wtPU);
-// calculate asymmetry
-            double pt0 = PC_vTrack0_pt[i];
-            double pt1 = PC_vTrack1_pt[i];
-            int q0 = PC_vTrack0_charge[i];
-            int q1 = PC_vTrack1_charge[i];
+
             int qtot = q0+q1;
 // Check charges
             FillTH1(id_q0Hist, q0, wtPU);
             FillTH1(id_q1Hist, q1, wtPU);
             FillTH1(id_qtotHist, qtot, wtPU);
-            double ptasym = pt0/(pt0+pt1);
+            double ptasym = (pt0-pt1)/(pt0+pt1);
             if (q0<0) ptasym = 1.0-ptasym;
-            if(pt>1.0)FillTH1(id_asym1Hist, ptasym, wtPU);
-            if(pt>2.0)FillTH1(id_asym2Hist, ptasym, wtPU);
-            if(pt>4.0)FillTH1(id_asym4Hist, ptasym, wtPU);
-            if(pt>8.0)FillTH1(id_asym8Hist, ptasym, wtPU);
-            if(pt>16.0)FillTH1(id_asym16Hist, ptasym, wtPU);
+            double xplus = (1.0 + ptasym)/2.0;
+            if(pt>1.0)FillTH1(id_asym1Hist, xplus, wtPU);
+            if(pt>2.0)FillTH1(id_asym2Hist, xplus, wtPU);
+            if(pt>4.0)FillTH1(id_asym4Hist, xplus, wtPU);
+            if(pt>8.0)FillTH1(id_asym8Hist, xplus, wtPU);
+            if(pt>16.0)FillTH1(id_asym16Hist, xplus, wtPU);
 		}
 /// Endcap plots
 		if( rerr < RERRCUT && abs(z) > ZCUT && abs(z) < 50.0 && abs(cos(theta)) < COSTCUT 

@@ -27,6 +27,28 @@
 	auto& PC_vTrack1_phi = s.Conv_Tk1_phi;
 	auto& PC_vTrack1_eta = s.Conv_Tk1_eta;
 
+    auto& Tk0_px = s.Conv_tracksPin_Px_Tk0;
+    auto& Tk0_py = s.Conv_tracksPin_Py_Tk0;
+    auto& Tk0_pz = s.Conv_tracksPin_Pz_Tk0;
+    auto& Tk0_x  = s.Conv_tracksInnerPosition_X_Tk0;
+    auto& Tk0_y  = s.Conv_tracksInnerPosition_Y_Tk0;
+    auto& Tk0_z  = s.Conv_tracksInnerPosition_Z_Tk0;
+
+    auto& Tk1_px = s.Conv_tracksPin_Px_Tk1;
+    auto& Tk1_py = s.Conv_tracksPin_Py_Tk1;
+    auto& Tk1_pz = s.Conv_tracksPin_Pz_Tk1;
+    auto& Tk1_x  = s.Conv_tracksInnerPosition_X_Tk1;
+    auto& Tk1_y  = s.Conv_tracksInnerPosition_Y_Tk1;
+    auto& Tk1_z  = s.Conv_tracksInnerPosition_Z_Tk1;
+
+// Quality
+    auto& Tk0_chi2 = s.Conv_Tk0_chi2;
+    auto& Tk1_chi2 = s.Conv_Tk1_chi2;
+    auto& Tk0_ndof = s.Conv_Tk0_ndof;
+    auto& Tk1_ndof = s.Conv_Tk1_ndof;
+    auto& Tk0_sd0  = s.Conv_tracksSigned_d0_Tk0;
+    auto& Tk1_sd0  = s.Conv_tracksSigned_d0_Tk1;
+
 // New variables
     auto& PC_mpair = s.Conv_pairInvariantMass;
     auto& PC_dcottheta = s.Conv_pairCotThetaSeparation;
