@@ -52,7 +52,8 @@ class histset2{
                        id_zcutHist, id_zcutHist2, id_rendcapHist,
                        id_conversionCandidateMassHist,
                        id_conversionCandidateMassHist2,
-                       id_lambdaCandidateMassHist,
+                       id_lambdaCandidateMassHist,id_lambdabarCandidateMassHist,id_lambdasCandidateMassHist,
+                       id_lambdasBkgdMassHist,id_lambdasSignalMassHist,
                        id_AP_pTminHist, id_AP_pTmaxHist, id_AP_pTaveHist,
                        id_AP_alphaHist,
                        numTH1Hist};
@@ -197,7 +198,11 @@ void histset2::init(){
 
     TH1Manager.at(id_conversionCandidateMassHist) = new MyTH1D("conversionCandidateMassHist","e+e- Pair Mass; Mass (GeV); Conversions per bin",200,0.0,1.0);
     TH1Manager.at(id_conversionCandidateMassHist2) = new MyTH1D("conversionCandidateMassHist2","e+e- Pair Mass; Mass (GeV); Conversions per bin",100,0.0,0.1);
-    TH1Manager.at(id_lambdaCandidateMassHist) = new MyTH1D("lambdaCandidateMassHist","Lamda Candidate Mass; Mass (GeV); Conversions per bin",300,1.0,2.5);
+    TH1Manager.at(id_lambdasCandidateMassHist) = new MyTH1D("lambdasCandidateMassHist","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",225,1.05,1.50);
+    TH1Manager.at(id_lambdasBkgdMassHist) = new MyTH1D("lambdasBkgdMassHist","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",90,1.05,1.50);
+    TH1Manager.at(id_lambdasSignalMassHist) = new MyTH1D("lambdasSignalMassHist","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",90,1.05,1.50);
+    TH1Manager.at(id_lambdabarCandidateMassHist) = new MyTH1D("lambdabarCandidateMassHist","Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",225,1.05,1.50);
+    TH1Manager.at(id_lambdaCandidateMassHist) = new MyTH1D("lambdaCandidateMassHist","Lambda Candidate Mass; Mass (GeV); Candidates per bin",225,1.05,1.50);
     TH1Manager.at(id_AP_pTminHist) = new MyTH1D("AP_pTminHist","Armenteros-Podolanski pT; Minimum pT (GeV); Conversions per bin",200,0.0,0.1);
     TH1Manager.at(id_AP_pTmaxHist) = new MyTH1D("AP_pTmaxHist","Armenteros-Podolanski pT; Maximum pT (GeV); Conversions per bin",200,0.0,0.1);
     TH1Manager.at(id_AP_pTaveHist) = new MyTH1D("AP_pTaveHist","Armenteros-Podolanski pT; Average pT (GeV); Conversions per bin",200,0.0,0.1);
@@ -507,6 +512,10 @@ void histset2::AnalyzeEntry(convsel& s){
         vpairppi  += v0p;
         vpairppi  += v1pi;
 
+        bool region1 = (r>3.7) && (r<6.2);
+        bool region2 = (r>7.6) && (r<10.3);
+        bool region3 = (r>11.7) && (r<15.3);
+
 // Apply fiducial cuts to all candidates
 		if(abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
            FillTH1(id_r1dHist, r, wtPU);
@@ -563,18 +572,46 @@ void histset2::AnalyzeEntry(convsel& s){
 // Lambda candidate with a proton ( Lambda -> pi- p ) only populates +ve alpha
                if(q1 == 1){
                   FillTH1(id_lambdaCandidateMassHist, vpairpip.M(), wtPU);
+                  FillTH1(id_lambdasCandidateMassHist, vpairpip.M(), wtPU);
+                  if(region1||region2||region3){
+                     FillTH1(id_lambdasBkgdMassHist, vpairpip.M(), wtPU);
+                  }
+                  else{
+                     FillTH1(id_lambdasSignalMassHist, vpairpip.M(), wtPU);
+                  }
                }
                else{
                   FillTH1(id_lambdaCandidateMassHist, vpairppi.M(), wtPU);
+                  FillTH1(id_lambdasCandidateMassHist, vpairppi.M(), wtPU);
+                  if(region1||region2||region3){
+                     FillTH1(id_lambdasBkgdMassHist, vpairppi.M(), wtPU);
+                  }
+                  else{
+                     FillTH1(id_lambdasSignalMassHist, vpairppi.M(), wtPU);
+                  }
                }
             }
             else{
 // Lambdabar candidate with an antiproton ( Lambdabar -> pi+ pbar) only populates -ve alpha
                if(q0 == 1){
-                  FillTH1(id_lambdaCandidateMassHist, vpairpip.M(), wtPU);
+                  FillTH1(id_lambdabarCandidateMassHist, vpairpip.M(), wtPU);
+                  FillTH1(id_lambdasCandidateMassHist, vpairpip.M(), wtPU);
+                  if(region1||region2||region3){
+                     FillTH1(id_lambdasBkgdMassHist, vpairpip.M(), wtPU);
+                  }
+                  else{
+                     FillTH1(id_lambdasSignalMassHist, vpairpip.M(), wtPU);
+                  }
                }
                else{
-                  FillTH1(id_lambdaCandidateMassHist, vpairppi.M(), wtPU);
+                  FillTH1(id_lambdabarCandidateMassHist, vpairppi.M(), wtPU);
+                  FillTH1(id_lambdasCandidateMassHist, vpairppi.M(), wtPU);
+                  if(region1||region2||region3){
+                     FillTH1(id_lambdasBkgdMassHist, vpairppi.M(), wtPU);
+                  }
+                  else{
+                     FillTH1(id_lambdasSignalMassHist, vpairppi.M(), wtPU);
+                  }
                }
             }
             FillTH1(id_AP_pTminHist, std::min(APpT0,APpT1), wtPU);
