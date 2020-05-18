@@ -557,8 +557,26 @@ void histset2::AnalyzeEntry(convsel& s){
 
             FillTH1(id_conversionCandidateMassHist, vpair.M(), wtPU);
             FillTH1(id_conversionCandidateMassHist2, vpair.M(), wtPU);
-            FillTH1(id_lambdaCandidateMassHist, vpairpip.M(), wtPU);
-            FillTH1(id_lambdaCandidateMassHist, vpairppi.M(), wtPU);
+// pip: Track 0 = pi, Track 1 = p
+// ppi: Track 0 = p , Track 1 = pi
+            if(APalpha >= 0.0){
+// Lambda candidate with a proton ( Lambda -> pi- p ) only populates +ve alpha
+               if(q1 == 1){
+                  FillTH1(id_lambdaCandidateMassHist, vpairpip.M(), wtPU);
+               }
+               else{
+                  FillTH1(id_lambdaCandidateMassHist, vpairppi.M(), wtPU);
+               }
+            }
+            else{
+// Lambdabar candidate with an antiproton ( Lambdabar -> pi+ pbar) only populates -ve alpha
+               if(q0 == 1){
+                  FillTH1(id_lambdaCandidateMassHist, vpairpip.M(), wtPU);
+               }
+               else{
+                  FillTH1(id_lambdaCandidateMassHist, vpairppi.M(), wtPU);
+               }
+            }
             FillTH1(id_AP_pTminHist, std::min(APpT0,APpT1), wtPU);
             FillTH1(id_AP_pTmaxHist, std::max(APpT0,APpT1), wtPU);
             FillTH1(id_AP_pTaveHist, 0.5*(APpT0+APpT1), wtPU);
