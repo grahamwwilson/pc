@@ -54,8 +54,13 @@ class histset2{
                        id_conversionCandidateMassHist2,
                        id_lambdaCandidateMassHist,id_lambdabarCandidateMassHist,id_lambdasCandidateMassHist,
                        id_lambdasBkgdMassHist,id_lambdasSignalMassHist,
+                       id_lambdasBkgdMassHistR1,id_lambdasBkgdMassHistR2,id_lambdasBkgdMassHistR3,
+                       id_KShortMassHist,id_KShortBkgdMassHistR1,id_KShortBkgdMassHistR2,
+                       id_KShortBkgdMassHistR3,id_KShortBkgdMassHist,
                        id_AP_pTminHist, id_AP_pTmaxHist, id_AP_pTaveHist,
                        id_AP_alphaHist,
+                       id_alphaBkgdHist, id_alphaSignalHist,
+                       id_alphaBkgdHistR1, id_alphaBkgdHistR2, id_alphaBkgdHistR3,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -200,13 +205,31 @@ void histset2::init(){
     TH1Manager.at(id_conversionCandidateMassHist2) = new MyTH1D("conversionCandidateMassHist2","e+e- Pair Mass; Mass (GeV); Conversions per bin",100,0.0,0.1);
     TH1Manager.at(id_lambdasCandidateMassHist) = new MyTH1D("lambdasCandidateMassHist","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",225,1.05,1.50);
     TH1Manager.at(id_lambdasBkgdMassHist) = new MyTH1D("lambdasBkgdMassHist","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",90,1.05,1.50);
+    TH1Manager.at(id_lambdasBkgdMassHistR1) = new MyTH1D("lambdasBkgdMassHistR1","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",90,1.05,1.50);
+    TH1Manager.at(id_lambdasBkgdMassHistR2) = new MyTH1D("lambdasBkgdMassHistR2","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",90,1.05,1.50);
+    TH1Manager.at(id_lambdasBkgdMassHistR3) = new MyTH1D("lambdasBkgdMassHistR3","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",90,1.05,1.50);
     TH1Manager.at(id_lambdasSignalMassHist) = new MyTH1D("lambdasSignalMassHist","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",90,1.05,1.50);
     TH1Manager.at(id_lambdabarCandidateMassHist) = new MyTH1D("lambdabarCandidateMassHist","Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",225,1.05,1.50);
     TH1Manager.at(id_lambdaCandidateMassHist) = new MyTH1D("lambdaCandidateMassHist","Lambda Candidate Mass; Mass (GeV); Candidates per bin",225,1.05,1.50);
+
+    TH1Manager.at(id_KShortMassHist) = new MyTH1D("KShortMassHist","KShort Candidate Mass; Mass (GeV); Candidates per bin",250,0.25,0.75);
+    TH1Manager.at(id_KShortBkgdMassHist) = new MyTH1D("KShortBkgdMassHist","KShort Candidate Mass; Mass (GeV); Candidates per bin",250,0.25,0.75);
+    TH1Manager.at(id_KShortBkgdMassHistR1) = new MyTH1D("KShortBkgdMassHistR1","KShort Candidate Mass; Mass (GeV); Candidates per bin",250,0.25,0.75);
+    TH1Manager.at(id_KShortBkgdMassHistR2) = new MyTH1D("KShortBkgdMassHistR2","KShort Candidate Mass; Mass (GeV); Candidates per bin",250,0.25,0.75);
+    TH1Manager.at(id_KShortBkgdMassHistR3) = new MyTH1D("KShortBkgdMassHistR3","KShort Candidate Mass; Mass (GeV); Candidates per bin",250,0.25,0.75);
+    
     TH1Manager.at(id_AP_pTminHist) = new MyTH1D("AP_pTminHist","Armenteros-Podolanski pT; Minimum pT (GeV); Conversions per bin",200,0.0,0.1);
     TH1Manager.at(id_AP_pTmaxHist) = new MyTH1D("AP_pTmaxHist","Armenteros-Podolanski pT; Maximum pT (GeV); Conversions per bin",200,0.0,0.1);
     TH1Manager.at(id_AP_pTaveHist) = new MyTH1D("AP_pTaveHist","Armenteros-Podolanski pT; Average pT (GeV); Conversions per bin",200,0.0,0.1);
     TH1Manager.at(id_AP_alphaHist) = new MyTH1D("AP_alphaHist","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
+
+
+    TH1Manager.at(id_alphaBkgdHist) = new MyTH1D("alphaBkgdHist","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
+    TH1Manager.at(id_alphaBkgdHistR1) = new MyTH1D("alphaBkgdHistR1","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
+    TH1Manager.at(id_alphaBkgdHistR2) = new MyTH1D("alphaBkgdHistR2","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
+    TH1Manager.at(id_alphaBkgdHistR3) = new MyTH1D("alphaBkgdHistR3","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
+    TH1Manager.at(id_alphaSignalHist) = new MyTH1D("alphaSignalHist","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
+    
 
 /*    asym2 = new TH1D("asym2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     asym4 = new TH1D("asym4", "Photon pT > 4 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
@@ -553,19 +576,30 @@ void histset2::AnalyzeEntry(convsel& s){
 		//make quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
                 && fitprob > FITPROBCUT && std::max(nBefore0,nBefore1)==0 ){
-/*
-    TH1Manager.at(id_conversionCandidateMassHist) = new MyTH1D("conversionCandidateMassHist","e+e- Pair Mass; Mass (GeV); Conversions per bin",200,0.0,1.0);
-    TH1Manager.at(id_conversionCandidateMassHist2) = new MyTH1D("conversionCandidateMassHist2","e+e- Pair Mass; Mass (GeV); Conversions per bin",100,0.0,0.1);
-    TH1Manager.at(id_lambdaCandidateMassHist) = new MyTH1D("lambdaCandidateMassHist","Lamda Candidate Mass; Mass (GeV); Conversions per bin",300,1.0,2.5);
-    TH1Manager.at(id_AP_pTminHist) = new MyTH1D("AP_pTminHist","Armenteros-Podolanski pT; Minimum pT (GeV); Conversions per bin",200,0.0,0.1);
-    TH1Manager.at(id_AP_pTmaxHist) = new MyTH1D("AP_pTmaxHist","Armenteros-Podolanski pT; Maximum pT (GeV); Conversions per bin",200,0.0,0.1);
-    TH1Manager.at(id_AP_pTaveHist) = new MyTH1D("AP_pTaveHist","Armenteros-Podolanski pT; Average pT (GeV); Conversions per bin",200,0.0,0.1);
-    TH1Manager.at(id_AP_alphaHist) = new MyTH1D("AP_alphaHist","Armenteros-Podolanski alpha; (pL+ - pL-)/(pL+ + pL-); Conversions per bin",200,-1.0,1.0);
-*/
+
             vcuts[i] = true;
+
+            if(region1||region2||region3){
+               FillTH1(id_alphaBkgdHist, APalpha, wtPU);
+               if(region1)FillTH1(id_alphaBkgdHistR1, APalpha, wtPU);
+               if(region2)FillTH1(id_alphaBkgdHistR2, APalpha, wtPU);
+               if(region3)FillTH1(id_alphaBkgdHistR3, APalpha, wtPU);
+            }
+            else{
+               FillTH1(id_alphaSignalHist, APalpha, wtPU);
+            }
 
             FillTH1(id_conversionCandidateMassHist, vpair.M(), wtPU);
             FillTH1(id_conversionCandidateMassHist2, vpair.M(), wtPU);
+
+            FillTH1(id_KShortMassHist, vpairpipi.M(), wtPU);
+            if(region1||region2||region3){
+               FillTH1(id_KShortBkgdMassHist, vpairpipi.M(), wtPU);
+               if(region1)FillTH1(id_KShortBkgdMassHistR1, vpairpipi.M(), wtPU);
+               if(region2)FillTH1(id_KShortBkgdMassHistR2, vpairpipi.M(), wtPU);
+               if(region3)FillTH1(id_KShortBkgdMassHistR3, vpairpipi.M(), wtPU);
+            }            
+
 // pip: Track 0 = pi, Track 1 = p
 // ppi: Track 0 = p , Track 1 = pi
             if(APalpha >= 0.0){
@@ -575,6 +609,9 @@ void histset2::AnalyzeEntry(convsel& s){
                   FillTH1(id_lambdasCandidateMassHist, vpairpip.M(), wtPU);
                   if(region1||region2||region3){
                      FillTH1(id_lambdasBkgdMassHist, vpairpip.M(), wtPU);
+                     if(region1)FillTH1(id_lambdasBkgdMassHistR1, vpairpip.M(), wtPU);
+                     if(region2)FillTH1(id_lambdasBkgdMassHistR2, vpairpip.M(), wtPU);
+                     if(region3)FillTH1(id_lambdasBkgdMassHistR3, vpairpip.M(), wtPU);
                   }
                   else{
                      FillTH1(id_lambdasSignalMassHist, vpairpip.M(), wtPU);
@@ -585,6 +622,9 @@ void histset2::AnalyzeEntry(convsel& s){
                   FillTH1(id_lambdasCandidateMassHist, vpairppi.M(), wtPU);
                   if(region1||region2||region3){
                      FillTH1(id_lambdasBkgdMassHist, vpairppi.M(), wtPU);
+                     if(region1)FillTH1(id_lambdasBkgdMassHistR1, vpairppi.M(), wtPU);
+                     if(region2)FillTH1(id_lambdasBkgdMassHistR2, vpairppi.M(), wtPU);
+                     if(region3)FillTH1(id_lambdasBkgdMassHistR3, vpairppi.M(), wtPU);
                   }
                   else{
                      FillTH1(id_lambdasSignalMassHist, vpairppi.M(), wtPU);
@@ -598,6 +638,9 @@ void histset2::AnalyzeEntry(convsel& s){
                   FillTH1(id_lambdasCandidateMassHist, vpairpip.M(), wtPU);
                   if(region1||region2||region3){
                      FillTH1(id_lambdasBkgdMassHist, vpairpip.M(), wtPU);
+                     if(region1)FillTH1(id_lambdasBkgdMassHistR1, vpairpip.M(), wtPU);
+                     if(region2)FillTH1(id_lambdasBkgdMassHistR2, vpairpip.M(), wtPU);
+                     if(region3)FillTH1(id_lambdasBkgdMassHistR3, vpairpip.M(), wtPU);
                   }
                   else{
                      FillTH1(id_lambdasSignalMassHist, vpairpip.M(), wtPU);
@@ -608,6 +651,9 @@ void histset2::AnalyzeEntry(convsel& s){
                   FillTH1(id_lambdasCandidateMassHist, vpairppi.M(), wtPU);
                   if(region1||region2||region3){
                      FillTH1(id_lambdasBkgdMassHist, vpairppi.M(), wtPU);
+                     if(region1)FillTH1(id_lambdasBkgdMassHistR1, vpairppi.M(), wtPU);
+                     if(region2)FillTH1(id_lambdasBkgdMassHistR2, vpairppi.M(), wtPU);
+                     if(region3)FillTH1(id_lambdasBkgdMassHistR3, vpairppi.M(), wtPU);
                   }
                   else{
                      FillTH1(id_lambdasSignalMassHist, vpairppi.M(), wtPU);
