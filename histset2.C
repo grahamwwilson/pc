@@ -254,7 +254,7 @@ void histset2::init(){
 	TH2Manager.at(id_mggRCutHist) = new MyTH2D("mggRCutHist","Di-#gamma Mass;Mass (GeV); Radius (cm)", 400, 0.0, 1.0, 25, 0.0, 25.0 );
 	TH2Manager.at(id_rhophiHist) = new MyTH2D("rhophiHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Phi (rad)",100,0.0,5.0,40,-PI,PI);
 //                    id_AP_pT_alphaHist,
-	TH2Manager.at(id_AP_pT_alphaHist) = new MyTH2D("AP_pT_alphaHist","Armenteros-Podolanski Plot; alpha; pT (GeV)",200,-1.0,1.0,200,0.0,0.22);
+	TH2Manager.at(id_AP_pT_alphaHist) = new MyTH2D("AP_pT_alphaHist","Armenteros-Podolanski Plot; #alpha = (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); p_{T} (GeV)",200,-1.0,1.0,200,0.0,0.22);
 }
 
 void histset2::FillTH1(int index, double x, double w=1.0){
@@ -711,6 +711,8 @@ void histset2::AnalyzeEntry(convsel& s){
             if(pt>4.0)FillTH1(id_alpha4Hist, APalpha, wtPU);
             if(pt>8.0)FillTH1(id_alpha8Hist, APalpha, wtPU);
             if(pt>16.0)FillTH1(id_alpha16Hist, APalpha, wtPU);
+
+// Also include correlation plot between APalpha and ptasym.
 
 		}
 /// Endcap plots
