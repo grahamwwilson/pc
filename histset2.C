@@ -14,6 +14,20 @@
 using MyTH1D = ROOT::TThreadedObject<TH1D>;
 using MyTH2D = ROOT::TThreadedObject<TH2D>;
 
+// Use a vector of structs to retain intermediate results 
+// indexed by conversion
+struct tuple {
+    double radius;
+    double rerr;
+    double mpair;
+    double pfit;
+    double alpha;
+    double qpt0;
+    double qpt1;
+    double Pos;
+    double Neg;
+};
+
 class histset2{
 	
     public:
@@ -29,6 +43,7 @@ class histset2{
        enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
                        id_numpvWHist,
                        id_rerrHist, id_phierrHist, id_zerrHist,
+                       id_r1dHist2, id_r1dHist3,
                        id_r1dHist, id_r1dcutHist, 
                        id_r1dlowPUHist, id_r1dmedPUHist, id_r1dhiPUHist, 
                        id_r1dlowPUcutHist, id_r1dmedPUcutHist, id_r1dhiPUcutHist, 
@@ -134,6 +149,9 @@ void histset2::init(){
 	TH1Manager.at(id_costhetaHist) = new MyTH1D("costhetaHist","Photon Conversions; cos(theta); ", 200, -1.0, 1.0);
 	TH1Manager.at(id_pfitHist) = new MyTH1D("pfitHist","Photon Conversions;Fit probability; ", 100, 0.0, 1.0);
 	TH1Manager.at(id_r1dHist) = new MyTH1D("r1dHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",100, 0.0, 10.0);
+	TH1Manager.at(id_r1dHist2) = new MyTH1D("r1dHist2","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
+	TH1Manager.at(id_r1dHist3) = new MyTH1D("r1dHist3","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
+
 	TH1Manager.at(id_r1dwideHist) = new MyTH1D("r1dwideHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
 	TH1Manager.at(id_zcutHist) = new MyTH1D("zcutHist","Photon Conversions; z (cm); ", 250, -25.0, 25.0);
 	TH1Manager.at(id_zcutHist2) = new MyTH1D("zcutHist2","Photon Conversions; z (cm); ", 500, -50.0, 50.0);
@@ -417,25 +435,26 @@ void histset2::AnalyzeEntry(convsel& s){
 	FillTH1(id_numpvWHist, numberOfPV, wtPU);
 	FillTH2(id_npc_npvHist, numberOfPV, numberOfPC, wtPU);
 
-// Pileup values (here assume first 12 are in-time, next 4 are out-of-time?)
-/*
-    if(!isRealData){
-       int sum1 = 0;
-       for(int i=0; i<16; i++){
-           sum1 += mcpu[i];
-       }
-       FillTH1(id_PUHist, double(sum1)/16.0);
-    }
-*/
-
     std::vector<bool> vcuts;
+    std::vector<double> PosTkInfo;
+    std::vector<double> NegTkInfo; 
 
 // Probably a good idea to keep track of whether each conversion 
 // candidate passes particular cuts, to ease later code 
 // with gamma-gamma invariant mass
+
+// Also make vectors with derived quantities managed using a struct 
+// that can be plotted later
+    std::vector<tuple> tup;
+
 	for(int i=0; i<PC_x.GetSize(); i++){
 
+// push-back new tuple with default constructor
+        tup.push_back(tuple());
+
         vcuts.push_back(false);
+        PosTkInfo.push_back(-1.0);
+        NegTkInfo.push_back(-1.0);
 		x = PC_x[i];
 		y = PC_y[i];
 		z = PC_z[i];
@@ -550,15 +569,10 @@ void histset2::AnalyzeEntry(convsel& s){
            FillTH1(id_costhetaHist, cos(theta), wtPU);      
     	   FillTH2(id_xyHist, x, y, wtPU);
            FillTH2(id_xywideHist, x, y, wtPU);
-//           FillTH2(id_rphiHist, r, phi, wtPU);
            FillTH2(id_rzHist, z, r, wtPU);
            FillTH1(id_pTHist2, pt, wtPU);
            FillTH1(id_EHist2, E, wtPU);
            FillTH1(id_phiHist2, phi, wtPU);
-/*    auto& PC_mpair = s.PC_pairInvariantMass;
-    auto& PC_dcottheta = s.PC_pairCotThetaSeparation;
-    auto& PC_dmin = s.PC_distOfMinimumApproach;
-    auto& PC_dphi = s.PC_dPhiTracksAtVtx; */
            FillTH1(id_dminHist, PC_dmin[i], wtPU);
            FillTH1(id_dphiHist, PC_dphi[i], wtPU);
            if(PC_mpair[i]<0.25){
@@ -575,8 +589,34 @@ void histset2::AnalyzeEntry(convsel& s){
 		//make quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
                 && fitprob > FITPROBCUT && std::max(nBefore0,nBefore1)==0 ){
-
             vcuts[i] = true;
+// Keep track of chisq/dof of constituent tracks to later identify conversion 
+// candidates that use the same track.
+// Hmm - maybe need to keep track of all the used tracks
+            if(q0 == 1 && q1 == -1){
+               PosTkInfo[i] = Tk0_chi2[i]/double(Tk0_ndof[i]);
+               NegTkInfo[i] = Tk1_chi2[i]/double(Tk1_ndof[i]);
+            }
+            else{
+               PosTkInfo[i] = Tk1_chi2[i]/double(Tk1_ndof[i]);
+               NegTkInfo[i] = Tk0_chi2[i]/double(Tk0_ndof[i]);
+            }
+// Fill tuple with relevant derived quantities
+            tup[i].radius = r;
+            tup[i].rerr = rerr;
+            tup[i].mpair = vpair.M();
+            tup[i].pfit = fitprob;
+            tup[i].alpha = APalpha;
+            tup[i].qpt0 = APpT0;
+            tup[i].qpt1 = APpT1;
+            tup[i].Pos = PosTkInfo[i];
+            tup[i].Neg = NegTkInfo[i];
+// for technical checks
+            FillTH1( id_r1dHist2, tup[i].radius );
+        }
+
+		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
+                && fitprob > FITPROBCUT && std::max(nBefore0,nBefore1)==0 ){
 
             if(region1||region2||region3){
                FillTH1(id_alphaBkgdHist, APalpha, wtPU);
@@ -753,6 +793,30 @@ void histset2::AnalyzeEntry(convsel& s){
 			}
 		}				
 	}
+
+// For each selected conversion identify which other selected conversions share tracks.
+// Current implementation simply rejects the subsequent conversions rather than doing any arbitration.
+    for(unsigned int i=0; i<numberOfPC-1; i++){
+        if(vcuts[i]){
+           for(unsigned int j=i+1; j<numberOfPC; j++){
+              bool deselect = false;
+              if(vcuts[j]){
+                 if(PosTkInfo[i] == PosTkInfo[j] || NegTkInfo[i] == NegTkInfo[j]) deselect = true;
+              }
+              if(deselect)vcuts[j] = false;
+           }
+        }
+    }
+
+// Now should have eliminated duplicates
+    for(unsigned int i=0; i<numberOfPC; i++){
+        if(vcuts[i]){
+// for technical checks
+           FillTH1( id_r1dHist3, tup[i].radius );
+        }
+    }
+
+// Maybe use vector of structs ?
 
 	//gamma gamma stuff IS THIS LOOP CORRECT
     // Can also speed this up a bit ...
