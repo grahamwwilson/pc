@@ -839,7 +839,7 @@ void histset2::AnalyzeEntry(convsel& s){
 // Characterize our matching problem for this event
 
 //    if(vcandidate.size() >=3 && std::min(mNeg.size(), mPos.size()) < vcandidate.size() ){
-    if(vcandidate.size() >=7){
+    if(vcandidate.size() >=6){
        std::cout << " " << std::endl;
        std::cout << "Event " << eventNumber << std::endl;
        std::cout << "nedges = " << vcandidate.size() << std::endl;
@@ -847,6 +847,13 @@ void histset2::AnalyzeEntry(convsel& s){
        std::cout << "N+ = " << mmPos.size() << std::endl;
        std::cout << "n- = " << mNeg.size() << std::endl;
        std::cout << "n+ = " << mPos.size() << std::endl;
+       std::cout << "Target cardinality = " << std::min(mNeg.size(),mPos.size()) << std::endl;
+// Prior solution wtih no arbitration
+       std::cout << "Prior edge solution: ";
+       for(int i=0; i<numberOfPC; ++i){
+           if(vcuts[i])std::cout << std::setw(3) << i; 
+       }
+       std::cout << std::endl;
 //    }
 
 // Let's try setting up our (n- * n+) cost matrix as input to the Hungarian Algorithm.
@@ -884,14 +891,14 @@ void histset2::AnalyzeEntry(convsel& s){
 
 // Debug printing
     for (auto irow = costMatrix.begin(); irow != costMatrix.end(); ++irow) {
-        std::cout << "Row weights: ";
+        std::cout << "Row weights:   ";
         for (auto pos = irow->begin(); pos != irow->end(); ++pos) {
             std::cout << std::setw(10) << *pos << " ";
         }
         std::cout << std::endl;
     }
     for (auto irow = edgeMatrix.begin(); irow != edgeMatrix.end(); ++irow) {
-        std::cout << "Edges      : ";
+        std::cout << "Edges      :   ";
         for (auto pos = irow->begin(); pos != irow->end(); ++pos) {
             std::cout << std::setw(10) << *pos << " ";
         }
