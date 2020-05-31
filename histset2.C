@@ -12,13 +12,14 @@
 #include "Math/Vector4D.h"
 #include <map>
 #include <iomanip>
+#include "Hungarian.h"
 //#include <vector>
 using MyTH1D = ROOT::TThreadedObject<TH1D>;
 using MyTH2D = ROOT::TThreadedObject<TH2D>;
 
 // Use a vector of structs to retain intermediate results 
 // indexed by conversion
-struct tuple {
+struct mytuple {
     double radius;
     double rerr;
     double mpair;
@@ -453,12 +454,12 @@ void histset2::AnalyzeEntry(convsel& s){
 
 // Also make vectors with derived quantities managed using a struct 
 // that can be plotted later
-    std::vector<tuple> tup;
+    std::vector<mytuple> tup;
 
 	for(int i=0; i<PC_x.GetSize(); i++){
 
 // push-back new tuple with default constructor
-        tup.push_back(tuple());
+        tup.push_back(mytuple());
 
         vcuts.push_back(false);
         PosTkInfo.push_back(-1.0);
@@ -837,9 +838,12 @@ void histset2::AnalyzeEntry(convsel& s){
 // Maybe use vector of structs ?
 
 // Characterize our matching problem for this event
+// Note this is often overkill if there are no duplicates, ie. n- = n+ = nedges?
+
+    std::vector<int> vsel;   // Vector for indices of selected conversions after removing duplicates
 
 //    if(vcandidate.size() >=3 && std::min(mNeg.size(), mPos.size()) < vcandidate.size() ){
-    if(vcandidate.size() >=6){
+    if(vcandidate.size() >=1){
        std::cout << " " << std::endl;
        std::cout << "Event " << eventNumber << std::endl;
        std::cout << "nedges = " << vcandidate.size() << std::endl;
@@ -847,7 +851,7 @@ void histset2::AnalyzeEntry(convsel& s){
        std::cout << "N+ = " << mmPos.size() << std::endl;
        std::cout << "n- = " << mNeg.size() << std::endl;
        std::cout << "n+ = " << mPos.size() << std::endl;
-       std::cout << "Target cardinality = " << std::min(mNeg.size(),mPos.size()) << std::endl;
+       std::cout << "Target maximum possible cardinality of solution = " << std::min(mNeg.size(),mPos.size()) << std::endl;
 // Prior solution wtih no arbitration
        std::cout << "Prior edge solution: ";
        for(int i=0; i<numberOfPC; ++i){
@@ -875,7 +879,8 @@ void histset2::AnalyzeEntry(convsel& s){
                  if(NegTkInfo[k] == negInfo && PosTkInfo[k] == posInfo ) {
 // Found matching edge
                     std::cout << "Found matching edge " << k << std::endl;
-                    v.push_back(1.0-tup[k].pfit);
+// Add cost value of corresponding chi-squared value for 1 dof.
+                    v.push_back(TMath::ChisquareQuantile(1.0-tup[k].pfit,1.0));
                     e.push_back(k);
                     found=true;
                  }
@@ -903,6 +908,50 @@ void histset2::AnalyzeEntry(convsel& s){
             std::cout << std::setw(10) << *pos << " ";
         }
         std::cout << std::endl;
+    }
+
+// Use Hungarian Algorithm to find the minimum cost assignment 
+// of electrons to positrons. The total cost will be the total 
+// chi-squared of all assignments (each with 1 dof).
+// Need to take care also of the case where there is no 
+// one-sided perfect matching, and algorithmically, the extra 
+// assignments are assigned to the fictional high-cost edges with 
+// nominal weight of 10000.
+
+	HungarianAlgorithm HungAlgo;
+	std::vector<int> assignment;
+
+	double cost = HungAlgo.Solve(costMatrix, assignment);
+
+    std::cout << "costMatrix.size() " << costMatrix.size() << std::endl;
+
+//    std::vector<int> vsel;   // Vector for indices of selected conversions after removing duplicates
+
+	for (unsigned int x = 0; x < costMatrix.size(); x++){
+// Need to check if this row is assigned (may not be if nRows > nCols)
+        if(assignment[x] >= 0){
+           if(edgeMatrix[x][assignment[x]] == -1){
+              cost-=10000.0;
+           }
+           else{
+              vsel.push_back(edgeMatrix[x][assignment[x]]);
+           }
+           std::cout << x << "," << assignment[x] 
+                     << " " << costMatrix[x][assignment[x]] << " " 
+                     << edgeMatrix[x][assignment[x]] << std::endl;
+        }
+    }
+
+    int nconvs = vsel.size();
+    if(vsel.size() > 0){
+       double psel = TMath::Prob(cost,vsel.size());
+	   std::cout << "\nMinimized total chisq: " << cost << " ( " << vsel.size() << " ) " << " p-value " << psel <<std::endl;
+       std::sort(vsel.begin(), vsel.end());
+       std::cout << "Selected conversions ";
+       for(int i=0; i<vsel.size(); ++i){
+           std::cout << std::setw(3) << " " << vsel[i]; 
+       }
+       std::cout << std::endl;
     }
 }
 
