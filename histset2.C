@@ -10,6 +10,8 @@
 #include "myweights.h"
 #include "Math/Vector3D.h"
 #include "Math/Vector4D.h"
+#include <map>
+#include <iomanip>
 //#include <vector>
 using MyTH1D = ROOT::TThreadedObject<TH1D>;
 using MyTH2D = ROOT::TThreadedObject<TH2D>;
@@ -437,7 +439,13 @@ void histset2::AnalyzeEntry(convsel& s){
 
     std::vector<bool> vcuts;
     std::vector<double> PosTkInfo;
-    std::vector<double> NegTkInfo; 
+    std::vector<double> NegTkInfo;
+    
+    std::vector<int> vcandidate;
+    std::map<double, int> mNeg;
+    std::multimap<double, int> mmNeg;
+    std::map<double, int> mPos;
+    std::multimap<double, int> mmPos;
 
 // Probably a good idea to keep track of whether each conversion 
 // candidate passes particular cuts, to ease later code 
@@ -601,6 +609,14 @@ void histset2::AnalyzeEntry(convsel& s){
                PosTkInfo[i] = Tk1_chi2[i]/double(Tk1_ndof[i]);
                NegTkInfo[i] = Tk0_chi2[i]/double(Tk0_ndof[i]);
             }
+
+// Fill STL containers that help define the "matching problem"
+            vcandidate.push_back(i);
+            mNeg.insert(std::make_pair(NegTkInfo[i],i));
+            mmNeg.insert(std::make_pair(NegTkInfo[i],i));
+            mPos.insert(std::make_pair(PosTkInfo[i],i));
+            mmPos.insert(std::make_pair(PosTkInfo[i],i));
+
 // Fill tuple with relevant derived quantities
             tup[i].radius = r;
             tup[i].rerr = rerr;
@@ -807,6 +823,8 @@ void histset2::AnalyzeEntry(convsel& s){
            }
         }
     }
+// There should be better ways to achieve the same thing. Maybe use STL set or multiset / map or multimap
+
 
 // Now should have eliminated duplicates
     for(unsigned int i=0; i<numberOfPC; i++){
@@ -817,6 +835,69 @@ void histset2::AnalyzeEntry(convsel& s){
     }
 
 // Maybe use vector of structs ?
+
+// Characterize our matching problem for this event
+
+//    if(vcandidate.size() >=3 && std::min(mNeg.size(), mPos.size()) < vcandidate.size() ){
+    if(vcandidate.size() >=7){
+       std::cout << " " << std::endl;
+       std::cout << "Event " << eventNumber << std::endl;
+       std::cout << "nedges = " << vcandidate.size() << std::endl;
+       std::cout << "N- = " << mmNeg.size() << std::endl;
+       std::cout << "N+ = " << mmPos.size() << std::endl;
+       std::cout << "n- = " << mNeg.size() << std::endl;
+       std::cout << "n+ = " << mPos.size() << std::endl;
+//    }
+
+// Let's try setting up our (n- * n+) cost matrix as input to the Hungarian Algorithm.
+// Hopefully we don't need to worry about whether 
+// nRows > nCols or nCols > nRows when rectangular rather than square.
+
+    std::vector< std::vector <double> > costMatrix;
+    std::vector< std::vector <int> > edgeMatrix;
+    for ( auto i = mNeg.begin(); i != mNeg.end(); ++i ){        // n- rows for each -ve track
+         std::vector<double> v;
+         std::vector<int> e;
+         for ( auto j = mPos.begin(); j != mPos.end(); ++j ){   // n+ cols for each +ve track
+// Go through all the edge candidates and see if there is an edge corresponding to this pairing.
+             double negInfo = i->first;
+             double posInfo = j->first;
+             bool found = false;
+             for (auto iter = vcandidate.begin(); iter != vcandidate.end(); ++iter) {
+                 unsigned int k = *iter;
+                 if(NegTkInfo[k] == negInfo && PosTkInfo[k] == posInfo ) {
+// Found matching edge
+                    std::cout << "Found matching edge " << k << std::endl;
+                    v.push_back(1.0-tup[k].pfit);
+                    e.push_back(k);
+                    found=true;
+                 }
+             }
+             if(!found){
+                v.push_back(10000.0);
+                e.push_back(-1);
+             }
+         }
+         costMatrix.push_back(v);
+         edgeMatrix.push_back(e);
+    }
+
+// Debug printing
+    for (auto irow = costMatrix.begin(); irow != costMatrix.end(); ++irow) {
+        std::cout << "Row weights: ";
+        for (auto pos = irow->begin(); pos != irow->end(); ++pos) {
+            std::cout << std::setw(10) << *pos << " ";
+        }
+        std::cout << std::endl;
+    }
+    for (auto irow = edgeMatrix.begin(); irow != edgeMatrix.end(); ++irow) {
+        std::cout << "Edges      : ";
+        for (auto pos = irow->begin(); pos != irow->end(); ++pos) {
+            std::cout << std::setw(10) << *pos << " ";
+        }
+        std::cout << std::endl;
+    }
+}
 
 	//gamma gamma stuff IS THIS LOOP CORRECT
     // Can also speed this up a bit ...

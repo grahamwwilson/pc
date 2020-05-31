@@ -3,6 +3,7 @@ CMSSW
 *.bak
 *~
 *.root
+*.out
 *.o
 compiledthreads
 compiledThreads2
