@@ -28,8 +28,8 @@ double HungarianAlgorithm::Solve(vector <vector<double> >& DistMatrix, vector<in
 	unsigned int nRows = DistMatrix.size();
 	unsigned int nCols = DistMatrix[0].size();
 
-	std::cout << "nRows " << nRows << std::endl;
-	std::cout << "nCols " << nCols << std::endl;
+	//std::cout << "nRows " << nRows << std::endl;
+	//std::cout << "nCols " << nCols << std::endl;
 
 	double *distMatrixIn = new double[nRows * nCols];
 	int *assignment = new int[nRows];
@@ -216,7 +216,7 @@ void HungarianAlgorithm::computeassignmentcost(int *assignment, double *cost, do
 		col = assignment[row];
 		if (col >= 0){
 			*cost += distMatrix[row + nOfRows*col];
-            std::cout << row << "," << col << " : " << distMatrix[row + nOfRows*col] << std::endl;
+            //std::cout << row << "," << col << " : " << distMatrix[row + nOfRows*col] << std::endl;
         }
 	}
 }

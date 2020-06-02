@@ -46,7 +46,7 @@ class histset2{
        enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
                        id_numpvWHist,
                        id_rerrHist, id_phierrHist, id_zerrHist,
-                       id_r1dHist2, id_r1dHist3,
+                       id_r1dHist2, id_r1dHist3, id_r1dHist4,
                        id_r1dHist, id_r1dcutHist, 
                        id_r1dlowPUHist, id_r1dmedPUHist, id_r1dhiPUHist, 
                        id_r1dlowPUcutHist, id_r1dmedPUcutHist, id_r1dhiPUcutHist, 
@@ -154,6 +154,7 @@ void histset2::init(){
 	TH1Manager.at(id_r1dHist) = new MyTH1D("r1dHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",100, 0.0, 10.0);
 	TH1Manager.at(id_r1dHist2) = new MyTH1D("r1dHist2","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
 	TH1Manager.at(id_r1dHist3) = new MyTH1D("r1dHist3","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
+	TH1Manager.at(id_r1dHist4) = new MyTH1D("r1dHist4","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
 
 	TH1Manager.at(id_r1dwideHist) = new MyTH1D("r1dwideHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
 	TH1Manager.at(id_zcutHist) = new MyTH1D("zcutHist","Photon Conversions; z (cm); ", 250, -25.0, 25.0);
@@ -337,6 +338,8 @@ void histset2::AnalyzeEntry(convsel& s){
     double rho,phip;
     double rps;
     double rnominal;
+
+    const bool lpr = true;    // print flag
 	
 	const double RERRCUT = 0.25;
 	const double COSTCUT = 0.85;
@@ -828,41 +831,46 @@ void histset2::AnalyzeEntry(convsel& s){
 
 
 // Now should have eliminated duplicates
+    int nsel3 = 0;
     for(unsigned int i=0; i<numberOfPC; i++){
         if(vcuts[i]){
 // for technical checks
            FillTH1( id_r1dHist3, tup[i].radius );
+           nsel3++;
         }
     }
 
 // Maybe use vector of structs ?
 
 // Characterize our matching problem for this event
-// Note this is often overkill if there are no duplicates, ie. n- = n+ = nedges?
+// Note this is unnecessary if there are no duplicates, ie. n- = n+ = nedges.
 
     std::vector<int> vsel;   // Vector for indices of selected conversions after removing duplicates
 
-//    if(vcandidate.size() >=3 && std::min(mNeg.size(), mPos.size()) < vcandidate.size() ){
-    if(vcandidate.size() >=1){
-       std::cout << " " << std::endl;
-       std::cout << "Event " << eventNumber << std::endl;
-       std::cout << "nedges = " << vcandidate.size() << std::endl;
-       std::cout << "N- = " << mmNeg.size() << std::endl;
-       std::cout << "N+ = " << mmPos.size() << std::endl;
-       std::cout << "n- = " << mNeg.size() << std::endl;
-       std::cout << "n+ = " << mPos.size() << std::endl;
-       std::cout << "Target maximum possible cardinality of solution = " << std::min(mNeg.size(),mPos.size()) << std::endl;
-// Prior solution wtih no arbitration
-       std::cout << "Prior edge solution: ";
-       for(int i=0; i<numberOfPC; ++i){
-           if(vcuts[i])std::cout << std::setw(3) << i; 
+    if(std::min(mNeg.size(), mPos.size()) < vcandidate.size()){
+// We actually have an assignment problem to worry about
+       if(lpr){
+          std::cout << " " << std::endl;
+          std::cout << "Event " << eventNumber << std::endl;
+          std::cout << "nedges = " << vcandidate.size() << std::endl;
+          std::cout << "N- = " << mmNeg.size() << std::endl;
+          std::cout << "N+ = " << mmPos.size() << std::endl;
+          std::cout << "n- = " << mNeg.size() << std::endl;
+          std::cout << "n+ = " << mPos.size() << std::endl;
+          std::cout << "Target maximum possible cardinality of solution = " << std::min(mNeg.size(),mPos.size()) << std::endl;
+// Prior solution with no arbitration
+          std::cout << "Prior edge solution: ";
+          for(int i=0; i<numberOfPC; ++i){
+              if(vcuts[i])std::cout << std::setw(3) << i; 
+          }
+          std::cout << std::endl;
        }
-       std::cout << std::endl;
-//    }
 
 // Let's try setting up our (n- * n+) cost matrix as input to the Hungarian Algorithm.
 // Hopefully we don't need to worry about whether 
 // nRows > nCols or nCols > nRows when rectangular rather than square.
+// TODO: One may reduce the size of the problem at the cost of more 
+// book-keeping by removing edges and vertices that have no ambiguities.
 
     std::vector< std::vector <double> > costMatrix;
     std::vector< std::vector <int> > edgeMatrix;
@@ -878,7 +886,7 @@ void histset2::AnalyzeEntry(convsel& s){
                  unsigned int k = *iter;
                  if(NegTkInfo[k] == negInfo && PosTkInfo[k] == posInfo ) {
 // Found matching edge
-                    std::cout << "Found matching edge " << k << std::endl;
+                    if(lpr)std::cout << "Found matching edge " << k << std::endl;
 // Add cost value of corresponding chi-squared value for 1 dof.
                     v.push_back(TMath::ChisquareQuantile(1.0-tup[k].pfit,1.0));
                     e.push_back(k);
@@ -895,19 +903,21 @@ void histset2::AnalyzeEntry(convsel& s){
     }
 
 // Debug printing
-    for (auto irow = costMatrix.begin(); irow != costMatrix.end(); ++irow) {
-        std::cout << "Row weights:   ";
-        for (auto pos = irow->begin(); pos != irow->end(); ++pos) {
-            std::cout << std::setw(10) << *pos << " ";
-        }
-        std::cout << std::endl;
-    }
-    for (auto irow = edgeMatrix.begin(); irow != edgeMatrix.end(); ++irow) {
-        std::cout << "Edges      :   ";
-        for (auto pos = irow->begin(); pos != irow->end(); ++pos) {
-            std::cout << std::setw(10) << *pos << " ";
-        }
-        std::cout << std::endl;
+    if(lpr){
+       for (auto irow = costMatrix.begin(); irow != costMatrix.end(); ++irow) {
+           std::cout << "Row weights:   ";
+           for (auto pos = irow->begin(); pos != irow->end(); ++pos) {
+               std::cout << std::setw(10) << *pos << " ";
+           }
+           std::cout << std::endl;
+       }
+       for (auto irow = edgeMatrix.begin(); irow != edgeMatrix.end(); ++irow) {
+           std::cout << "Edges      :   ";
+           for (auto pos = irow->begin(); pos != irow->end(); ++pos) {
+               std::cout << std::setw(10) << *pos << " ";
+           }
+           std::cout << std::endl;
+       }
     }
 
 // Use Hungarian Algorithm to find the minimum cost assignment 
@@ -923,7 +933,7 @@ void histset2::AnalyzeEntry(convsel& s){
 
 	double cost = HungAlgo.Solve(costMatrix, assignment);
 
-    std::cout << "costMatrix.size() " << costMatrix.size() << std::endl;
+    if(lpr)std::cout << "costMatrix.size() " << costMatrix.size() << std::endl;
 
 //    std::vector<int> vsel;   // Vector for indices of selected conversions after removing duplicates
 
@@ -936,7 +946,7 @@ void histset2::AnalyzeEntry(convsel& s){
            else{
               vsel.push_back(edgeMatrix[x][assignment[x]]);
            }
-           std::cout << x << "," << assignment[x] 
+           if(lpr)std::cout << x << "," << assignment[x] 
                      << " " << costMatrix[x][assignment[x]] << " " 
                      << edgeMatrix[x][assignment[x]] << std::endl;
         }
@@ -945,15 +955,41 @@ void histset2::AnalyzeEntry(convsel& s){
     int nconvs = vsel.size();
     if(vsel.size() > 0){
        double psel = TMath::Prob(cost,vsel.size());
-	   std::cout << "\nMinimized total chisq: " << cost << " ( " << vsel.size() << " ) " << " p-value " << psel <<std::endl;
+	   if(lpr)std::cout << "\nMinimized total chisq: " << cost << " ( " << vsel.size() << " ) " << " p-value " << psel <<std::endl;
        std::sort(vsel.begin(), vsel.end());
-       std::cout << "Selected conversions ";
-       for(int i=0; i<vsel.size(); ++i){
-           std::cout << std::setw(3) << " " << vsel[i]; 
+       if(lpr){
+          std::cout << "Selected conversions ";
+          for(int i=0; i<vsel.size(); ++i){
+              std::cout << std::setw(3) << " " << vsel[i]; 
+          }
+          std::cout << std::endl;
        }
-       std::cout << std::endl;
     }
-}
+ }
+  else{
+// No ambiguities - so no assignment problem to solve 
+     if(vcandidate.size() > 0){
+        vsel = vcandidate;
+        std::sort(vsel.begin(), vsel.end());
+        if(lpr){
+           std::cout << "Selected conversions 2: " << eventNumber << " ";
+           for(int i=0; i<vsel.size(); ++i){
+              std::cout << std::setw(3) << " " << vsel[i]; 
+           }
+           std::cout << std::endl;
+        }
+     }
+  }
+
+// Now with duplicates eliminated histogram radius
+    for(unsigned int j=0; j<vsel.size(); ++j){
+        int i = vsel[j];
+// for technical checks
+        FillTH1( id_r1dHist4, tup[i].radius );
+    }
+
+//    std::cout << "Candidate counting: " << nsel3 << " " << vsel.size() << std::endl;
+    if(lpr&&nsel3!=vsel.size())std::cout << "Event " << eventNumber << " MISMATCH " << nsel3 << " " << vsel.size() << std::endl;
 
 	//gamma gamma stuff IS THIS LOOP CORRECT
     // Can also speed this up a bit ...
