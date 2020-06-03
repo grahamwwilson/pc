@@ -76,7 +76,7 @@ class histset2{
                        id_AP_alphaHist,
                        id_alphaBkgdHist, id_alphaSignalHist,
                        id_alphaBkgdHistR1, id_alphaBkgdHistR2, id_alphaBkgdHistR3,
-                       id_nconvHist,
+                       id_nconvHist, id_nassignedHist, id_nnonassignedHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -243,6 +243,8 @@ void histset2::init(){
     TH1Manager.at(id_alphaSignalHist) = new MyTH1D("alphaSignalHist","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
 
     TH1Manager.at(id_nconvHist) = new MyTH1D("nconvHist", "Photon Conversions; Number of Conversions; Entries per bin", 40, -0.5, 39.5 );
+    TH1Manager.at(id_nassignedHist) = new MyTH1D("nassignedHist", "Photon Conversions; Number of Conversions; Entries per bin", 40, -0.5, 39.5 );
+    TH1Manager.at(id_nnonassignedHist) = new MyTH1D("nnonassignedHist", "Photon Conversions; Number of Conversions; Entries per bin", 40, -0.5, 39.5 );
 
 // init TH2D
 	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
@@ -442,8 +444,9 @@ void histset2::AnalyzeEntry(convsel& s){
 // candidate passes particular cuts, to ease later code 
 // with gamma-gamma invariant mass
 
-// Also make vectors with derived quantities managed using a struct 
-// that can be plotted later
+    int nassigned = 0;
+  
+// Vector of derived quantities managed using a struct
     std::vector<mytuple> tup;
 
 	for(int i=0; i<PC_x.GetSize(); i++){
@@ -585,7 +588,7 @@ void histset2::AnalyzeEntry(convsel& s){
            FillTH1(id_dcotthetaHist, PC_dcottheta[i], wtPU);
         }
 
-		//make quality cuts
+// Make primary quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
                 && fitprob > FITPROBCUT && std::max(nBefore0,nBefore1)==0 ){
             vcuts[i] = true;
@@ -799,37 +802,8 @@ void histset2::AnalyzeEntry(convsel& s){
 		}				
 	}
 
-// For each selected conversion identify which other selected conversions share tracks.
-// Current implementation simply rejects the subsequent conversions rather than doing any arbitration.
-    for(unsigned int i=0; i<numberOfPC-1; i++){
-        if(vcuts[i]){
-           for(unsigned int j=i+1; j<numberOfPC; j++){
-              bool deselect = false;
-              if(vcuts[j]){
-                 if(PosTkInfo[i] == PosTkInfo[j] || NegTkInfo[i] == NegTkInfo[j]) deselect = true;
-              }
-              if(deselect)vcuts[j] = false;
-           }
-        }
-    }
-// There should be better ways to achieve the same thing. Maybe use STL set or multiset / map or multimap
-
-
-// Now should have eliminated duplicates
-    int nsel3 = 0;
-    for(unsigned int i=0; i<numberOfPC; i++){
-        if(vcuts[i]){
-// for technical checks
-           FillTH1( id_r1dHist3, tup[i].radius );
-           nsel3++;
-        }
-    }
-
-// Maybe use vector of structs ?
-
 // Characterize our matching problem for this event
 // Note this is unnecessary if there are no duplicates, ie. n- = n+ = nedges.
-
     std::vector<int> vsel;   // Vector for indices of selected conversions after removing duplicates
 
     if(std::min(mNeg.size(), mPos.size()) < vcandidate.size()){
@@ -849,22 +823,25 @@ void histset2::AnalyzeEntry(convsel& s){
               if(vcuts[i])std::cout << std::setw(3) << i; 
           }
           std::cout << std::endl;
+       }
 // Let's do some more characterization of the ambiguity complexity by investigating the multimaps
 // with a view to removing the non-ambiguities.
 // Note that in case of count==1 from the multimap, the map value is the unique edge ID for this polarity of track 
-          if(lreduce){
+       if(lreduce){
           for (auto i = mNeg.begin(); i!= mNeg.end(); ++i) {
               auto tkInfo = i->first;
               auto tkEdge = i->second;
               auto negCount = mmNeg.count(tkInfo);
-              std::cout << negCount << " edge(s) for e- with first key,value=(" 
-                        << tkInfo << "," << tkEdge << ") [edges: ";
+              if(lpr){
+                  std::cout << negCount << " edge(s) for e- with first key,value=(" 
+                            << tkInfo << "," << tkEdge << ") [edges: ";
 // Example from http://www.cplusplus.com/reference/map/multimap/count/
 // equal_range returns a pair with lower_bound and upper_bound positions.
-              for (auto it=mmNeg.equal_range(tkInfo).first; it!=mmNeg.equal_range(tkInfo).second; ++it){
-                  std::cout << ' ' << (*it).second;
+                  for (auto it=mmNeg.equal_range(tkInfo).first; it!=mmNeg.equal_range(tkInfo).second; ++it){
+                       std::cout << ' ' << (*it).second;
+                  }
+                  std::cout << " ] " << std::endl;
               }
-              std::cout << " ] " << std::endl;
               if(negCount==1){
 // Make candidate multimap when only one possibility for this electron. The key is the edge id. 
                  mmCandidate.insert(std::make_pair(tkEdge, tkInfo));
@@ -874,22 +851,24 @@ void histset2::AnalyzeEntry(convsel& s){
               auto tkInfo = i->first;
               auto tkEdge = i->second;
               auto posCount = mmPos.count(tkInfo);
-              std::cout << posCount << " edge(s) for e+ with first key,value=(" 
-                        << tkInfo << "," << tkEdge << ") [edges: ";
-              for (auto it=mmPos.equal_range(tkInfo).first; it!=mmPos.equal_range(tkInfo).second; ++it){
-                  std::cout << ' ' << (*it).second;
+              if(lpr){
+                  std::cout << posCount << " edge(s) for e+ with first key,value=(" 
+                            << tkInfo << "," << tkEdge << ") [edges: ";
+                  for (auto it=mmPos.equal_range(tkInfo).first; it!=mmPos.equal_range(tkInfo).second; ++it){
+                       std::cout << ' ' << (*it).second;
+                  }
+                  std::cout << " ] " << std::endl;
               }
-              std::cout << " ] " << std::endl;
               if(posCount==1){
                  mmCandidate.insert(std::make_pair(tkEdge, tkInfo));
               }
           }
-          std::cout << "mmCandidate multimap size " << mmCandidate.size() << std::endl;
+          if(lpr)std::cout << "mmCandidate multimap size " << mmCandidate.size() << std::endl;
           for (auto i = mmCandidate.begin(); i!= mmCandidate.end(); ++i) {
                auto tkEdge = i->first;
                auto tkInfo = i->second;
-               std::cout << "mmCandidate key= " << tkEdge << " multiplicity " 
-                         << mmCandidate.count(tkEdge) << " (value " << tkInfo << " ) " << std::endl;
+               if(lpr)std::cout << "mmCandidate key= " << tkEdge << " multiplicity " 
+                                << mmCandidate.count(tkEdge) << " (value " << tkInfo << " ) " << std::endl;
                if(mmCandidate.count(tkEdge) == 2 ){
 // There is an electron-positron pairing where the degree of each vertex is 1, and the same edge is incident on both.
 // So if we add this edge to the selected candidates we can dispense with this one from the assignment problem.
@@ -903,20 +882,18 @@ void histset2::AnalyzeEntry(convsel& s){
                   }
                }
           }
-          std::cout << "After reduction nedges = " << vcandidate.size() << std::endl;
-          std::cout << "N- = " << mmNeg.size() << std::endl;
-          std::cout << "N+ = " << mmPos.size() << std::endl;
-          std::cout << "n- = " << mNeg.size() << std::endl;
-          std::cout << "n+ = " << mPos.size() << std::endl;
-          std::cout << "Selected  " << vsel.size() << " non-ambiguous pairs " << std::endl;
-          }  // end of lreduce clause
-       }
+          if(lpr){
+              std::cout << "Already selected " << vsel.size() << " non-ambiguous pairings " << std::endl;
+              std::cout << "After reduction, nedges = " << vcandidate.size() << std::endl;
+              std::cout << "n- = " << mNeg.size() << std::endl;
+              std::cout << "n+ = " << mPos.size() << std::endl;
 
-// Let's try setting up our (n- * n+) cost matrix as input to the Hungarian Algorithm.
+          }
+      }  // end of lreduce clause
+
+// Set up our (n- * n+) cost matrix as input to the Hungarian Algorithm after reduction.
 // Hopefully we don't need to worry about whether 
 // nRows > nCols or nCols > nRows when rectangular rather than square.
-// TODO: One may reduce the size of the problem at the cost of more 
-// book-keeping by removing edges and vertices that have no ambiguities.
 
     std::vector< std::vector <double> > costMatrix;
     std::vector< std::vector <int> > edgeMatrix;
@@ -952,8 +929,6 @@ void histset2::AnalyzeEntry(convsel& s){
          costMatrix.push_back(v);
          edgeMatrix.push_back(e);
     }
-// Can we maybe remove the no-ambiguity instances by resizing 
-// these matrices? - not clear this is worth the effort.
 
 // Debug printing
     if(lpr){
@@ -973,24 +948,17 @@ void histset2::AnalyzeEntry(convsel& s){
        }
     }
 
-// Use Hungarian Algorithm to find the minimum cost assignment 
-// of electrons to positrons. The total cost will be the total 
-// chi-squared of all assignments (each with 1 dof).
-// Need to take care also of the case where there is no 
-// one-sided perfect matching, and algorithmically, the extra 
-// assignments are assigned to the fictional high-cost edges with 
-// nominal weight of 10000.
+// Use Hungarian Algorithm to find the minimum cost assignment of e- to e+. 
+// The total cost will be the total chi-squared of all assignments (each with 1 dof).
+// Need to take care also of the case where there is no one-sided perfect matching, 
+// and algorithmically, the extra assignments are assigned to the fictional 
+// high-cost edges with nominal weight of 10000.
 
 	HungarianAlgorithm HungAlgo;
 	std::vector<int> assignment;
 
 	double cost = HungAlgo.Solve(costMatrix, assignment);
-
     if(lpr)std::cout << "costMatrix.size() " << costMatrix.size() << std::endl;
-
-//    std::vector<int> vsel;   // Vector for indices of selected conversions after removing duplicates
-
-    int nassigned = 0;
 	for (unsigned int x = 0; x < costMatrix.size(); x++){
 // Need to check if this row is assigned (may not be if nRows > nCols)
         if(assignment[x] >= 0){
@@ -1006,17 +974,12 @@ void histset2::AnalyzeEntry(convsel& s){
                      << edgeMatrix[x][assignment[x]] << std::endl;
         }
     }
-
     if(nassigned > 0){
-       if(lpr)std::cout << "Assigned " << nassigned << " ambiguous pairs" << std::endl;
+       if(lpr)std::cout << "Assigned " << nassigned << " initially ambiguous pairings" << std::endl;
        double psel = TMath::Prob(cost, nassigned);
 	   if(lpr)std::cout << "Minimized total chisq: " << cost << " ( " << nassigned << " ) " << " p-value " << psel <<std::endl;
     }
-
-    int nconvs = vsel.size();
     if(vsel.size() > 0){
-//       double psel = TMath::Prob(cost,vsel.size());
-//	   if(lpr)std::cout << "Minimized total chisq: " << cost << " ( " << vsel.size() << " ) " << " p-value " << psel <<std::endl;
        std::sort(vsel.begin(), vsel.end());
        if(lpr){
           std::cout << "Selected conversions (" << vsel.size() << ")" ;
@@ -1026,7 +989,6 @@ void histset2::AnalyzeEntry(convsel& s){
           std::cout << std::endl;
        }
     }
-
  }
   else{
 // No ambiguities - so no assignment problem to solve 
@@ -1046,17 +1008,17 @@ void histset2::AnalyzeEntry(convsel& s){
 
 // Now with duplicates eliminated histogram multiplicity and conversion radius
     FillTH1( id_nconvHist, vsel.size() );
+    FillTH1( id_nassignedHist, nassigned );
+    FillTH1( id_nnonassignedHist, vsel.size() - nassigned );
     for(unsigned int j=0; j<vsel.size(); ++j){
         int i = vsel[j];
         FillTH1( id_r1dHist4, tup[i].radius );
     }
     
-// Keep track of cases where initial greedy algorithm finds less conversions than using assignment problem
-    if(lpr&&nsel3!=vsel.size())std::cout << "Event " << eventNumber << " MISMATCH " << nsel3 << " " << vsel.size() << std::endl;
-
 	//gamma gamma stuff
- 	if (numberOfPC>=2){
-        for(unsigned int i=0; i<numberOfPC-1; i++){
+ 	if (vsel.size()>=2){
+        for(unsigned int ii=0; ii<vsel.size()-1; ++ii){
+            int i = vsel[ii];
             double pxi = PC_Px[i];
             double pyi = PC_Py[i];
             double pzi = PC_Pz[i];
@@ -1064,7 +1026,8 @@ void histset2::AnalyzeEntry(convsel& s){
             double xi = PC_x[i];
             double yi = PC_y[i];
             double Ri = sqrt(xi*xi + yi*yi);
-            for(unsigned int j=i+1; j<numberOfPC; j++){
+            for(unsigned int jj=ii+1; jj<vsel.size(); ++jj){
+                int j = vsel[jj];
                 double pxj = PC_Px[j];
                 double pyj = PC_Py[j];
                 double pzj = PC_Pz[j];
@@ -1089,8 +1052,7 @@ void histset2::AnalyzeEntry(convsel& s){
                 }
             }
         }
-    }//end numpc
-		
+    }//end numpc	
 /*
 	for(int i=0; i<PC_vTrack_pt.GetSize(); i++){
         for(int j=0; j<PC_vTrack_pt[i].size(); j++){
@@ -1102,9 +1064,7 @@ void histset2::AnalyzeEntry(convsel& s){
 			FillTH2(id_pxpyHist, px, py, wtPU);
         }
     }
-*/
-//    cout << " vcuts length " << vcuts.size() << endl;
-    vcuts.clear();
-    
+*/ //    cout << " vcuts length " << vcuts.size() << endl;
+    vcuts.clear(); 
 }
 #endif
