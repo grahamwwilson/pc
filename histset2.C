@@ -13,12 +13,10 @@
 #include <map>
 #include <iomanip>
 #include "Hungarian.h"
-//#include <vector>
 using MyTH1D = ROOT::TThreadedObject<TH1D>;
 using MyTH2D = ROOT::TThreadedObject<TH2D>;
 
-// Use a vector of structs to retain intermediate results 
-// indexed by conversion
+// struct for derived quantities of each conversion
 struct mytuple {
     double radius;
     double rerr;
@@ -41,8 +39,7 @@ class histset2{
        void setweightoption(); 
 
        void AnalyzeEntry(convsel& s); 
-       //bookeeping enumeration: 
-       //(if we do this we don't need to worry about hist pointer copies and merging)
+       //bookeeping enumeration: if we do this we don't need to worry about hist pointer copies and merging
        enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
                        id_numpvWHist,
                        id_rerrHist, id_phierrHist, id_zerrHist,
@@ -79,6 +76,7 @@ class histset2{
                        id_AP_alphaHist,
                        id_alphaBkgdHist, id_alphaSignalHist,
                        id_alphaBkgdHistR1, id_alphaBkgdHistR2, id_alphaBkgdHistR3,
+                       id_nconvHist,
                        numTH1Hist};
        enum th2d_ids{id_pxpyHist,
                      id_xyHist,
@@ -204,13 +202,6 @@ void histset2::init(){
 	TH1Manager.at(id_q1Hist) = new MyTH1D("q1Hist","; q1; Events per bin", 5, -2.5, 2.5);
 	TH1Manager.at(id_qtotHist) = new MyTH1D("qtotHist","; qtot; Events per bin", 5, -2.5, 2.5);
 
-/*    asym = new TH1D("asym", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    asymcut0 = new TH1D("asymcut0", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    asymcut1 = new TH1D("asymcut1", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    asymcut2 = new TH1D("asymcut2", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    asymcut3 = new TH1D("asymcut3", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    asymcut4 = new TH1D("asymcut4", "Positron pT Fraction; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0); */
-
     TH1Manager.at(id_xplus1Hist) = new MyTH1D("xplus1", "Photon pT > 1 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     TH1Manager.at(id_xplus2Hist) = new MyTH1D("xplus2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     TH1Manager.at(id_xplus4Hist) = new MyTH1D("xplus4", "Photon pT > 4 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
@@ -245,17 +236,13 @@ void histset2::init(){
     TH1Manager.at(id_AP_pTaveHist) = new MyTH1D("AP_pTaveHist","Armenteros-Podolanski pT; Average pT (GeV); Conversions per bin",200,0.0,0.1);
     TH1Manager.at(id_AP_alphaHist) = new MyTH1D("AP_alphaHist","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
 
-
     TH1Manager.at(id_alphaBkgdHist) = new MyTH1D("alphaBkgdHist","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
     TH1Manager.at(id_alphaBkgdHistR1) = new MyTH1D("alphaBkgdHistR1","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
     TH1Manager.at(id_alphaBkgdHistR2) = new MyTH1D("alphaBkgdHistR2","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
     TH1Manager.at(id_alphaBkgdHistR3) = new MyTH1D("alphaBkgdHistR3","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
     TH1Manager.at(id_alphaSignalHist) = new MyTH1D("alphaSignalHist","Armenteros-Podolanski alpha; (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); Conversions per bin",200,-1.0,1.0);
-    
-/*    asym2 = new TH1D("asym2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    asym4 = new TH1D("asym4", "Photon pT > 4 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    asym8 = new TH1D("asym8", "Photon pT > 8 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
-    asym16 = new TH1D("asym16", "Photon pT > 16 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0); */
+
+    TH1Manager.at(id_nconvHist) = new MyTH1D("nconvHist", "Photon Conversions; Number of Conversions; Entries per bin", 40, -0.5, 39.5 );
 
 // init TH2D
 	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
@@ -274,7 +261,6 @@ void histset2::init(){
 	TH2Manager.at(id_mgg2Hist) = new MyTH2D("mgg2Hist","Di-#gamma Mass;Mass (GeV); nPV", 400, 0.0, 1.0, 100, -0.5, 99.5 );
 	TH2Manager.at(id_mggRCutHist) = new MyTH2D("mggRCutHist","Di-#gamma Mass;Mass (GeV); Radius (cm)", 400, 0.0, 1.0, 25, 0.0, 25.0 );
 	TH2Manager.at(id_rhophiHist) = new MyTH2D("rhophiHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Phi (rad)",100,0.0,5.0,40,-PI,PI);
-//                    id_AP_pT_alphaHist,
 	TH2Manager.at(id_AP_pT_alphaHist) = new MyTH2D("AP_pT_alphaHist","Armenteros-Podolanski Plot; #alpha = (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); p_{T} (GeV)",200,-1.0,1.0,200,0.0,0.22);
 }
 
@@ -339,7 +325,8 @@ void histset2::AnalyzeEntry(convsel& s){
     double rps;
     double rnominal;
 
-    const bool lpr = true;    // print flag
+    const bool lpr = true;       // print flag
+    const bool lreduce = true;   // do problem reduction
 	
 	const double RERRCUT = 0.25;
 	const double COSTCUT = 0.85;
@@ -443,13 +430,13 @@ void histset2::AnalyzeEntry(convsel& s){
 
     std::vector<bool> vcuts;
     std::vector<double> PosTkInfo;
-    std::vector<double> NegTkInfo;
-    
+    std::vector<double> NegTkInfo;    
     std::vector<int> vcandidate;
     std::map<double, int> mNeg;
     std::multimap<double, int> mmNeg;
     std::map<double, int> mPos;
     std::multimap<double, int> mmPos;
+    std::multimap<int, double> mmCandidate;
 
 // Probably a good idea to keep track of whether each conversion 
 // candidate passes particular cuts, to ease later code 
@@ -602,25 +589,23 @@ void histset2::AnalyzeEntry(convsel& s){
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
                 && fitprob > FITPROBCUT && std::max(nBefore0,nBefore1)==0 ){
             vcuts[i] = true;
-// Keep track of chisq/dof of constituent tracks to later identify conversion 
-// candidates that use the same track.
-// Hmm - maybe need to keep track of all the used tracks
+// Keep track of charge-signed chisq/dof of constituent tracks to later identify conversion 
+// candidates that use the same track (sign by charge of track)
             if(q0 == 1 && q1 == -1){
-               PosTkInfo[i] = Tk0_chi2[i]/double(Tk0_ndof[i]);
-               NegTkInfo[i] = Tk1_chi2[i]/double(Tk1_ndof[i]);
+               PosTkInfo[i] =  Tk0_chi2[i]/double(Tk0_ndof[i]);
+               NegTkInfo[i] = -Tk1_chi2[i]/double(Tk1_ndof[i]);
             }
             else{
-               PosTkInfo[i] = Tk1_chi2[i]/double(Tk1_ndof[i]);
-               NegTkInfo[i] = Tk0_chi2[i]/double(Tk0_ndof[i]);
+               PosTkInfo[i] =  Tk1_chi2[i]/double(Tk1_ndof[i]);
+               NegTkInfo[i] = -Tk0_chi2[i]/double(Tk0_ndof[i]);
             }
-
 // Fill STL containers that help define the "matching problem"
             vcandidate.push_back(i);
+// For the key/value pair use charge-signed chi2/dof as key, and conversion index as edge id for value
             mNeg.insert(std::make_pair(NegTkInfo[i],i));
             mmNeg.insert(std::make_pair(NegTkInfo[i],i));
             mPos.insert(std::make_pair(PosTkInfo[i],i));
             mmPos.insert(std::make_pair(PosTkInfo[i],i));
-
 // Fill tuple with relevant derived quantities
             tup[i].radius = r;
             tup[i].rerr = rerr;
@@ -864,6 +849,67 @@ void histset2::AnalyzeEntry(convsel& s){
               if(vcuts[i])std::cout << std::setw(3) << i; 
           }
           std::cout << std::endl;
+// Let's do some more characterization of the ambiguity complexity by investigating the multimaps
+// with a view to removing the non-ambiguities.
+// Note that in case of count==1 from the multimap, the map value is the unique edge ID for this polarity of track 
+          if(lreduce){
+          for (auto i = mNeg.begin(); i!= mNeg.end(); ++i) {
+              auto tkInfo = i->first;
+              auto tkEdge = i->second;
+              auto negCount = mmNeg.count(tkInfo);
+              std::cout << negCount << " edge(s) for e- with first key,value=(" 
+                        << tkInfo << "," << tkEdge << ") [edges: ";
+// Example from http://www.cplusplus.com/reference/map/multimap/count/
+// equal_range returns a pair with lower_bound and upper_bound positions.
+              for (auto it=mmNeg.equal_range(tkInfo).first; it!=mmNeg.equal_range(tkInfo).second; ++it){
+                  std::cout << ' ' << (*it).second;
+              }
+              std::cout << " ] " << std::endl;
+              if(negCount==1){
+// Make candidate multimap when only one possibility for this electron. The key is the edge id. 
+                 mmCandidate.insert(std::make_pair(tkEdge, tkInfo));
+              }
+          }
+          for (auto i = mPos.begin(); i!= mPos.end(); ++i) {
+              auto tkInfo = i->first;
+              auto tkEdge = i->second;
+              auto posCount = mmPos.count(tkInfo);
+              std::cout << posCount << " edge(s) for e+ with first key,value=(" 
+                        << tkInfo << "," << tkEdge << ") [edges: ";
+              for (auto it=mmPos.equal_range(tkInfo).first; it!=mmPos.equal_range(tkInfo).second; ++it){
+                  std::cout << ' ' << (*it).second;
+              }
+              std::cout << " ] " << std::endl;
+              if(posCount==1){
+                 mmCandidate.insert(std::make_pair(tkEdge, tkInfo));
+              }
+          }
+          std::cout << "mmCandidate multimap size " << mmCandidate.size() << std::endl;
+          for (auto i = mmCandidate.begin(); i!= mmCandidate.end(); ++i) {
+               auto tkEdge = i->first;
+               auto tkInfo = i->second;
+               std::cout << "mmCandidate key= " << tkEdge << " multiplicity " 
+                         << mmCandidate.count(tkEdge) << " (value " << tkInfo << " ) " << std::endl;
+               if(mmCandidate.count(tkEdge) == 2 ){
+// There is an electron-positron pairing where the degree of each vertex is 1, and the same edge is incident on both.
+// So if we add this edge to the selected candidates we can dispense with this one from the assignment problem.
+                  if(tkInfo<0.0){
+                     vsel.push_back(tkEdge);
+                     vcandidate.erase(remove(vcandidate.begin(),vcandidate.end(),tkEdge),vcandidate.end());
+                     mNeg.erase(tkInfo);
+                  }
+                  else{
+                     mPos.erase(tkInfo);
+                  }
+               }
+          }
+          std::cout << "After reduction nedges = " << vcandidate.size() << std::endl;
+          std::cout << "N- = " << mmNeg.size() << std::endl;
+          std::cout << "N+ = " << mmPos.size() << std::endl;
+          std::cout << "n- = " << mNeg.size() << std::endl;
+          std::cout << "n+ = " << mPos.size() << std::endl;
+          std::cout << "Selected  " << vsel.size() << " non-ambiguous pairs " << std::endl;
+          }  // end of lreduce clause
        }
 
 // Let's try setting up our (n- * n+) cost matrix as input to the Hungarian Algorithm.
@@ -874,9 +920,12 @@ void histset2::AnalyzeEntry(convsel& s){
 
     std::vector< std::vector <double> > costMatrix;
     std::vector< std::vector <int> > edgeMatrix;
+    int irow = -1;
     for ( auto i = mNeg.begin(); i != mNeg.end(); ++i ){        // n- rows for each -ve track
+         irow++;
          std::vector<double> v;
          std::vector<int> e;
+         int nfound = 0;
          for ( auto j = mPos.begin(); j != mPos.end(); ++j ){   // n+ cols for each +ve track
 // Go through all the edge candidates and see if there is an edge corresponding to this pairing.
              double negInfo = i->first;
@@ -891,6 +940,7 @@ void histset2::AnalyzeEntry(convsel& s){
                     v.push_back(TMath::ChisquareQuantile(1.0-tup[k].pfit,1.0));
                     e.push_back(k);
                     found=true;
+                    nfound++;
                  }
              }
              if(!found){
@@ -898,9 +948,12 @@ void histset2::AnalyzeEntry(convsel& s){
                 e.push_back(-1);
              }
          }
+         if(lpr)std::cout << "irow " << irow << " nedges = " << nfound << std::endl;
          costMatrix.push_back(v);
          edgeMatrix.push_back(e);
     }
+// Can we maybe remove the no-ambiguity instances by resizing 
+// these matrices? - not clear this is worth the effort.
 
 // Debug printing
     if(lpr){
@@ -937,6 +990,7 @@ void histset2::AnalyzeEntry(convsel& s){
 
 //    std::vector<int> vsel;   // Vector for indices of selected conversions after removing duplicates
 
+    int nassigned = 0;
 	for (unsigned int x = 0; x < costMatrix.size(); x++){
 // Need to check if this row is assigned (may not be if nRows > nCols)
         if(assignment[x] >= 0){
@@ -945,6 +999,7 @@ void histset2::AnalyzeEntry(convsel& s){
            }
            else{
               vsel.push_back(edgeMatrix[x][assignment[x]]);
+              nassigned++;
            }
            if(lpr)std::cout << x << "," << assignment[x] 
                      << " " << costMatrix[x][assignment[x]] << " " 
@@ -952,19 +1007,26 @@ void histset2::AnalyzeEntry(convsel& s){
         }
     }
 
+    if(nassigned > 0){
+       if(lpr)std::cout << "Assigned " << nassigned << " ambiguous pairs" << std::endl;
+       double psel = TMath::Prob(cost, nassigned);
+	   if(lpr)std::cout << "Minimized total chisq: " << cost << " ( " << nassigned << " ) " << " p-value " << psel <<std::endl;
+    }
+
     int nconvs = vsel.size();
     if(vsel.size() > 0){
-       double psel = TMath::Prob(cost,vsel.size());
-	   if(lpr)std::cout << "\nMinimized total chisq: " << cost << " ( " << vsel.size() << " ) " << " p-value " << psel <<std::endl;
+//       double psel = TMath::Prob(cost,vsel.size());
+//	   if(lpr)std::cout << "Minimized total chisq: " << cost << " ( " << vsel.size() << " ) " << " p-value " << psel <<std::endl;
        std::sort(vsel.begin(), vsel.end());
        if(lpr){
-          std::cout << "Selected conversions ";
+          std::cout << "Selected conversions (" << vsel.size() << ")" ;
           for(int i=0; i<vsel.size(); ++i){
               std::cout << std::setw(3) << " " << vsel[i]; 
           }
           std::cout << std::endl;
        }
     }
+
  }
   else{
 // No ambiguities - so no assignment problem to solve 
@@ -972,7 +1034,8 @@ void histset2::AnalyzeEntry(convsel& s){
         vsel = vcandidate;
         std::sort(vsel.begin(), vsel.end());
         if(lpr){
-           std::cout << "Selected conversions 2: " << eventNumber << " ";
+           std::cout << " " << std::endl;
+           std::cout << "Selected conversions S: " << eventNumber << "  (" << vsel.size() << ")";
            for(int i=0; i<vsel.size(); ++i){
               std::cout << std::setw(3) << " " << vsel[i]; 
            }
@@ -981,18 +1044,17 @@ void histset2::AnalyzeEntry(convsel& s){
      }
   }
 
-// Now with duplicates eliminated histogram radius
+// Now with duplicates eliminated histogram multiplicity and conversion radius
+    FillTH1( id_nconvHist, vsel.size() );
     for(unsigned int j=0; j<vsel.size(); ++j){
         int i = vsel[j];
-// for technical checks
         FillTH1( id_r1dHist4, tup[i].radius );
     }
-
-//    std::cout << "Candidate counting: " << nsel3 << " " << vsel.size() << std::endl;
+    
+// Keep track of cases where initial greedy algorithm finds less conversions than using assignment problem
     if(lpr&&nsel3!=vsel.size())std::cout << "Event " << eventNumber << " MISMATCH " << nsel3 << " " << vsel.size() << std::endl;
 
-	//gamma gamma stuff IS THIS LOOP CORRECT
-    // Can also speed this up a bit ...
+	//gamma gamma stuff
  	if (numberOfPC>=2){
         for(unsigned int i=0; i<numberOfPC-1; i++){
             double pxi = PC_Px[i];
