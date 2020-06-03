@@ -40,57 +40,32 @@ class histset2{
 
        void AnalyzeEntry(convsel& s); 
        //bookeeping enumeration: if we do this we don't need to worry about hist pointer copies and merging
-       enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,
-                       id_numpvWHist,
-                       id_rerrHist, id_phierrHist, id_zerrHist,
-                       id_r1dHist2, id_r1dHist3, id_r1dHist4,
-                       id_r1dHist, id_r1dcutHist, 
-                       id_r1dlowPUHist, id_r1dmedPUHist, id_r1dhiPUHist, 
-                       id_r1dlowPUcutHist, id_r1dmedPUcutHist, id_r1dhiPUcutHist, 
-                       id_r1dwideHist, id_r1dwidecutHist, id_r1dwidecutWHist,
-                       id_r1dwidecutPSHist,
-                       id_r1dwidelowPUHist, id_r1dwidemedPUHist, id_r1dwidehiPUHist, 
-                       id_r1dwidelowPUcutHist, id_r1dwidemedPUcutHist, id_r1dwidehiPUcutHist, 
-                       id_rhobpHist, id_rbpHist, id_mggHist, id_mggCutHist,
-                       id_numnopcHist, id_numpvnopcHist, id_phiHist,
-                       id_mggallHist, id_pfitHist, id_zHist, id_costhetaHist,
-                       id_pTHist, id_EHist,
-                       id_pTHist2, id_EHist2, id_phiHist2, id_runHist,
-                       id_isdataHist, id_nPUHist, id_PUHist, id_wtHist,
-                       id_wwtHist, id_numpvUWHist, 
-                       id_dminHist, id_dphiHist, id_mpairHist, id_dcotthetaHist,
-                       id_r1dwidecutDHist, id_r1dwidecutDDHist,
-                       id_r1dwidecutNomHist, id_rnomHist,
-                       id_xplus1Hist, id_xplus2Hist, id_xplus4Hist, id_xplus8Hist, id_xplus16Hist,
-                       id_alpha1Hist, id_alpha2Hist, id_alpha4Hist, id_alpha8Hist, id_alpha16Hist,
-                       id_q0Hist, id_q1Hist, id_qtotHist,
-                       id_zcutHist, id_zcutHist2, id_rendcapHist,
-                       id_conversionCandidateMassHist,
-                       id_conversionCandidateMassHist2,
-                       id_lambdaCandidateMassHist,id_lambdabarCandidateMassHist,id_lambdasCandidateMassHist,
-                       id_lambdasBkgdMassHist,id_lambdasSignalMassHist,
-                       id_lambdasBkgdMassHistR1,id_lambdasBkgdMassHistR2,id_lambdasBkgdMassHistR3,
-                       id_KShortMassHist,id_KShortBkgdMassHistR1,id_KShortBkgdMassHistR2,
-                       id_KShortBkgdMassHistR3,id_KShortBkgdMassHist,
-                       id_AP_pTminHist, id_AP_pTmaxHist, id_AP_pTaveHist,
-                       id_AP_alphaHist,
-                       id_alphaBkgdHist, id_alphaSignalHist,
-                       id_alphaBkgdHistR1, id_alphaBkgdHistR2, id_alphaBkgdHistR3,
-                       id_nconvHist, id_nassignedHist, id_nnonassignedHist,
-                       numTH1Hist};
-       enum th2d_ids{id_pxpyHist,
-                     id_xyHist,
-                     id_xywideHist,
-                     id_rphiHist, 
-                     id_rzHist, id_rzHist2, id_rzHist3, id_rzHist4,
-                     id_xycutHist,
-                     id_xywidecutHist, id_xywidecutHist2,
-                     id_npv_rcutHist,
-                     id_mgg2Hist,
-                     id_mggRCutHist,
-                     id_npc_npvHist, id_rhophiHist,
-                     id_AP_pT_alphaHist,
-                     numTH2Hist};
+       enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,id_numpvWHist,id_rerrHist, id_phierrHist, id_zerrHist,
+            id_r1dHist2, id_r1dHist3, id_r1dHist4, id_r1dHist, id_r1dcutHist, id_r1dlowPUHist, id_r1dmedPUHist, id_r1dhiPUHist, 
+            id_r1dlowPUcutHist, id_r1dmedPUcutHist, id_r1dhiPUcutHist, id_r1dwideHist, id_r1dwidecutHist, id_r1dwidecutWHist,
+            id_r1dwidecutPSHist, id_r1dwidelowPUHist, id_r1dwidemedPUHist, id_r1dwidehiPUHist, id_r1dwidelowPUcutHist,
+            id_r1dwidemedPUcutHist, id_r1dwidehiPUcutHist, id_rhobpHist, id_rbpHist, id_mggHist, id_mggCutHist,
+            id_numnopcHist, id_numpvnopcHist, id_phiHist, id_mggallHist, id_pfitHist, id_zHist, id_costhetaHist,
+            id_pTHist, id_EHist, id_pTHist2, id_EHist2, id_phiHist2, id_runHist, id_isdataHist, id_nPUHist, id_PUHist, id_wtHist,
+            id_wwtHist, id_numpvUWHist, id_dminHist, id_dphiHist, id_mpairHist, id_dcotthetaHist, id_r1dwidecutDHist, id_r1dwidecutDDHist,
+            id_r1dwidecutNomHist, id_rnomHist,
+            id_xplus1Hist, id_xplus2Hist, id_xplus4Hist, id_xplus8Hist, id_xplus16Hist,
+            id_alpha1Hist, id_alpha2Hist, id_alpha4Hist, id_alpha8Hist, id_alpha16Hist,
+            id_q0Hist, id_q1Hist, id_qtotHist,
+            id_zcutHist, id_zcutHist2, id_rendcapHist,
+            id_conversionCandidateMassHist, id_conversionCandidateMassHist2,
+            id_lambdaCandidateMassHist,id_lambdabarCandidateMassHist,id_lambdasCandidateMassHist,
+            id_lambdasBkgdMassHist,id_lambdasSignalMassHist, id_lambdasBkgdMassHistR1,id_lambdasBkgdMassHistR2,id_lambdasBkgdMassHistR3,
+            id_KShortMassHist,id_KShortBkgdMassHistR1,id_KShortBkgdMassHistR2, id_KShortBkgdMassHistR3,id_KShortBkgdMassHist,
+            id_AP_pTminHist, id_AP_pTmaxHist, id_AP_pTaveHist, id_AP_alphaHist,
+            id_alphaBkgdHist, id_alphaSignalHist, id_alphaBkgdHistR1, id_alphaBkgdHistR2, id_alphaBkgdHistR3,
+            id_nconvHist, id_nassignedHist, id_nnonassignedHist,
+            numTH1Hist};
+       enum th2d_ids{id_pxpyHist, id_xyHist, id_xywideHist, id_rphiHist, 
+            id_rzHist, id_rzHist2, id_rzHist3, id_rzHist4,
+            id_xycutHist, id_xywidecutHist, id_xywidecutHist2,
+            id_npv_rcutHist, id_mgg2Hist, id_mggRCutHist, id_npc_npvHist, id_rhophiHist, id_AP_pT_alphaHist,
+            numTH2Hist};
 
 	   //make a big vector and load enumerated histograms onto the vector
        std::vector<MyTH1D*>  TH1Manager{};
@@ -450,8 +425,7 @@ void histset2::AnalyzeEntry(convsel& s){
     std::vector<mytuple> tup;
 
 	for(int i=0; i<PC_x.GetSize(); i++){
-
-// push-back new tuple with default constructor
+// push-back new mytuple struct with default constructor
         tup.push_back(mytuple());
 
         vcuts.push_back(false);
@@ -538,6 +512,7 @@ void histset2::AnalyzeEntry(convsel& s){
 		zerr = sqrt(vzz);
 	 	fitprob = TMath::Prob(PC_vtx_chi2[i], 3);
 
+// This logic is a bit confused. It would likely be less confusing if it was reliably +ve/-ve.
         ROOT::Math::PxPyPzMVector v0,v0pi,v0p,v1,v1pi,v1p;
         v0 = ROOT::Math::PxPyPzMVector( px0p, py0p, pz0p, MASS_ELECTRON );
         v0pi = ROOT::Math::PxPyPzMVector( px0p, py0p, pz0p, MASS_PION );
@@ -584,7 +559,6 @@ void histset2::AnalyzeEntry(convsel& s){
 //Fill overflow bin
               FillTH1(id_mpairHist, 0.2501, wtPU);
            }
-
            FillTH1(id_dcotthetaHist, PC_dcottheta[i], wtPU);
         }
 
@@ -646,7 +620,6 @@ void histset2::AnalyzeEntry(convsel& s){
                if(region2)FillTH1(id_KShortBkgdMassHistR2, vpairpipi.M(), wtPU);
                if(region3)FillTH1(id_KShortBkgdMassHistR3, vpairpipi.M(), wtPU);
             }            
-
 // pip: Track 0 = pi, Track 1 = p
 // ppi: Track 0 = p , Track 1 = pi
             if(APalpha >= 0.0){
@@ -760,7 +733,6 @@ void histset2::AnalyzeEntry(convsel& s){
             if(pt>16.0)FillTH1(id_alpha16Hist, APalpha, wtPU);
 
 // Also include correlation plot between APalpha and ptasym.
-
 		}
 /// Endcap plots
 		if( rerr < RERRCUT && abs(z) > ZCUT && abs(z) < 50.0 && abs(cos(theta)) < COSTCUT 
@@ -772,7 +744,6 @@ void histset2::AnalyzeEntry(convsel& s){
 			FillTH1(id_rendcapHist, r, wtPU);
 			FillTH1(id_zcutHist2, z, wtPU);
         }
-	
 		//pileup cuts
 		if( numberOfPV <= 16){
 			FillTH1(id_r1dlowPUHist, r, wtPU);
@@ -871,7 +842,7 @@ void histset2::AnalyzeEntry(convsel& s){
                                 << mmCandidate.count(tkEdge) << " (value " << tkInfo << " ) " << std::endl;
                if(mmCandidate.count(tkEdge) == 2 ){
 // There is an electron-positron pairing where the degree of each vertex is 1, and the same edge is incident on both.
-// So if we add this edge to the selected candidates we can dispense with this one from the assignment problem.
+// So if we add this edge to the selected candidates we can erase this one and its constituents from the assignment problem.
                   if(tkInfo<0.0){
                      vsel.push_back(tkEdge);
                      vcandidate.erase(remove(vcandidate.begin(),vcandidate.end(),tkEdge),vcandidate.end());
@@ -891,9 +862,8 @@ void histset2::AnalyzeEntry(convsel& s){
           }
       }  // end of lreduce clause
 
-// Set up our (n- * n+) cost matrix as input to the Hungarian Algorithm after reduction.
-// Hopefully we don't need to worry about whether 
-// nRows > nCols or nCols > nRows when rectangular rather than square.
+// Set up the (n- * n+) cost matrix as input to the Hungarian Algorithm after reduction.
+// (this works for both nRows <= nCols and nRows > nCols)
 
     std::vector< std::vector <double> > costMatrix;
     std::vector< std::vector <int> > edgeMatrix;
@@ -929,7 +899,6 @@ void histset2::AnalyzeEntry(convsel& s){
          costMatrix.push_back(v);
          edgeMatrix.push_back(e);
     }
-
 // Debug printing
     if(lpr){
        for (auto irow = costMatrix.begin(); irow != costMatrix.end(); ++irow) {
@@ -953,10 +922,8 @@ void histset2::AnalyzeEntry(convsel& s){
 // Need to take care also of the case where there is no one-sided perfect matching, 
 // and algorithmically, the extra assignments are assigned to the fictional 
 // high-cost edges with nominal weight of 10000.
-
 	HungarianAlgorithm HungAlgo;
 	std::vector<int> assignment;
-
 	double cost = HungAlgo.Solve(costMatrix, assignment);
     if(lpr)std::cout << "costMatrix.size() " << costMatrix.size() << std::endl;
 	for (unsigned int x = 0; x < costMatrix.size(); x++){
@@ -1042,19 +1009,18 @@ void histset2::AnalyzeEntry(convsel& s){
                 double Rj = sqrt(xj*xj + yj*yj);
                 if (abs(Ri-3.0)<1.0 && abs(Rj-3.0)<1.0&&std::min(Ei,Ej)>2.0){
                     FillTH1(id_mggHist, m12, wtPU);
-                    if(vcuts[i]&&vcuts[j])FillTH2(id_mgg2Hist, m12, numberOfPV, wtPU);
-                    if(vcuts[i]&&vcuts[j])FillTH1(id_mggCutHist, m12, wtPU);
+                    FillTH2(id_mgg2Hist, m12, numberOfPV, wtPU);
+                    FillTH1(id_mggCutHist, m12, wtPU);
                 }
-                if (vcuts[i]&&vcuts[j]&&std::min(Ei,Ej)>2.0){
+                if (std::min(Ei,Ej)>2.0){
                     FillTH1(id_mggallHist, m12, wtPU);
                     FillTH2(id_mggRCutHist, m12, Ri, wtPU);
                     FillTH2(id_mggRCutHist, m12, Rj, wtPU);
                 }
             }
         }
-    }//end numpc	
-/*
-	for(int i=0; i<PC_vTrack_pt.GetSize(); i++){
+    }	
+/*  for(int i=0; i<PC_vTrack_pt.GetSize(); i++){
         for(int j=0; j<PC_vTrack_pt[i].size(); j++){
 			px = PC_vTrack_pt[i][j] * cos( PC_vTrack_phi[i][j] );
 			py = PC_vTrack_pt[i][j] * sin( PC_vTrack_phi[i][j] );
@@ -1063,8 +1029,7 @@ void histset2::AnalyzeEntry(convsel& s){
 			FillTH1(id_pzHist, pz, wtPU);
 			FillTH2(id_pxpyHist, px, py, wtPU);
         }
-    }
-*/ //    cout << " vcuts length " << vcuts.size() << endl;
+    } */
     vcuts.clear(); 
 }
 #endif
