@@ -30,16 +30,13 @@ struct mytuple {
 };
 
 class histset2{
-	
     public:
- 	   double PI =4.0*atan(1.0);
-
+       double PI =4.0*atan(1.0);
        histset2();	
        void init(); 
        void setweightoption(); 
-
        void AnalyzeEntry(convsel& s); 
-       //bookeeping enumeration: if we do this we don't need to worry about hist pointer copies and merging
+// bookeeping enumeration: if we do this we don't need to worry about hist pointer copies and merging
        enum th1d_ids{id_ptHist, id_pzHist, id_numpcHist, id_numpvHist,id_numpvWHist,id_rerrHist, id_phierrHist, id_zerrHist,
             id_r1dHist2, id_r1dHist3, id_r1dHist4, id_r1dHist, id_r1dcutHist, id_r1dlowPUHist, id_r1dmedPUHist, id_r1dhiPUHist, 
             id_r1dlowPUcutHist, id_r1dmedPUcutHist, id_r1dhiPUcutHist, id_r1dwideHist, id_r1dwidecutHist, id_r1dwidecutWHist,
@@ -66,43 +63,33 @@ class histset2{
             id_xycutHist, id_xywidecutHist, id_xywidecutHist2,
             id_npv_rcutHist, id_mgg2Hist, id_mggRCutHist, id_npc_npvHist, id_rhophiHist, id_AP_pT_alphaHist,
             numTH2Hist};
-
-	   //make a big vector and load enumerated histograms onto the vector
+// make a big vector and load enumerated histograms onto the vector
        std::vector<MyTH1D*>  TH1Manager{};
        std::vector<MyTH2D*>  TH2Manager{};
-
-	   //locate the histogram and perform pointer copying 
+// locate the histogram and perform pointer copying 
        void FillTH1(int index, double x, double w);
        void FillTH2(int index, double x, double y, double w);
-	
        void WriteHist(); 
 };
 
 histset2::histset2(){
-
     std::vector<MyTH1D*>  Manager1(numTH1Hist);
     TH1Manager=Manager1;
-
     std::vector<MyTH2D*>  Manager2(numTH2Hist);
     TH2Manager=Manager2;
-
     init();
     setweightoption();
-
 }
 
 void histset2::setweightoption(){
-
-	for(int i=0; i<numTH1Hist; i++){
+    for(int i=0; i<numTH1Hist; i++){
         auto hptr = TH1Manager.at(i)->Get();
         hptr->Sumw2(kTRUE);
     }
-
-	for(int i=0; i<numTH2Hist; i++){
+    for(int i=0; i<numTH2Hist; i++){
         auto hptr = TH2Manager.at(i)->Get();
         hptr->Sumw2(kTRUE);
     }
-
 }
 
 void histset2::init(){
@@ -111,71 +98,71 @@ void histset2::init(){
     TH1Manager.at(id_wwtHist) = new MyTH1D("wwtHist", "Weighted weight Distribution; Weight; Weighted events per bin", 1000, 0.0, 10.0);
     TH1Manager.at(id_ptHist) = new MyTH1D("ptHist", "p_{T} Distribution;p_{T};1/p_{T} dN/dp_{T}", 100, 0.0, 5.0);
     TH1Manager.at(id_pzHist) = new MyTH1D("pzHist", "p_{Z} Distribution;p_{Z};dN/dp_{Z}", 100, 0.0, 5.0);
-	TH1Manager.at(id_numpcHist) = new MyTH1D("numpcHist", "Number of PC;;Entries per bin", 100,-0.5, 99.5);
-	TH1Manager.at(id_numpvHist) = new MyTH1D("numpvHist", "Number of PV;;Entries per bin", 100,-0.5, 99.5);
-	TH1Manager.at(id_numpvWHist) = new MyTH1D("numpvWHist", "Number of PV;;Entries per bin", 200,-0.5, 199.5);
-	TH1Manager.at(id_numpvUWHist) = new MyTH1D("numpvUWHist", "Number of PV;;Entries per bin", 200,-0.5, 199.5);
-	TH1Manager.at(id_numnopcHist) = new MyTH1D("numnopcHist", "Number of no PC;;Entries per bin", 100,-0.5, 99.5);
-	TH1Manager.at(id_numpvnopcHist) = new MyTH1D("numpvnopcHist", "Number of PV (no PC);;Entries per bin", 100,-0.5, 99.5);
-	TH1Manager.at(id_rerrHist) = new MyTH1D("rerrHist", "Conversion Radial Error; #Delta R (cm); Entries per 0.05 bin", 40, 0.0, 2.0);
-	TH1Manager.at(id_phierrHist) = new MyTH1D("phierrHist", "Conversion Azimuthal Error;#Delta #phi; Entries per 0.002 bin",50, 0.0, 0.1);
-	TH1Manager.at(id_zerrHist) = new MyTH1D("zerrHist","Conversion Z Error;#Delta z (cm); Entries per 0.1 bin", 50, 0.0, 5.0);
-	TH1Manager.at(id_pfitHist) = new MyTH1D("pfitHist","Photon Conversions;Fit probability; ", 100, 0.0, 1.0);
-	TH1Manager.at(id_zHist) = new MyTH1D("zHist","Photon Conversions; z (cm); ", 200, -25.0, 25.0);
-	TH1Manager.at(id_costhetaHist) = new MyTH1D("costhetaHist","Photon Conversions; cos(theta); ", 200, -1.0, 1.0);
-	TH1Manager.at(id_pfitHist) = new MyTH1D("pfitHist","Photon Conversions;Fit probability; ", 100, 0.0, 1.0);
-	TH1Manager.at(id_r1dHist) = new MyTH1D("r1dHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",100, 0.0, 10.0);
-	TH1Manager.at(id_r1dHist2) = new MyTH1D("r1dHist2","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
-	TH1Manager.at(id_r1dHist3) = new MyTH1D("r1dHist3","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
-	TH1Manager.at(id_r1dHist4) = new MyTH1D("r1dHist4","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
+    TH1Manager.at(id_numpcHist) = new MyTH1D("numpcHist", "Number of PC;;Entries per bin", 100,-0.5, 99.5);
+    TH1Manager.at(id_numpvHist) = new MyTH1D("numpvHist", "Number of PV;;Entries per bin", 100,-0.5, 99.5);
+    TH1Manager.at(id_numpvWHist) = new MyTH1D("numpvWHist", "Number of PV;;Entries per bin", 200,-0.5, 199.5);
+    TH1Manager.at(id_numpvUWHist) = new MyTH1D("numpvUWHist", "Number of PV;;Entries per bin", 200,-0.5, 199.5);
+    TH1Manager.at(id_numnopcHist) = new MyTH1D("numnopcHist", "Number of no PC;;Entries per bin", 100,-0.5, 99.5);
+    TH1Manager.at(id_numpvnopcHist) = new MyTH1D("numpvnopcHist", "Number of PV (no PC);;Entries per bin", 100,-0.5, 99.5);
+    TH1Manager.at(id_rerrHist) = new MyTH1D("rerrHist", "Conversion Radial Error; #Delta R (cm); Entries per 0.05 bin", 40, 0.0, 2.0);
+    TH1Manager.at(id_phierrHist) = new MyTH1D("phierrHist", "Conversion Azimuthal Error;#Delta #phi; Entries per 0.002 bin",50, 0.0, 0.1);
+    TH1Manager.at(id_zerrHist) = new MyTH1D("zerrHist","Conversion Z Error;#Delta z (cm); Entries per 0.1 bin", 50, 0.0, 5.0);
+    TH1Manager.at(id_pfitHist) = new MyTH1D("pfitHist","Photon Conversions;Fit probability; ", 100, 0.0, 1.0);
+    TH1Manager.at(id_zHist) = new MyTH1D("zHist","Photon Conversions; z (cm); ", 200, -25.0, 25.0);
+    TH1Manager.at(id_costhetaHist) = new MyTH1D("costhetaHist","Photon Conversions; cos(theta); ", 200, -1.0, 1.0);
+    TH1Manager.at(id_pfitHist) = new MyTH1D("pfitHist","Photon Conversions;Fit probability; ", 100, 0.0, 1.0);
+    TH1Manager.at(id_r1dHist) = new MyTH1D("r1dHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",100, 0.0, 10.0);
+    TH1Manager.at(id_r1dHist2) = new MyTH1D("r1dHist2","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
+    TH1Manager.at(id_r1dHist3) = new MyTH1D("r1dHist3","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
+    TH1Manager.at(id_r1dHist4) = new MyTH1D("r1dHist4","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
 
-	TH1Manager.at(id_r1dwideHist) = new MyTH1D("r1dwideHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
-	TH1Manager.at(id_zcutHist) = new MyTH1D("zcutHist","Photon Conversions; z (cm); ", 250, -25.0, 25.0);
-	TH1Manager.at(id_zcutHist2) = new MyTH1D("zcutHist2","Photon Conversions; z (cm); ", 500, -50.0, 50.0);
-	TH1Manager.at(id_r1dcutHist) = new MyTH1D("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 100, 0.0, 10.0);
-	TH1Manager.at(id_rendcapHist) = new MyTH1D("rendcapHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
-	TH1Manager.at(id_r1dwidecutHist) = new MyTH1D("r1dwidecutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
-	TH1Manager.at(id_r1dwidecutDHist) = new MyTH1D("r1dwidecutDHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
-	TH1Manager.at(id_r1dwidecutDDHist) = new MyTH1D("r1dwidecutDDHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
-	TH1Manager.at(id_r1dwidecutWHist) = new MyTH1D("r1dwidecutWHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
-	TH1Manager.at(id_r1dwidecutPSHist) = new MyTH1D("r1dwidecutPSHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
-	TH1Manager.at(id_r1dwidecutNomHist) = new MyTH1D("r1dwidecutNomHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
-	TH1Manager.at(id_r1dlowPUHist) = new MyTH1D("r1dlowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
-	TH1Manager.at(id_r1dmedPUHist) = new MyTH1D("r1dmedPUHist","Conversion Radius: No Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
-	TH1Manager.at(id_r1dhiPUHist) = new MyTH1D("r1dhiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
-	TH1Manager.at(id_r1dwidelowPUHist) = new MyTH1D("r1dwidelowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",250,0.,25.);
-	TH1Manager.at(id_r1dwidemedPUHist) = new MyTH1D("r1dwidemedPUHist","Conversion Radius: No Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",250,0.,25.);
-	TH1Manager.at(id_r1dwidehiPUHist) = new MyTH1D("r1dwidehiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",250,0.,25.);
-	TH1Manager.at(id_r1dlowPUcutHist) = new MyTH1D("r1dlowPUcutHist","Conversion Radius: Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
-	TH1Manager.at(id_r1dmedPUcutHist) = new MyTH1D("r1dmedPUcutHist","Conversion Radius: Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
-	TH1Manager.at(id_r1dhiPUcutHist) = new MyTH1D("r1dhiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
-	TH1Manager.at(id_r1dwidelowPUcutHist) = new MyTH1D("r1dwidelowPUcutHist","Conversion Radius: Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",250,0.,25.);
-	TH1Manager.at(id_r1dwidemedPUcutHist) = new MyTH1D("r1dwidemedPUcutHist","Conversion Radius: Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",250,0.,25.);
-	TH1Manager.at(id_r1dwidehiPUcutHist) = new MyTH1D("r1dwidehiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",250,0.,25.);
-	TH1Manager.at(id_rhobpHist) = new MyTH1D("rhobpHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
-	TH1Manager.at(id_rbpHist) = new MyTH1D("rbpHist","Conversion Radius w.r.t BPIX Center and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
-	TH1Manager.at(id_rnomHist) = new MyTH1D("rnomHist","Conversion Radius w.r.t Nominal Center and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
-	TH1Manager.at(id_mggHist) = new MyTH1D("mggHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0, 1.0 );
-	TH1Manager.at(id_mggallHist) = new MyTH1D("mggallHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0, 1.0 );
-	TH1Manager.at(id_mggCutHist) = new MyTH1D("mggCutHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0,1.0 );
-	TH1Manager.at(id_pTHist) = new MyTH1D("pTHist","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
-	TH1Manager.at(id_EHist) = new MyTH1D("EHist","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
-	TH1Manager.at(id_phiHist) = new MyTH1D("phiHist","Photon Phi;Phi (rad); Entries per bin", 40, -PI, PI );
-	TH1Manager.at(id_pTHist2) = new MyTH1D("pTHist2","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
-	TH1Manager.at(id_EHist2) = new MyTH1D("EHist2","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
-	TH1Manager.at(id_phiHist2) = new MyTH1D("phiHist2","Photon Phi;Phi (rad); Entries per bin", 40, -PI, PI );
-	TH1Manager.at(id_runHist) = new MyTH1D("runHist",";Run Number; Events per bin", 5000, 320500.5, 325500.5);
-	TH1Manager.at(id_isdataHist) = new MyTH1D("isdataHist",";isData; Events per bin", 2, -0.5, 1.5);
-	TH1Manager.at(id_dminHist) = new MyTH1D("dminHist",";dmin; Conversions per bin", 200, -1.0, 1.0);
-	TH1Manager.at(id_dphiHist) = new MyTH1D("dphiHist",";dphi; Conversions per bin", 200, -0.8, 0.8);
-	TH1Manager.at(id_dcotthetaHist) = new MyTH1D("dcotthetaHist",";dcottheta; Conversions per bin", 200, -0.5, 0.5);
-	TH1Manager.at(id_mpairHist) = new MyTH1D("mpairHist",";mpair (GeV); Conversions per bin", 52, -0.005, 0.255);
+    TH1Manager.at(id_r1dwideHist) = new MyTH1D("r1dwideHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
+    TH1Manager.at(id_zcutHist) = new MyTH1D("zcutHist","Photon Conversions; z (cm); ", 250, -25.0, 25.0);
+    TH1Manager.at(id_zcutHist2) = new MyTH1D("zcutHist2","Photon Conversions; z (cm); ", 500, -50.0, 50.0);
+    TH1Manager.at(id_r1dcutHist) = new MyTH1D("r1dcutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 100, 0.0, 10.0);
+    TH1Manager.at(id_rendcapHist) = new MyTH1D("rendcapHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+    TH1Manager.at(id_r1dwidecutHist) = new MyTH1D("r1dwidecutHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+    TH1Manager.at(id_r1dwidecutDHist) = new MyTH1D("r1dwidecutDHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+    TH1Manager.at(id_r1dwidecutDDHist) = new MyTH1D("r1dwidecutDDHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+    TH1Manager.at(id_r1dwidecutWHist) = new MyTH1D("r1dwidecutWHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+    TH1Manager.at(id_r1dwidecutPSHist) = new MyTH1D("r1dwidecutPSHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+    TH1Manager.at(id_r1dwidecutNomHist) = new MyTH1D("r1dwidecutNomHist","Conversions Radius With Cuts; R (cm); Entries per 0.1 bin", 250, 0.0, 25.0);
+    TH1Manager.at(id_r1dlowPUHist) = new MyTH1D("r1dlowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
+    TH1Manager.at(id_r1dmedPUHist) = new MyTH1D("r1dmedPUHist","Conversion Radius: No Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
+    TH1Manager.at(id_r1dhiPUHist) = new MyTH1D("r1dhiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
+    TH1Manager.at(id_r1dwidelowPUHist) = new MyTH1D("r1dwidelowPUHist","Conversion Radius: No Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",250,0.,25.);
+    TH1Manager.at(id_r1dwidemedPUHist) = new MyTH1D("r1dwidemedPUHist","Conversion Radius: No Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",250,0.,25.);
+    TH1Manager.at(id_r1dwidehiPUHist) = new MyTH1D("r1dwidehiPUHist","Conversion Radius: No Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",250,0.,25.);
+    TH1Manager.at(id_r1dlowPUcutHist) = new MyTH1D("r1dlowPUcutHist","Conversion Radius: Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",100,0.,10.);
+    TH1Manager.at(id_r1dmedPUcutHist) = new MyTH1D("r1dmedPUcutHist","Conversion Radius: Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",100,0.,10.);
+    TH1Manager.at(id_r1dhiPUcutHist) = new MyTH1D("r1dhiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",100,0.,10.);
+    TH1Manager.at(id_r1dwidelowPUcutHist) = new MyTH1D("r1dwidelowPUcutHist","Conversion Radius: Quality Cuts, PV #leq 16;R (cm);Entries per 0.1 bin",250,0.,25.);
+    TH1Manager.at(id_r1dwidemedPUcutHist) = new MyTH1D("r1dwidemedPUcutHist","Conversion Radius: Quality Cuts, PV #gt 16 and #lt 36;R (cm);Entries per 0.1 bin",250,0.,25.);
+    TH1Manager.at(id_r1dwidehiPUcutHist) = new MyTH1D("r1dwidehiPUcutHist","Conversion Radius: Quality Cuts, PV #geq 36;R (cm);Entries per 0.1 bin",250,0.,25.);
+    TH1Manager.at(id_rhobpHist) = new MyTH1D("rhobpHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
+    TH1Manager.at(id_rbpHist) = new MyTH1D("rbpHist","Conversion Radius w.r.t BPIX Center and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
+    TH1Manager.at(id_rnomHist) = new MyTH1D("rnomHist","Conversion Radius w.r.t Nominal Center and Quality Cuts; R (cm); Entries per 0.05 bin",100,0.,5.);
+    TH1Manager.at(id_mggHist) = new MyTH1D("mggHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0, 1.0 );
+    TH1Manager.at(id_mggallHist) = new MyTH1D("mggallHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0, 1.0 );
+    TH1Manager.at(id_mggCutHist) = new MyTH1D("mggCutHist","Di-#gamma Mass;Mass GeV; Entries per 2.5 MeV bin", 400, 0.0,1.0 );
+    TH1Manager.at(id_pTHist) = new MyTH1D("pTHist","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
+    TH1Manager.at(id_EHist) = new MyTH1D("EHist","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
+    TH1Manager.at(id_phiHist) = new MyTH1D("phiHist","Photon Phi;Phi (rad); Entries per bin", 40, -PI, PI );
+    TH1Manager.at(id_pTHist2) = new MyTH1D("pTHist2","Photon pT;pT (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0);
+    TH1Manager.at(id_EHist2) = new MyTH1D("EHist2","Photon Energy;Energy (GeV); Entries per 0.1 GeV bin", 1000, 0.0, 100.0 );
+    TH1Manager.at(id_phiHist2) = new MyTH1D("phiHist2","Photon Phi;Phi (rad); Entries per bin", 40, -PI, PI );
+    TH1Manager.at(id_runHist) = new MyTH1D("runHist",";Run Number; Events per bin", 5000, 320500.5, 325500.5);
+    TH1Manager.at(id_isdataHist) = new MyTH1D("isdataHist",";isData; Events per bin", 2, -0.5, 1.5);
+    TH1Manager.at(id_dminHist) = new MyTH1D("dminHist",";dmin; Conversions per bin", 200, -1.0, 1.0);
+    TH1Manager.at(id_dphiHist) = new MyTH1D("dphiHist",";dphi; Conversions per bin", 200, -0.8, 0.8);
+    TH1Manager.at(id_dcotthetaHist) = new MyTH1D("dcotthetaHist",";dcottheta; Conversions per bin", 200, -0.5, 0.5);
+    TH1Manager.at(id_mpairHist) = new MyTH1D("mpairHist",";mpair (GeV); Conversions per bin", 52, -0.005, 0.255);
 // These two are only relevant if MC
-	TH1Manager.at(id_nPUHist) = new MyTH1D("nPUHist",";nPU (MC truth); Events per bin", 100, -0.5, 99.5);
-	TH1Manager.at(id_PUHist) = new MyTH1D("PUDistributionHist",";PU (MC); Events per bin", 400, -0.5, 99.5);
-	TH1Manager.at(id_q0Hist) = new MyTH1D("q0Hist","; q0; Events per bin", 5, -2.5, 2.5);
-	TH1Manager.at(id_q1Hist) = new MyTH1D("q1Hist","; q1; Events per bin", 5, -2.5, 2.5);
-	TH1Manager.at(id_qtotHist) = new MyTH1D("qtotHist","; qtot; Events per bin", 5, -2.5, 2.5);
+    TH1Manager.at(id_nPUHist) = new MyTH1D("nPUHist",";nPU (MC truth); Events per bin", 100, -0.5, 99.5);
+    TH1Manager.at(id_PUHist) = new MyTH1D("PUDistributionHist",";PU (MC); Events per bin", 400, -0.5, 99.5);
+    TH1Manager.at(id_q0Hist) = new MyTH1D("q0Hist","; q0; Events per bin", 5, -2.5, 2.5);
+    TH1Manager.at(id_q1Hist) = new MyTH1D("q1Hist","; q1; Events per bin", 5, -2.5, 2.5);
+    TH1Manager.at(id_qtotHist) = new MyTH1D("qtotHist","; qtot; Events per bin", 5, -2.5, 2.5);
 
     TH1Manager.at(id_xplus1Hist) = new MyTH1D("xplus1", "Photon pT > 1 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     TH1Manager.at(id_xplus2Hist) = new MyTH1D("xplus2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
@@ -222,23 +209,23 @@ void histset2::init(){
     TH1Manager.at(id_nnonassignedHist) = new MyTH1D("nnonassignedHist", "Photon Conversions; Number of Conversions; Entries per bin", 40, -0.5, 39.5 );
 
 // init TH2D
-	TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
-	TH2Manager.at(id_xyHist) = new MyTH2D("xyHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
-	TH2Manager.at(id_xywideHist) = new MyTH2D("xywideHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
-	TH2Manager.at(id_rphiHist) = new MyTH2D("rphiHist", "Conversion Vertices in R-#phi per mm*60mrad bin; R (cm); #phi",250,0.0,25.0,40,-PI,PI);
-	TH2Manager.at(id_rzHist) = new MyTH2D("rzHist", "Conversion Vertices in R-z per mm^{2} bin; PC_z (cm); R (cm)",200,-10.,10.,100,0.,10.);
-	TH2Manager.at(id_rzHist2) = new MyTH2D("rzHist2", "Conversion Vertices in R-z per mm^{2} bin; |z| (cm); R (cm)",250,25.0,50.0,250,0.0,25.0);
-	TH2Manager.at(id_rzHist3) = new MyTH2D("rzHist3", "Conversion Vertices in R-z per mm^{2} bin; |z| (cm); R (cm)",250,25.0,50.0,250,0.0,25.0);
-	TH2Manager.at(id_rzHist4) = new MyTH2D("rzHist4", "Conversion Vertices in R-z per mm^{2} bin; |z| (cm); R (cm)",250,25.0,50.0,250,0.0,25.0);
-	TH2Manager.at(id_xycutHist) = new MyTH2D("xycutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
-	TH2Manager.at(id_xywidecutHist) = new MyTH2D("xywidecutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
-	TH2Manager.at(id_xywidecutHist2) = new MyTH2D("xywidecutHist2", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
-	TH2Manager.at(id_npv_rcutHist) = new MyTH2D("npv_rcutHist", "Conversion Vertices per mm; R (cm); nPV",250,0.0,25.0,100,-0.5,99.5);
-	TH2Manager.at(id_npc_npvHist) = new MyTH2D("npc_npvHist", " ; nPV; nPC",100,-0.5,99.5,100,-0.5,99.5);
-	TH2Manager.at(id_mgg2Hist) = new MyTH2D("mgg2Hist","Di-#gamma Mass;Mass (GeV); nPV", 400, 0.0, 1.0, 100, -0.5, 99.5 );
-	TH2Manager.at(id_mggRCutHist) = new MyTH2D("mggRCutHist","Di-#gamma Mass;Mass (GeV); Radius (cm)", 400, 0.0, 1.0, 25, 0.0, 25.0 );
-	TH2Manager.at(id_rhophiHist) = new MyTH2D("rhophiHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Phi (rad)",100,0.0,5.0,40,-PI,PI);
-	TH2Manager.at(id_AP_pT_alphaHist) = new MyTH2D("AP_pT_alphaHist","Armenteros-Podolanski Plot; #alpha = (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); p_{T} (GeV)",200,-1.0,1.0,200,0.0,0.22);
+    TH2Manager.at(id_pxpyHist) = new MyTH2D("pxpyHist", "p_{X} vs p_{Y} Distribution;p_{X};p_{Y}", 200, -10., 10., 200, -10., 10.);
+    TH2Manager.at(id_xyHist) = new MyTH2D("xyHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
+    TH2Manager.at(id_xywideHist) = new MyTH2D("xywideHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
+    TH2Manager.at(id_rphiHist) = new MyTH2D("rphiHist", "Conversion Vertices in R-#phi per mm*60mrad bin; R (cm); #phi",250,0.0,25.0,40,-PI,PI);
+    TH2Manager.at(id_rzHist) = new MyTH2D("rzHist", "Conversion Vertices in R-z per mm^{2} bin; PC_z (cm); R (cm)",200,-10.,10.,100,0.,10.);
+    TH2Manager.at(id_rzHist2) = new MyTH2D("rzHist2", "Conversion Vertices in R-z per mm^{2} bin; |z| (cm); R (cm)",250,25.0,50.0,250,0.0,25.0);
+    TH2Manager.at(id_rzHist3) = new MyTH2D("rzHist3", "Conversion Vertices in R-z per mm^{2} bin; |z| (cm); R (cm)",250,25.0,50.0,250,0.0,25.0);
+    TH2Manager.at(id_rzHist4) = new MyTH2D("rzHist4", "Conversion Vertices in R-z per mm^{2} bin; |z| (cm); R (cm)",250,25.0,50.0,250,0.0,25.0);
+    TH2Manager.at(id_xycutHist) = new MyTH2D("xycutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",200,-10.,10.,200,-10.,10.);
+    TH2Manager.at(id_xywidecutHist) = new MyTH2D("xywidecutHist", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
+    TH2Manager.at(id_xywidecutHist2) = new MyTH2D("xywidecutHist2", "Conversion Vertices per mm^{2} bin; x (cm); y (cm)",500,-25.,25.,500,-25.,25.);
+    TH2Manager.at(id_npv_rcutHist) = new MyTH2D("npv_rcutHist", "Conversion Vertices per mm; R (cm); nPV",250,0.0,25.0,100,-0.5,99.5);
+    TH2Manager.at(id_npc_npvHist) = new MyTH2D("npc_npvHist", " ; nPV; nPC",100,-0.5,99.5,100,-0.5,99.5);
+    TH2Manager.at(id_mgg2Hist) = new MyTH2D("mgg2Hist","Di-#gamma Mass;Mass (GeV); nPV", 400, 0.0, 1.0, 100, -0.5, 99.5 );
+    TH2Manager.at(id_mggRCutHist) = new MyTH2D("mggRCutHist","Di-#gamma Mass;Mass (GeV); Radius (cm)", 400, 0.0, 1.0, 25, 0.0, 25.0 );
+    TH2Manager.at(id_rhophiHist) = new MyTH2D("rhophiHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Phi (rad)",100,0.0,5.0,40,-PI,PI);
+    TH2Manager.at(id_AP_pT_alphaHist) = new MyTH2D("AP_pT_alphaHist","Armenteros-Podolanski Plot; #alpha = (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); p_{T} (GeV)",200,-1.0,1.0,200,0.0,0.22);
 }
 
 void histset2::FillTH1(int index, double x, double w=1.0){
@@ -289,15 +276,15 @@ void histset2::AnalyzeEntry(convsel& s){
 
     #include "mylocaltree.h"     //All the variable incantations needed
 
-	double px,py,pz;
+    double px,py,pz;
     double px0p,py0p,pz0p;
     double px1p,py1p,pz1p;
     double pt0,pt1,tanl0,tanl1,phi0,phi1,qR0,qR1;
-	double x,y,z;
+    double x,y,z;
     double x0p,y0p,z0p;
     double x1p,y1p,z1p;
     int nBefore0,nBefore1;
-	double r,theta,phi;
+    double r,theta,phi;
     double rho,phip;
     double rps;
     double rnominal;
@@ -305,10 +292,10 @@ void histset2::AnalyzeEntry(convsel& s){
     const bool lpr = true;       // print flag
     const bool lreduce = true;   // do problem reduction
 	
-	const double RERRCUT = 0.25;
-	const double COSTCUT = 0.85;
-	const double ZCUT = 25.0;
-	const double FITPROBCUT = 0.010;
+    const double RERRCUT = 0.25;
+    const double COSTCUT = 0.85;
+    const double ZCUT = 25.0;
+    const double FITPROBCUT = 0.010;
     const double MASSCUT = 0.15;
 
     const double MASS_ELECTRON = 0.5109989461e-3;
@@ -319,12 +306,9 @@ void histset2::AnalyzeEntry(convsel& s){
 // Scale MC to data based on number 
 // of events with at least 1 conversion
     const double NFACTOR = 3.68068361*1.00000128;
-
-	double fitprob;
-
+    double fitprob;
 // We now have various "centers" to compare to for radial coordinates.
-
-	//beam pipe displacement (in cm) from Anna's DPF2019 talk
+// beam pipe displacement (in cm) from Anna's DPF2019 talk
     const double x0bpdata =  0.171;
     const double y0bpdata = -0.176;
     const double x0bpmc = 0.0;
@@ -347,10 +331,10 @@ void histset2::AnalyzeEntry(convsel& s){
     double x0,y0,x0bp,y0bp,x0ps,y0ps;
 
 	//error calcs
-	double vxx,vxy,vyy,vzz; //variances
-	double varsum_r, varsum_phi; //intermediate calculation variables
-	double rerr,phierr,zerr;//errors
-	double sphi,cphi;
+    double vxx,vxy,vyy,vzz; //variances
+    double varsum_r, varsum_phi; //intermediate calculation variables
+    double rerr,phierr,zerr;//errors
+    double sphi,cphi;
     
     double wtPU;
 
@@ -490,27 +474,26 @@ void histset2::AnalyzeEntry(convsel& s){
         double pL1 = xyzv1.Dot(xyzv)/sqrt(xyzv.Mag2());
         double APalpha = (pL0 - pL1)/(pL0 + pL1);
         if (q0<0) APalpha = -APalpha;
-
-		r = sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) );
-		phi = atan2(y-y0, x-x0);
+        r = sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) );
+        phi = atan2(y-y0, x-x0);
         theta = atan2(pt,pz);
-		rho  =  sqrt( (x-x0bp)*(x-x0bp) + (y-y0bp)*(y-y0bp)) ;
+        rho  =  sqrt( (x-x0bp)*(x-x0bp) + (y-y0bp)*(y-y0bp)) ;
         phip =  atan2(y-y0bp, x-x0bp);
-		rps = sqrt( (x-x0ps)*(x-x0ps) + (y-y0ps)*(y-y0ps) );
+        rps = sqrt( (x-x0ps)*(x-x0ps) + (y-y0ps)*(y-y0ps) );
         rnominal = sqrt( x*x + y*y );
-		vxx = PC_vtx_sigmaxx[i];
-		vxy = PC_vtx_sigmaxy[i];
-		vyy = PC_vtx_sigmayy[i];
-		vzz = PC_vtx_sigmazz[i];
-		cphi = cos(phi);
-		sphi = sin(phi);
-		// This is the correct one
-		varsum_r   = cphi*cphi*vxx + 2.0*sphi*cphi*vxy + sphi*sphi*vyy;
-		varsum_phi = sphi*sphi*vxx - 2.0*sphi*cphi*vxy + cphi*cphi*vyy;
-		rerr = sqrt(varsum_r);
-		phierr = sqrt(varsum_phi)/r;
-		zerr = sqrt(vzz);
-	 	fitprob = TMath::Prob(PC_vtx_chi2[i], 3);
+        vxx = PC_vtx_sigmaxx[i];
+        vxy = PC_vtx_sigmaxy[i];
+        vyy = PC_vtx_sigmayy[i];
+        vzz = PC_vtx_sigmazz[i];
+        cphi = cos(phi);
+        sphi = sin(phi);
+// This is the correct one
+        varsum_r   = cphi*cphi*vxx + 2.0*sphi*cphi*vxy + sphi*sphi*vyy;
+        varsum_phi = sphi*sphi*vxx - 2.0*sphi*cphi*vxy + cphi*cphi*vyy;
+        rerr = sqrt(varsum_r);
+        phierr = sqrt(varsum_phi)/r;
+        zerr = sqrt(vzz);
+        fitprob = TMath::Prob(PC_vtx_chi2[i], 3);
 
 // This logic is a bit confused. It would likely be less confusing if it was reliably +ve/-ve.
         ROOT::Math::PxPyPzMVector v0,v0pi,v0p,v1,v1pi,v1p;
@@ -535,7 +518,7 @@ void histset2::AnalyzeEntry(convsel& s){
         bool region3 = (r>11.7) && (r<15.3);
 
 // Apply fiducial cuts to all candidates
-		if(abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
+        if(abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
            FillTH1(id_r1dHist, r, wtPU);
            FillTH1(id_r1dwideHist, r, wtPU);
            FillTH1(id_rerrHist, rerr, wtPU);
