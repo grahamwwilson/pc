@@ -300,7 +300,7 @@ void histset2::AnalyzeEntry(convsel& s){
 
     const double MASS_ELECTRON = 0.5109989461e-3;
     const double MASS_PION = 139.57061e-3;
-//    const double MASS_KAON = 493.677e-3;
+    const double MASS_KAON = 493.677e-3;
     const double MASS_PROTON = 938.272081e-3;
 
 // Scale MC to data based on number 
@@ -495,7 +495,19 @@ void histset2::AnalyzeEntry(convsel& s){
         zerr = sqrt(vzz);
         fitprob = TMath::Prob(PC_vtx_chi2[i], 3);
 
-// This logic is a bit confused. It would likely be less confusing if it was reliably +ve/-ve.
+// This logic is a bit confused. It would likely be less confusing if it was reliably -ve/+ve.
+// Let's try using a deque. I could have a deque of vectors that is ordered by -ve then +ve.
+        std::deque < std::vector <double> > Mom;
+        std::vector <double> momentum0 = {px0p, py0p, pz0p};
+        std::vector <double> momentum1 = {px1p, py1p, pz1p};
+// Fill Mom with the -ve then +ve track 3-momenta
+        Mom.push_back(momentum0);
+        if(q1>0){
+           Mom.push_back(momentum1);
+        }
+        else{
+           Mom.push_front(momentum1);
+        }
         ROOT::Math::PxPyPzMVector v0,v0pi,v0p,v1,v1pi,v1p;
         v0 = ROOT::Math::PxPyPzMVector( px0p, py0p, pz0p, MASS_ELECTRON );
         v0pi = ROOT::Math::PxPyPzMVector( px0p, py0p, pz0p, MASS_PION );
@@ -503,11 +515,30 @@ void histset2::AnalyzeEntry(convsel& s){
         v1   = ROOT::Math::PxPyPzMVector( px1p, py1p, pz1p, MASS_ELECTRON );
         v1pi = ROOT::Math::PxPyPzMVector( px1p, py1p, pz1p, MASS_PION );
         v1p  = ROOT::Math::PxPyPzMVector( px1p, py1p, pz1p, MASS_PROTON );
-        ROOT::Math::PxPyPzMVector vpair, vpairpipi, vpairpip, vpairppi;
-        vpair += v0;
-        vpair += v1;
-        vpairpipi += v0pi;
-        vpairpipi += v1pi;
+
+        ROOT::Math::PxPyPzMVector vNege,vNegpi,vNegk,vNegp;
+        ROOT::Math::PxPyPzMVector vPose,vPospi,vPosk,vPosp;
+        vNege  = ROOT::Math::PxPyPzMVector( Mom[0][0], Mom[0][1], Mom[0][2], MASS_ELECTRON );
+        vNegpi = ROOT::Math::PxPyPzMVector( Mom[0][0], Mom[0][1], Mom[0][2], MASS_PION );
+        vNegk  = ROOT::Math::PxPyPzMVector( Mom[0][0], Mom[0][1], Mom[0][2], MASS_KAON );
+        vNegp  = ROOT::Math::PxPyPzMVector( Mom[0][0], Mom[0][1], Mom[0][2], MASS_PROTON );
+        vPose  = ROOT::Math::PxPyPzMVector( Mom[1][0], Mom[1][1], Mom[1][2], MASS_ELECTRON );
+        vPospi = ROOT::Math::PxPyPzMVector( Mom[1][0], Mom[1][1], Mom[1][2], MASS_PION );
+        vPosk  = ROOT::Math::PxPyPzMVector( Mom[1][0], Mom[1][1], Mom[1][2], MASS_KAON );
+        vPosp  = ROOT::Math::PxPyPzMVector( Mom[1][0], Mom[1][1], Mom[1][2], MASS_PROTON );
+
+        ROOT::Math::PxPyPzMVector vpair, vpairpipi, vpairkk, vpairpip, vpairppi, vpairLambda, vpairALambda;
+        vpair += vNege;
+        vpair += vPose;
+        vpairpipi += vNegpi;
+        vpairpipi += vPospi;
+        vpairkk += vNegk;
+        vpairkk += vPosk;
+        vpairLambda += vPosp;
+        vpairLambda += vNegpi;
+        vpairALambda += vNegp;
+        vpairALambda += vPospi;
+
         vpairpip  += v0pi;
         vpairpip  += v1p;
         vpairppi  += v0p;
