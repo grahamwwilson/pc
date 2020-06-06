@@ -119,7 +119,7 @@ void histset2::AnalyzeEntry(convsel& s){
     double rps;
     double rnominal;
 
-    const bool lpr = true;       // print flag
+    const bool lpr = false;      // print flag
     const bool lreduce = true;   // do problem reduction
 	
     const double RERRCUT = 0.25;
@@ -167,6 +167,10 @@ void histset2::AnalyzeEntry(convsel& s){
     double sphi,cphi;
     
     double wtPU;
+
+    if(lpr)std::cout << " " << std::endl;
+    if(lpr)std::cout << " ------------BoE-------------- " << std::endl;
+    if(lpr)std::cout << " " << std::endl;
 
     FillTH1(id_runHist, runNumber);
     FillTH1(id_isdataHist, isRealData);
@@ -338,13 +342,6 @@ void histset2::AnalyzeEntry(convsel& s){
         else{
            Mom.push_front(momentum1);
         }
-        ROOT::Math::PxPyPzMVector v0,v0pi,v0p,v1,v1pi,v1p;
-        v0 = ROOT::Math::PxPyPzMVector( px0p, py0p, pz0p, MASS_ELECTRON );
-        v0pi = ROOT::Math::PxPyPzMVector( px0p, py0p, pz0p, MASS_PION );
-        v0p  = ROOT::Math::PxPyPzMVector( px0p, py0p, pz0p, MASS_PROTON );
-        v1   = ROOT::Math::PxPyPzMVector( px1p, py1p, pz1p, MASS_ELECTRON );
-        v1pi = ROOT::Math::PxPyPzMVector( px1p, py1p, pz1p, MASS_PION );
-        v1p  = ROOT::Math::PxPyPzMVector( px1p, py1p, pz1p, MASS_PROTON );
 
         ROOT::Math::PxPyPzMVector vNege,vNegpi,vNegk,vNegp;
         ROOT::Math::PxPyPzMVector vPose,vPospi,vPosk,vPosp;
@@ -368,43 +365,6 @@ void histset2::AnalyzeEntry(convsel& s){
         vpairLambda += vNegpi;
         vpairALambda += vNegp;
         vpairALambda += vPospi;
-
-        vpairpip  += v0pi;
-        vpairpip  += v1p;
-        vpairppi  += v0p;
-        vpairppi  += v1pi;
-
-        bool region1 = (r>3.7) && (r<6.2);
-        bool region2 = (r>7.6) && (r<10.3);
-        bool region3 = (r>11.7) && (r<15.3);
-
-// Apply fiducial cuts to all candidates
-        if(abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-           FillTH1(id_r1dHist, r, wtPU);
-           FillTH1(id_r1dwideHist, r, wtPU);
-           FillTH1(id_rerrHist, rerr, wtPU);
-           FillTH1(id_phierrHist, phierr, wtPU);
-           FillTH1(id_zerrHist, zerr, wtPU);
-           FillTH1(id_pfitHist, fitprob, wtPU);
-           FillTH1(id_zHist, z, wtPU);
-           FillTH1(id_costhetaHist, cos(theta), wtPU);      
-    	   FillTH2(id_xyHist, x, y, wtPU);
-           FillTH2(id_xywideHist, x, y, wtPU);
-           FillTH2(id_rzHist, z, r, wtPU);
-           FillTH1(id_pTHist2, pt, wtPU);
-           FillTH1(id_EHist2, E, wtPU);
-           FillTH1(id_phiHist2, phi, wtPU);
-           FillTH1(id_dminHist, PC_dmin[i], wtPU);
-           FillTH1(id_dphiHist, PC_dphi[i], wtPU);
-           if(PC_mpair[i]<0.25){
-              FillTH1(id_mpairHist, PC_mpair[i], wtPU);
-           }
-           else{
-//Fill overflow bin
-              FillTH1(id_mpairHist, 0.2501, wtPU);
-           }
-           FillTH1(id_dcotthetaHist, PC_dcottheta[i], wtPU);
-        }
 
 // Make primary quality cuts
 		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
@@ -430,191 +390,35 @@ void histset2::AnalyzeEntry(convsel& s){
 // Fill tuple with relevant derived quantities
             tup[i].radius = r;
             tup[i].rerr = rerr;
-            tup[i].mpair = vpair.M();
+//            tup[i].mpair = vpair.M();
             tup[i].pfit = fitprob;
             tup[i].alpha = APalpha;
             tup[i].qpt0 = APpT0;
             tup[i].qpt1 = APpT1;
             tup[i].Pos = PosTkInfo[i];
             tup[i].Neg = NegTkInfo[i];
-// for technical checks
-            FillTH1( id_r1dHist2, tup[i].radius );
-        }
-
-		if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT 
-                && fitprob > FITPROBCUT && std::max(nBefore0,nBefore1)==0 ){
-
-            if(region1||region2||region3){
-               FillTH1(id_alphaBkgdHist, APalpha, wtPU);
-               if(region1)FillTH1(id_alphaBkgdHistR1, APalpha, wtPU);
-               if(region2)FillTH1(id_alphaBkgdHistR2, APalpha, wtPU);
-               if(region3)FillTH1(id_alphaBkgdHistR3, APalpha, wtPU);
-            }
-            else{
-               FillTH1(id_alphaSignalHist, APalpha, wtPU);
-            }
-
-            FillTH1(id_conversionCandidateMassHist, vpair.M(), wtPU);
-            FillTH1(id_conversionCandidateMassHist2, vpair.M(), wtPU);
-
-            FillTH1(id_KShortMassHist, vpairpipi.M(), wtPU);
-            if(region1||region2||region3){
-               FillTH1(id_KShortBkgdMassHist, vpairpipi.M(), wtPU);
-               if(region1)FillTH1(id_KShortBkgdMassHistR1, vpairpipi.M(), wtPU);
-               if(region2)FillTH1(id_KShortBkgdMassHistR2, vpairpipi.M(), wtPU);
-               if(region3)FillTH1(id_KShortBkgdMassHistR3, vpairpipi.M(), wtPU);
-            }            
-// pip: Track 0 = pi, Track 1 = p
-// ppi: Track 0 = p , Track 1 = pi
-            if(APalpha >= 0.0){
-// Lambda candidate with a proton ( Lambda -> pi- p ) only populates +ve alpha
-               if(q1 == 1){
-                  FillTH1(id_lambdaCandidateMassHist, vpairpip.M(), wtPU);
-                  FillTH1(id_lambdasCandidateMassHist, vpairpip.M(), wtPU);
-                  if(region1||region2||region3){
-                     FillTH1(id_lambdasBkgdMassHist, vpairpip.M(), wtPU);
-                     if(region1)FillTH1(id_lambdasBkgdMassHistR1, vpairpip.M(), wtPU);
-                     if(region2)FillTH1(id_lambdasBkgdMassHistR2, vpairpip.M(), wtPU);
-                     if(region3)FillTH1(id_lambdasBkgdMassHistR3, vpairpip.M(), wtPU);
-                  }
-                  else{
-                     FillTH1(id_lambdasSignalMassHist, vpairpip.M(), wtPU);
-                  }
-               }
-               else{
-                  FillTH1(id_lambdaCandidateMassHist, vpairppi.M(), wtPU);
-                  FillTH1(id_lambdasCandidateMassHist, vpairppi.M(), wtPU);
-                  if(region1||region2||region3){
-                     FillTH1(id_lambdasBkgdMassHist, vpairppi.M(), wtPU);
-                     if(region1)FillTH1(id_lambdasBkgdMassHistR1, vpairppi.M(), wtPU);
-                     if(region2)FillTH1(id_lambdasBkgdMassHistR2, vpairppi.M(), wtPU);
-                     if(region3)FillTH1(id_lambdasBkgdMassHistR3, vpairppi.M(), wtPU);
-                  }
-                  else{
-                     FillTH1(id_lambdasSignalMassHist, vpairppi.M(), wtPU);
-                  }
-               }
-            }
-            else{
-// Lambdabar candidate with an antiproton ( Lambdabar -> pi+ pbar) only populates -ve alpha
-               if(q0 == 1){
-                  FillTH1(id_lambdabarCandidateMassHist, vpairpip.M(), wtPU);
-                  FillTH1(id_lambdasCandidateMassHist, vpairpip.M(), wtPU);
-                  if(region1||region2||region3){
-                     FillTH1(id_lambdasBkgdMassHist, vpairpip.M(), wtPU);
-                     if(region1)FillTH1(id_lambdasBkgdMassHistR1, vpairpip.M(), wtPU);
-                     if(region2)FillTH1(id_lambdasBkgdMassHistR2, vpairpip.M(), wtPU);
-                     if(region3)FillTH1(id_lambdasBkgdMassHistR3, vpairpip.M(), wtPU);
-                  }
-                  else{
-                     FillTH1(id_lambdasSignalMassHist, vpairpip.M(), wtPU);
-                  }
-               }
-               else{
-                  FillTH1(id_lambdabarCandidateMassHist, vpairppi.M(), wtPU);
-                  FillTH1(id_lambdasCandidateMassHist, vpairppi.M(), wtPU);
-                  if(region1||region2||region3){
-                     FillTH1(id_lambdasBkgdMassHist, vpairppi.M(), wtPU);
-                     if(region1)FillTH1(id_lambdasBkgdMassHistR1, vpairppi.M(), wtPU);
-                     if(region2)FillTH1(id_lambdasBkgdMassHistR2, vpairppi.M(), wtPU);
-                     if(region3)FillTH1(id_lambdasBkgdMassHistR3, vpairppi.M(), wtPU);
-                  }
-                  else{
-                     FillTH1(id_lambdasSignalMassHist, vpairppi.M(), wtPU);
-                  }
-               }
-            }
-            FillTH1(id_AP_pTminHist, std::min(APpT0,APpT1), wtPU);
-            FillTH1(id_AP_pTmaxHist, std::max(APpT0,APpT1), wtPU);
-            FillTH1(id_AP_pTaveHist, 0.5*(APpT0+APpT1), wtPU);
-            FillTH1(id_AP_alphaHist, APalpha, wtPU);
-            FillTH2(id_AP_pT_alphaHist, APalpha, std::min(APpT0,APpT1), wtPU);
-
-			FillTH1(id_zcutHist, z, wtPU);
-			FillTH1(id_r1dcutHist, r, wtPU);
-			FillTH1(id_r1dwidecutHist, r);
-			FillTH1(id_r1dwidecutWHist, r, wtPU);
-			FillTH1(id_r1dwidecutPSHist, rps, wtPU);
-			FillTH1(id_r1dwidecutNomHist, rnominal, wtPU);
-            if(PC_dmin[i]>-998.0){
-   			   FillTH1(id_r1dwidecutDHist, r, wtPU);
-            }
-            if(PC_dmin[i]>0.0){
-   			   FillTH1(id_r1dwidecutDDHist, r, wtPU);
-            }
-
-            FillTH2(id_rphiHist, r, phi, wtPU);
-
-			FillTH2(id_xycutHist, x, y, wtPU);
-			FillTH2(id_xywidecutHist, x, y, wtPU);
-            FillTH1(id_phiHist, phi, wtPU);	
-			FillTH1(id_rhobpHist, rho, wtPU);
-			FillTH1(id_rbpHist, r, wtPU);
-            FillTH1(id_rnomHist, rnominal, wtPU);
-			FillTH2(id_rhophiHist, rho, phip, wtPU);
-            FillTH2(id_npv_rcutHist, r, numberOfPV, wtPU);
-            FillTH1(id_pTHist, pt, wtPU);
-            FillTH1(id_EHist,E, wtPU);
-
-            int qtot = q0+q1;
-// Check charges
-            FillTH1(id_q0Hist, q0, wtPU);
-            FillTH1(id_q1Hist, q1, wtPU);
-            FillTH1(id_qtotHist, qtot, wtPU);
+            tup[i].phierr = phierr;
+            tup[i].zerr = zerr;
+            tup[i].mass = {vpair.M(), vpairpipi.M(), vpairkk.M(), vpairLambda.M(), vpairALambda.M()};
+// Check
+            if(lpr)std::cout << "Masses: " << tup[i].mass[0] << " " << tup[i].mass[1] << " " 
+                             << tup[i].mass[2] << " " << tup[i].mass[3] << " " << tup[i].mass[4] << std::endl;
+            tup[i].rho = rho;
+            tup[i].rps = rps;
+            tup[i].rnominal = rnominal;
+            tup[i].phi = phi;
+            tup[i].pt = pt;
+            tup[i].E = E;
+            tup[i].phip = phip;
             double ptasym = (pt0-pt1)/(pt0+pt1);
             if (q0<0) ptasym = -ptasym;
             double xplus = (1.0 + ptasym)/2.0;
-            if(pt>1.0)FillTH1(id_xplus1Hist, xplus, wtPU);
-            if(pt>2.0)FillTH1(id_xplus2Hist, xplus, wtPU);
-            if(pt>4.0)FillTH1(id_xplus4Hist, xplus, wtPU);
-            if(pt>8.0)FillTH1(id_xplus8Hist, xplus, wtPU);
-            if(pt>16.0)FillTH1(id_xplus16Hist, xplus, wtPU);
-
-            if(pt>1.0)FillTH1(id_alpha1Hist, APalpha, wtPU);
-            if(pt>2.0)FillTH1(id_alpha2Hist, APalpha, wtPU);
-            if(pt>4.0)FillTH1(id_alpha4Hist, APalpha, wtPU);
-            if(pt>8.0)FillTH1(id_alpha8Hist, APalpha, wtPU);
-            if(pt>16.0)FillTH1(id_alpha16Hist, APalpha, wtPU);
-
-// Also include correlation plot between APalpha and ptasym.
-		}
-/// Endcap plots
-		if( rerr < RERRCUT && abs(z) > ZCUT && abs(z) < 50.0 && abs(cos(theta)) < COSTCUT 
-                && fitprob > FITPROBCUT ){
-			FillTH2(id_xywidecutHist2, x, y, wtPU);
-			FillTH2(id_rzHist2, abs(z), r, wtPU);
-            if(z>0.0)FillTH2(id_rzHist3, abs(z), r, wtPU);
-            if(z<0.0)FillTH2(id_rzHist4, abs(z), r, wtPU);
-			FillTH1(id_rendcapHist, r, wtPU);
-			FillTH1(id_zcutHist2, z, wtPU);
+            tup[i].xplus = xplus;
+            tup[i].theta = theta;
+// for technical checks
+            FillTH1( id_r1dHist2, tup[i].radius );
         }
-		//pileup cuts
-		if( numberOfPV <= 16){
-			FillTH1(id_r1dlowPUHist, r, wtPU);
-			FillTH1(id_r1dwidelowPUHist, r, wtPU) ;
-			//low PU quality cuts
-			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-				FillTH1(id_r1dlowPUcutHist, r, wtPU);
-				FillTH1(id_r1dwidelowPUcutHist, r, wtPU);
-			}
-		}
-		if( numberOfPV > 16 && numberOfPV < 36){
-			FillTH1(id_r1dmedPUHist, r, wtPU);
-			FillTH1(id_r1dwidemedPUHist, r, wtPU);
-			//low PU quality cuts
-			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-				FillTH1(id_r1dmedPUcutHist, r, wtPU);
-				FillTH1(id_r1dwidemedPUcutHist, r, wtPU);
-			}
-		}
-		if( numberOfPV >= 36){
-			FillTH1(id_r1dhiPUHist, r, wtPU);
-			FillTH1(id_r1dwidehiPUHist, r, wtPU);
-			if( rerr < RERRCUT && abs(z) < ZCUT && abs(cos(theta)) < COSTCUT && fitprob > FITPROBCUT){
-				FillTH1(id_r1dhiPUcutHist, r, wtPU);
-				FillTH1(id_r1dwidehiPUcutHist, r, wtPU);
-			}
-		}				
+// Also include correlation plot between APalpha and ptasym.
 	}
 
 // Characterize our matching problem for this event
@@ -817,14 +621,139 @@ void histset2::AnalyzeEntry(convsel& s){
      }
   }
 
-// Now with duplicates eliminated histogram multiplicity and conversion radius
+// Now with duplicates eliminated histograms for selected candidates
     FillTH1( id_nconvHist, vsel.size() );
     FillTH1( id_nassignedHist, nassigned );
     FillTH1( id_nnonassignedHist, vsel.size() - nassigned );
+
     for(unsigned int j=0; j<vsel.size(); ++j){
+
         int i = vsel[j];
+        r = tup[i].radius;
+        bool region1 = (r>3.7) && (r<6.2);
+        bool region2 = (r>7.6) && (r<10.3);
+        bool region3 = (r>11.7) && (r<15.3);
+
         FillTH1( id_r1dHist4, tup[i].radius );
-    }
+        if( numberOfPV <= 16)FillTH1(id_r1dwidelowPUcutHist, tup[i].radius, wtPU);
+        if( numberOfPV > 16 && numberOfPV < 36)FillTH1(id_r1dwidemedPUcutHist, tup[i].radius, wtPU);
+        if( numberOfPV >= 36)FillTH1(id_r1dwidehiPUcutHist, tup[i].radius, wtPU);
+
+        FillTH1(id_AP_pTminHist, std::min(tup[i].qpt0,tup[i].qpt1), wtPU);
+        FillTH1(id_AP_pTmaxHist, std::max(tup[i].qpt0,tup[i].qpt1), wtPU);
+        FillTH1(id_AP_pTaveHist, 0.5*(tup[i].qpt0+tup[i].qpt1), wtPU);
+        FillTH1(id_AP_alphaHist, tup[i].alpha, wtPU);
+        FillTH2(id_AP_pT_alphaHist, tup[i].alpha, std::min(tup[i].qpt0,tup[i].qpt1), wtPU);
+
+        FillTH1(id_zcutHist, PC_z[i], wtPU);
+        FillTH1(id_r1dcutHist, r, wtPU);
+        FillTH1(id_r1dwidecutHist, r);
+        FillTH1(id_r1dwidecutWHist, r, wtPU);
+
+        FillTH1(id_r1dwidecutPSHist, tup[i].rps, wtPU);
+        FillTH1(id_r1dwidecutNomHist, tup[i].rnominal, wtPU);
+        if(PC_dmin[i]>-998.0){
+   		   FillTH1(id_r1dwidecutDHist, r, wtPU);
+        }
+        if(PC_dmin[i]>0.0){
+   		   FillTH1(id_r1dwidecutDDHist, r, wtPU);
+        }
+        FillTH2(id_rphiHist, r, tup[i].phi, wtPU);
+		FillTH2(id_xycutHist, PC_x[i], PC_y[i], wtPU);
+		FillTH2(id_xywidecutHist, PC_x[i], PC_y[i], wtPU);
+        FillTH1(id_phiHist, tup[i].phi, wtPU);	
+		FillTH1(id_rhobpHist, tup[i].rho, wtPU);
+		FillTH1(id_rbpHist, r, wtPU);
+        FillTH1(id_rnomHist, tup[i].rnominal, wtPU);
+		FillTH2(id_rhophiHist, tup[i].rho, tup[i].phip, wtPU);
+        FillTH2(id_npv_rcutHist, r, numberOfPV, wtPU);
+        FillTH1(id_pTHist, tup[i].pt, wtPU);
+        FillTH1(id_EHist, tup[i].E, wtPU);
+
+// Other histograms
+        FillTH1(id_rerrHist, tup[i].rerr, wtPU);
+        FillTH1(id_phierrHist, tup[i].phierr, wtPU);
+        FillTH1(id_zerrHist, tup[i].zerr, wtPU);
+        FillTH1(id_pfitHist, tup[i].pfit, wtPU);
+        FillTH1(id_zHist, PC_z[i], wtPU);
+        FillTH1(id_costhetaHist, cos(tup[i].theta), wtPU);      
+    	FillTH2(id_xyHist, PC_x[i], PC_y[i], wtPU);
+        FillTH2(id_xywideHist, PC_x[i], PC_y[i], wtPU);
+        FillTH2(id_rzHist, PC_z[i], r, wtPU);
+        FillTH1(id_pTHist2, tup[i].pt, wtPU);
+        FillTH1(id_EHist2, tup[i].E, wtPU);
+        FillTH1(id_phiHist2, tup[i].phi, wtPU);
+        FillTH1(id_dminHist, PC_dmin[i], wtPU);
+        FillTH1(id_dphiHist, PC_dphi[i], wtPU);
+        if(PC_mpair[i]<0.25){
+           FillTH1(id_mpairHist, PC_mpair[i], wtPU);
+        }
+        else{
+//Fill overflow bin
+           FillTH1(id_mpairHist, 0.2501, wtPU);
+        }
+        FillTH1(id_dcotthetaHist, PC_dcottheta[i], wtPU);
+
+        if(tup[i].pt>1.0)FillTH1(id_xplus1Hist, tup[i].xplus, wtPU);
+        if(tup[i].pt>2.0)FillTH1(id_xplus2Hist, tup[i].xplus, wtPU);
+        if(tup[i].pt>4.0)FillTH1(id_xplus4Hist, tup[i].xplus, wtPU);
+        if(tup[i].pt>8.0)FillTH1(id_xplus8Hist, tup[i].xplus, wtPU);
+        if(tup[i].pt>16.0)FillTH1(id_xplus16Hist, tup[i].xplus, wtPU);
+
+        if(tup[i].pt>1.0)FillTH1(id_alpha1Hist, tup[i].alpha, wtPU);
+        if(tup[i].pt>2.0)FillTH1(id_alpha2Hist, tup[i].alpha, wtPU);
+        if(tup[i].pt>4.0)FillTH1(id_alpha4Hist, tup[i].alpha, wtPU);
+        if(tup[i].pt>8.0)FillTH1(id_alpha8Hist, tup[i].alpha, wtPU);
+        if(tup[i].pt>16.0)FillTH1(id_alpha16Hist, tup[i].alpha, wtPU);
+
+        if(region1||region2||region3){
+           FillTH1(id_alphaBkgdHist, tup[i].alpha, wtPU);
+           if(region1)FillTH1(id_alphaBkgdHistR1, tup[i].alpha, wtPU);
+           if(region2)FillTH1(id_alphaBkgdHistR2, tup[i].alpha, wtPU);
+           if(region3)FillTH1(id_alphaBkgdHistR3, tup[i].alpha, wtPU);
+        }
+        else{
+           FillTH1(id_alphaSignalHist, tup[i].alpha, wtPU);
+        }
+        FillTH1(id_conversionCandidateMassHist, tup[i].mass[0], wtPU);
+        FillTH1(id_conversionCandidateMassHist2, tup[i].mass[0], wtPU);
+        FillTH1(id_KShortMassHist, tup[i].mass[1], wtPU);
+        if(region1||region2||region3){
+           FillTH1(id_KShortBkgdMassHist, tup[i].mass[1], wtPU);
+           if(region1)FillTH1(id_KShortBkgdMassHistR1, tup[i].mass[1], wtPU);
+           if(region2)FillTH1(id_KShortBkgdMassHistR2, tup[i].mass[1], wtPU);
+           if(region3)FillTH1(id_KShortBkgdMassHistR3, tup[i].mass[1], wtPU);
+        }
+        if(tup[i].alpha >= 0.0){
+// Lambda candidate with a proton ( Lambda -> pi- p ) only populates +ve alpha
+           FillTH1(id_lambdaCandidateMassHist, tup[i].mass[3], wtPU);
+           FillTH1(id_lambdasCandidateMassHist, tup[i].mass[3], wtPU);
+           if(region1||region2||region3){
+              FillTH1(id_lambdasBkgdMassHist, tup[i].mass[3], wtPU);
+              if(region1)FillTH1(id_lambdasBkgdMassHistR1, tup[i].mass[3], wtPU);
+              if(region2)FillTH1(id_lambdasBkgdMassHistR2, tup[i].mass[3], wtPU);
+              if(region3)FillTH1(id_lambdasBkgdMassHistR3, tup[i].mass[3], wtPU);
+           }
+           else{
+              FillTH1(id_lambdasSignalMassHist, tup[i].mass[3], wtPU);
+           }
+        }
+        else{
+// Lambdabar candidate with an antiproton ( Lambdabar -> pi+ pbar) only populates -ve alpha
+           FillTH1(id_lambdabarCandidateMassHist, tup[i].mass[4], wtPU);
+           FillTH1(id_lambdasCandidateMassHist, tup[i].mass[4], wtPU);
+           if(region1||region2||region3){
+              FillTH1(id_lambdasBkgdMassHist, tup[i].mass[4], wtPU);
+              if(region1)FillTH1(id_lambdasBkgdMassHistR1, tup[i].mass[4], wtPU);
+              if(region2)FillTH1(id_lambdasBkgdMassHistR2, tup[i].mass[4], wtPU);
+              if(region3)FillTH1(id_lambdasBkgdMassHistR3, tup[i].mass[4], wtPU);
+           }
+           else{
+              FillTH1(id_lambdasSignalMassHist, tup[i].mass[4], wtPU);
+           }
+        } 
+
+    }  // End of selected candidate loop
     
 	//gamma gamma stuff
  	if (vsel.size()>=2){
