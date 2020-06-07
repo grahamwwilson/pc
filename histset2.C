@@ -170,7 +170,9 @@ void histset2::AnalyzeEntry(convsel& s){
 
     std::vector<bool> vcuts;
     std::vector<double> PosTkInfo;
-    std::vector<double> NegTkInfo;    
+    std::vector<double> NegTkInfo;
+    std::vector<double> PosPt;
+    std::vector<double> NegPt;     
     std::vector<int> vcandidate;
     std::map<double, int> mNeg;
     std::multimap<double, int> mmNeg;
@@ -258,6 +260,8 @@ void histset2::AnalyzeEntry(convsel& s){
         vcuts.push_back(false);
         PosTkInfo.push_back(-1.0);
         NegTkInfo.push_back(-1.0);
+        PosPt.push_back(-1.0);
+        NegPt.push_back(-1.0);
 		x = PC_x[i];
 		y = PC_y[i];
 		z = PC_z[i];
@@ -384,12 +388,16 @@ void histset2::AnalyzeEntry(convsel& s){
             if(q0 == 1 && q1 == -1){
                PosTkInfo[i] =  Tk0_chi2[i]/double(Tk0_ndof[i]);
                NegTkInfo[i] = -Tk1_chi2[i]/double(Tk1_ndof[i]);
+               PosPt[i] = sqrt(Tk0_px[i]*Tk0_px[i] + Tk0_py[i]*Tk0_py[i]);
+               NegPt[i] = sqrt(Tk1_px[i]*Tk1_px[i] + Tk1_py[i]*Tk1_py[i]);
 //               PosTkInfo[i] =  abs(Tk0_sd0[i])*Tk0_chi2[i]/double(Tk0_ndof[i]);
 //               NegTkInfo[i] = -abs(Tk1_sd0[i])*Tk1_chi2[i]/double(Tk1_ndof[i]);
             }
             else{
                PosTkInfo[i] =  Tk1_chi2[i]/double(Tk1_ndof[i]);
                NegTkInfo[i] = -Tk0_chi2[i]/double(Tk0_ndof[i]);
+               PosPt[i] = sqrt(Tk1_px[i]*Tk1_px[i] + Tk1_py[i]*Tk1_py[i]);
+               NegPt[i] = sqrt(Tk0_px[i]*Tk0_px[i] + Tk0_py[i]*Tk0_py[i]);
 //               PosTkInfo[i] =  abs(Tk1_sd0[i])*Tk1_chi2[i]/double(Tk1_ndof[i]);
 //               NegTkInfo[i] = -abs(Tk0_sd0[i])*Tk0_chi2[i]/double(Tk0_ndof[i]);
             }
@@ -434,6 +442,8 @@ void histset2::AnalyzeEntry(convsel& s){
                double xplus = (1.0 + ptasym)/2.0;
                tup[i].xplus = xplus;
                tup[i].theta = theta;
+               tup[i].ptPos = PosPt[i];
+               tup[i].ptNeg = NegPt[i];
 // for technical checks
                FillTH1( id_r1dHist2, tup[i].radius );
             }
@@ -714,17 +724,32 @@ void histset2::AnalyzeEntry(convsel& s){
         }
         FillTH1(id_dcotthetaHist, PC_dcottheta[i], wtPU);
 
+        if(tup[i].pt<=1.0)FillTH1(id_xplus0Hist, tup[i].xplus, wtPU);
         if(tup[i].pt>1.0)FillTH1(id_xplus1Hist, tup[i].xplus, wtPU);
         if(tup[i].pt>2.0)FillTH1(id_xplus2Hist, tup[i].xplus, wtPU);
         if(tup[i].pt>4.0)FillTH1(id_xplus4Hist, tup[i].xplus, wtPU);
         if(tup[i].pt>8.0)FillTH1(id_xplus8Hist, tup[i].xplus, wtPU);
         if(tup[i].pt>16.0)FillTH1(id_xplus16Hist, tup[i].xplus, wtPU);
 
+        if(tup[i].pt<=1.0)FillTH1(id_alpha0Hist, tup[i].alpha, wtPU);
         if(tup[i].pt>1.0)FillTH1(id_alpha1Hist, tup[i].alpha, wtPU);
         if(tup[i].pt>2.0)FillTH1(id_alpha2Hist, tup[i].alpha, wtPU);
         if(tup[i].pt>4.0)FillTH1(id_alpha4Hist, tup[i].alpha, wtPU);
         if(tup[i].pt>8.0)FillTH1(id_alpha8Hist, tup[i].alpha, wtPU);
         if(tup[i].pt>16.0)FillTH1(id_alpha16Hist, tup[i].alpha, wtPU);
+        FillTH2(id_pTalphaHist, tup[i].alpha, tup[i].pt, wtPU);
+
+        if(tup[i].pt<=1.0)FillTH1(id_r0Hist, r, wtPU);
+        if(tup[i].pt>1.0)FillTH1(id_r1Hist, r, wtPU);
+        if(tup[i].pt>2.0)FillTH1(id_r2Hist, r, wtPU);
+        if(tup[i].pt>4.0)FillTH1(id_r4Hist, r, wtPU);
+        if(tup[i].pt>8.0)FillTH1(id_r8Hist, r, wtPU);
+        if(tup[i].pt>1.0&&tup[i].pt<=2.0)FillTH1(id_r1Hist2, r, wtPU);
+        if(tup[i].pt>2.0&&tup[i].pt<=4.0)FillTH1(id_r2Hist2, r, wtPU);
+        if(tup[i].pt>4.0&&tup[i].pt<=8.0)FillTH1(id_r4Hist2, r, wtPU);
+        if(tup[i].pt>8.0&&tup[i].pt<=16.0)FillTH1(id_r8Hist2, r, wtPU);
+        if(tup[i].pt>16.0)FillTH1(id_r16Hist, r, wtPU);
+        if(tup[i].pt>16.0 && abs(tup[i].alpha)>0.96)FillTH1(id_rAsymmetricHist, r, wtPU);
 
         if(region1||region2||region3){
            FillTH1(id_alphaBkgdHist, tup[i].alpha, wtPU);

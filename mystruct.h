@@ -22,4 +22,6 @@ struct mytuple {
     double phip;
     double xplus;
     double theta;
+    double ptPos;
+    double ptNeg;
 };

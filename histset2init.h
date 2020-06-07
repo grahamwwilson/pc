@@ -72,17 +72,32 @@ void histset2::init(){
     TH1Manager.at(id_q1Hist) = new MyTH1D("q1Hist","; q1; Events per bin", 5, -2.5, 2.5);
     TH1Manager.at(id_qtotHist) = new MyTH1D("qtotHist","; qtot; Events per bin", 5, -2.5, 2.5);
 
+    TH1Manager.at(id_xplus0Hist) = new MyTH1D("xplus0", "Photon pT <= 1 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     TH1Manager.at(id_xplus1Hist) = new MyTH1D("xplus1", "Photon pT > 1 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     TH1Manager.at(id_xplus2Hist) = new MyTH1D("xplus2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     TH1Manager.at(id_xplus4Hist) = new MyTH1D("xplus4", "Photon pT > 4 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     TH1Manager.at(id_xplus8Hist) = new MyTH1D("xplus8", "Photon pT > 8 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     TH1Manager.at(id_xplus16Hist) = new MyTH1D("xplus16", "Photon pT > 16 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
 
+    TH1Manager.at(id_alpha0Hist) = new MyTH1D("alpha0", "Photon pT <= 1 GeV; AP alpha; Entries per 0.02 bin", 100, -1.0, 1.0);
     TH1Manager.at(id_alpha1Hist) = new MyTH1D("alpha1", "Photon pT > 1 GeV; AP alpha; Entries per 0.02 bin", 100, -1.0, 1.0);
     TH1Manager.at(id_alpha2Hist) = new MyTH1D("alpha2", "Photon pT > 2 GeV; AP alpha; Entries per 0.02 bin", 100, -1.0, 1.0);
     TH1Manager.at(id_alpha4Hist) = new MyTH1D("alpha4", "Photon pT > 4 GeV; AP alpha; Entries per 0.02 bin", 100, -1.0, 1.0);
     TH1Manager.at(id_alpha8Hist) = new MyTH1D("alpha8", "Photon pT > 8 GeV; AP alpha; Entries per 0.02 bin", 100, -1.0, 1.0);
     TH1Manager.at(id_alpha16Hist) = new MyTH1D("alpha16", "Photon pT > 16 GeV; AP alpha; Entries per 0.02 bin", 100, -1.0, 1.0);
+
+    TH1Manager.at(id_r0Hist) = new MyTH1D("r0", "Photon pT <= 1 GeV; Radius (cm); Entries per 0.1 cm bin", 250, 0.0, 25.0);
+    TH1Manager.at(id_r1Hist) = new MyTH1D("r1", "Photon pT > 1 GeV; Radius (cm); Entries per 0.1 cm bin", 250,  0.0, 25.0);
+    TH1Manager.at(id_r2Hist) = new MyTH1D("r2", "Photon pT > 2 GeV; Radius (cm); Entries per 0.1 cm bin", 250,  0.0, 25.0);
+    TH1Manager.at(id_r4Hist) = new MyTH1D("r4", "Photon pT > 4 GeV; Radius (cm); Entries per 0.1 cm bin", 250,  0.0, 25.0);
+    TH1Manager.at(id_r8Hist) = new MyTH1D("r8", "Photon pT > 8 GeV; Radius (cm); Entries per 0.1 cm bin", 250,  0.0, 25.0);
+    TH1Manager.at(id_r16Hist) = new MyTH1D("r16", "Photon pT > 16 GeV; Radius (cm); Entries per 0.1 cm bin", 250, 0.0, 25.0);
+
+    TH1Manager.at(id_r1Hist2) = new MyTH1D("r1p", "Photon pT [1,2] GeV; Radius (cm); Entries per 0.1 cm bin", 250,  0.0, 25.0);
+    TH1Manager.at(id_r2Hist2) = new MyTH1D("r2p", "Photon pT [2,4] GeV; Radius (cm); Entries per 0.1 cm bin", 250,  0.0, 25.0);
+    TH1Manager.at(id_r4Hist2) = new MyTH1D("r4p", "Photon pT [4,8] GeV; Radius (cm); Entries per 0.1 cm bin", 250,  0.0, 25.0);
+    TH1Manager.at(id_r8Hist2) = new MyTH1D("r8p", "Photon pT [8,16] GeV; Radius (cm); Entries per 0.1 cm bin", 250,  0.0, 25.0);
+    TH1Manager.at(id_rAsymmetricHist) = new MyTH1D("rAsymmetric", "Photon pT > 16 GeV (|#alpha| > 0.96); Radius (cm); Entries per 0.25 cm bin", 100, 0.0, 25.0);
 
     TH1Manager.at(id_conversionCandidateMassHist) = new MyTH1D("conversionCandidateMassHist","e+e- Pair Mass; Mass (GeV); Conversions per bin",200,0.0,1.0);
     TH1Manager.at(id_conversionCandidateMassHist2) = new MyTH1D("conversionCandidateMassHist2","e+e- Pair Mass; Mass (GeV); Conversions per bin",100,0.0,0.1);
@@ -134,5 +149,6 @@ void histset2::init(){
     TH2Manager.at(id_mggRCutHist) = new MyTH2D("mggRCutHist","Di-#gamma Mass;Mass (GeV); Radius (cm)", 400, 0.0, 1.0, 25, 0.0, 25.0 );
     TH2Manager.at(id_rhophiHist) = new MyTH2D("rhophiHist","Conversion Radius w.r.t Beam Pipe Center and Quality Cuts; R (cm); Phi (rad)",100,0.0,5.0,40,-PI,PI);
     TH2Manager.at(id_AP_pT_alphaHist) = new MyTH2D("AP_pT_alphaHist","Armenteros-Podolanski Plot; #alpha = (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); p_{T} (GeV)",200,-1.0,1.0,200,0.0,0.22);
+    TH2Manager.at(id_pTalphaHist) = new MyTH2D("pTalphaHist","Photon Candidate pT vs #alpha; #alpha = (p_{L}^{+} - p_{L}^{-})/(p_{L}^{+} + p_{L}^{-}); p_{T} (photon) (GeV)",200,-1.0,1.0,100,0.0,25.0);
 }
 
