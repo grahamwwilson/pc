@@ -72,6 +72,9 @@ void histset2::init(){
     TH1Manager.at(id_q1Hist) = new MyTH1D("q1Hist","; q1; Events per bin", 5, -2.5, 2.5);
     TH1Manager.at(id_qtotHist) = new MyTH1D("qtotHist","; qtot; Events per bin", 5, -2.5, 2.5);
 
+    TH1Manager.at(id_minptHist) = new MyTH1D("minptHist"," Conversion Candidates ; min pT of pair (GeV); Tracks per bin", 1000, 0.0, 10.0);
+    TH1Manager.at(id_maxptHist) = new MyTH1D("maxptHist"," Conversion Candidates ; max pT of pair (GeV); Tracks per bin", 1000, 0.0, 10.0);
+
     TH1Manager.at(id_xplus0Hist) = new MyTH1D("xplus0", "Photon pT <= 1 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     TH1Manager.at(id_xplus1Hist) = new MyTH1D("xplus1", "Photon pT > 1 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
     TH1Manager.at(id_xplus2Hist) = new MyTH1D("xplus2", "Photon pT > 2 GeV; Positron pT Fraction; Entries per 0.01 bin", 100, 0.0, 1.0);
@@ -99,8 +102,22 @@ void histset2::init(){
     TH1Manager.at(id_r8Hist2) = new MyTH1D("r8p", "Photon pT [8,16] GeV; Radius (cm); Entries per 0.1 cm bin", 250,  0.0, 25.0);
     TH1Manager.at(id_rAsymmetricHist) = new MyTH1D("rAsymmetric", "Photon pT > 16 GeV (|#alpha| > 0.96); Radius (cm); Entries per 0.25 cm bin", 100, 0.0, 25.0);
 
+    TH1Manager.at(id_m1Hist2) = new MyTH1D("m1p", "Photon pT [1,2] GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
+    TH1Manager.at(id_m2Hist2) = new MyTH1D("m2p", "Photon pT [2,4] GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
+    TH1Manager.at(id_m4Hist2) = new MyTH1D("m4p", "Photon pT [4,8] GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
+    TH1Manager.at(id_m8Hist2) = new MyTH1D("m8p", "Photon pT [8,16] GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
+    TH1Manager.at(id_m16Hist) = new MyTH1D("m16", "Photon pT 16 GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
+    TH1Manager.at(id_m0Hist) = new MyTH1D("m8", "Photon pT 0 GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
+
     TH1Manager.at(id_conversionCandidateMassHist) = new MyTH1D("conversionCandidateMassHist","e+e- Pair Mass; Mass (GeV); Conversions per bin",200,0.0,1.0);
     TH1Manager.at(id_conversionCandidateMassHist2) = new MyTH1D("conversionCandidateMassHist2","e+e- Pair Mass; Mass (GeV); Conversions per bin",100,0.0,0.1);
+    TH1Manager.at(id_conversionCandidateMassHist3) = new MyTH1D("conversionCandidateMassHist3","e+e- Pair Mass; Mass (GeV); Conversions per bin",100,0.0,0.025);
+    TH1Manager.at(id_convMassR1) = new MyTH1D("convMassR1","e+e- Pair Mass (R1); Mass (GeV); Conversions per bin",100,0.0,0.025);
+    TH1Manager.at(id_convMassR2) = new MyTH1D("convMassR2","e+e- Pair Mass (R2); Mass (GeV); Conversions per bin",100,0.0,0.025);
+    TH1Manager.at(id_convMassR3) = new MyTH1D("convMassR3","e+e- Pair Mass (R3); Mass (GeV); Conversions per bin",100,0.0,0.025);
+    TH1Manager.at(id_convMassSignal) = new MyTH1D("convMassSignal","e+e- Pair Mass (Signal); Mass (GeV); Conversions per bin",100,0.0,0.025);
+    TH1Manager.at(id_convMassAnomaly) = new MyTH1D("convMassAnomaly","e+e- Pair Mass (Signal); Mass (GeV); Conversions per bin",100,0.0,0.025);
+
     TH1Manager.at(id_lambdasCandidateMassHist) = new MyTH1D("lambdasCandidateMassHist","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",225,1.05,1.50);
     TH1Manager.at(id_lambdasBkgdMassHist) = new MyTH1D("lambdasBkgdMassHist","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",90,1.05,1.50);
     TH1Manager.at(id_lambdasBkgdMassHistR1) = new MyTH1D("lambdasBkgdMassHistR1","Lambda/Lambdabar Candidate Mass; Mass (GeV); Candidates per bin",90,1.05,1.50);

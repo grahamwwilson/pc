@@ -121,6 +121,7 @@ void histset2::AnalyzeEntry(convsel& s){
 
     const bool lpr = false;      // print flag
     const bool lreduce = true;   // do problem reduction
+    const bool lassign = true;   // Do assignment problem
 	
     const double RERRCUT = 0.25;
     const double COSTCUT = 0.85;
@@ -455,8 +456,8 @@ void histset2::AnalyzeEntry(convsel& s){
 // Note this is unnecessary if there are no duplicates, ie. n- = n+ = nedges.
     std::vector<int> vsel;   // Vector for indices of selected conversions after removing duplicates
 
-    if(std::min(mNeg.size(), mPos.size()) < vcandidate.size()){
-// We actually have an assignment problem to worry about
+    if(std::min(mNeg.size(), mPos.size()) < vcandidate.size() && lassign ){
+// We actually have an assignment problem to worry about and we want to worry about it
        if(lpr){
           std::cout << " " << std::endl;
           std::cout << "Event " << eventNumber << " numberOfPC " << numberOfPC << std::endl;
@@ -739,17 +740,33 @@ void histset2::AnalyzeEntry(convsel& s){
         if(tup[i].pt>16.0)FillTH1(id_alpha16Hist, tup[i].alpha, wtPU);
         FillTH2(id_pTalphaHist, tup[i].alpha, tup[i].pt, wtPU);
 
-        if(tup[i].pt<=1.0)FillTH1(id_r0Hist, r, wtPU);
+
         if(tup[i].pt>1.0)FillTH1(id_r1Hist, r, wtPU);
         if(tup[i].pt>2.0)FillTH1(id_r2Hist, r, wtPU);
         if(tup[i].pt>4.0)FillTH1(id_r4Hist, r, wtPU);
         if(tup[i].pt>8.0)FillTH1(id_r8Hist, r, wtPU);
+
+        if(tup[i].pt<=1.0)FillTH1(id_r0Hist, r, wtPU);
         if(tup[i].pt>1.0&&tup[i].pt<=2.0)FillTH1(id_r1Hist2, r, wtPU);
         if(tup[i].pt>2.0&&tup[i].pt<=4.0)FillTH1(id_r2Hist2, r, wtPU);
         if(tup[i].pt>4.0&&tup[i].pt<=8.0)FillTH1(id_r4Hist2, r, wtPU);
         if(tup[i].pt>8.0&&tup[i].pt<=16.0)FillTH1(id_r8Hist2, r, wtPU);
         if(tup[i].pt>16.0)FillTH1(id_r16Hist, r, wtPU);
-        if(tup[i].pt>16.0 && abs(tup[i].alpha)>0.96)FillTH1(id_rAsymmetricHist, r, wtPU);
+
+        if(tup[i].pt<=1.0)FillTH1(id_m0Hist, tup[i].mass[0], wtPU);
+        if(tup[i].pt>1.0&&tup[i].pt<=2.0)FillTH1(id_m1Hist2, tup[i].mass[0], wtPU);
+        if(tup[i].pt>2.0&&tup[i].pt<=4.0)FillTH1(id_m2Hist2, tup[i].mass[0], wtPU);
+        if(tup[i].pt>4.0&&tup[i].pt<=8.0)FillTH1(id_m4Hist2, tup[i].mass[0], wtPU);
+        if(tup[i].pt>8.0&&tup[i].pt<=16.0)FillTH1(id_m8Hist2, tup[i].mass[0], wtPU);
+        if(tup[i].pt>16.0)FillTH1(id_m16Hist, tup[i].mass[0], wtPU);
+
+        if(tup[i].pt>16.0 && abs(tup[i].alpha)>0.96){
+           FillTH1(id_rAsymmetricHist, r, wtPU);
+           FillTH1(id_convMassAnomaly, tup[i].mass[0], wtPU);
+        }
+
+        FillTH1(id_minptHist, std::min(tup[i].ptPos,tup[i].ptNeg), wtPU);
+        FillTH1(id_maxptHist, std::max(tup[i].ptPos,tup[i].ptNeg), wtPU);
 
         if(region1||region2||region3){
            FillTH1(id_alphaBkgdHist, tup[i].alpha, wtPU);
@@ -762,12 +779,19 @@ void histset2::AnalyzeEntry(convsel& s){
         }
         FillTH1(id_conversionCandidateMassHist, tup[i].mass[0], wtPU);
         FillTH1(id_conversionCandidateMassHist2, tup[i].mass[0], wtPU);
+        FillTH1(id_conversionCandidateMassHist3, tup[i].mass[0], wtPU);
         FillTH1(id_KShortMassHist, tup[i].mass[1], wtPU);
         if(region1||region2||region3){
            FillTH1(id_KShortBkgdMassHist, tup[i].mass[1], wtPU);
            if(region1)FillTH1(id_KShortBkgdMassHistR1, tup[i].mass[1], wtPU);
            if(region2)FillTH1(id_KShortBkgdMassHistR2, tup[i].mass[1], wtPU);
            if(region3)FillTH1(id_KShortBkgdMassHistR3, tup[i].mass[1], wtPU);
+           if(region1)FillTH1(id_convMassR1, tup[i].mass[0], wtPU);
+           if(region2)FillTH1(id_convMassR2, tup[i].mass[0], wtPU);
+           if(region3)FillTH1(id_convMassR3, tup[i].mass[0], wtPU);
+        }
+        else{
+           FillTH1(id_convMassSignal, tup[i].mass[0], wtPU);
         }
         if(tup[i].alpha >= 0.0){
 // Lambda candidate with a proton ( Lambda -> pi- p ) only populates +ve alpha
