@@ -22,18 +22,18 @@ using MyTH2D = ROOT::TThreadedObject<TH2D>;
 class histset2{
     public:
        double PI =4.0*atan(1.0);
-       histset2();	
-       void init(); 
-       void setweightoption(); 
+       histset2();
+       void init();
+       void setweightoption();
        void AnalyzeEntry(convsel& s);
-       #include "histset2enums.h" 
+       #include "histset2enums.h"
 // make a big vector and load enumerated histograms onto the vector
        std::vector<MyTH1D*>  TH1Manager{};
        std::vector<MyTH2D*>  TH2Manager{};
-// locate the histogram and perform pointer copying 
+// locate the histogram and perform pointer copying
        void FillTH1(int index, double x, double w);
        void FillTH2(int index, double x, double y, double w);
-       void WriteHist(); 
+       void WriteHist();
 };
 
 histset2::histset2(){
@@ -76,7 +76,7 @@ void histset2::WriteHist(){
 	for(int i=0; i<numTH1Hist; i++){
 	//do a check for entries, merge isn't safe for empty histograms
         auto hptr = TH1Manager.at(i)->Get();
-	    if(hptr->GetEntries() > 0){	
+	   if(hptr->GetEntries() > 0){
            auto histmerged = TH1Manager.at(i)->Merge();
            TH1D* h = (TH1D*) histmerged->Clone();
 		   outfile->WriteObject(h, h->GetName() );
@@ -99,7 +99,7 @@ void histset2::WriteHist(){
            auto h = TH2Manager.at(i)->Get()->Clone();
            outfile->WriteObject(h, h->GetName() );
         }
-	}	
+	}
 }
 
 void histset2::AnalyzeEntry(convsel& s){
@@ -119,7 +119,7 @@ void histset2::AnalyzeEntry(convsel& s){
     double rps;
     double rnominal;
 
-    const bool lpr = false;      // print flag
+    const bool lpr = true;      // print flag
     const bool lreduce = true;   // do problem reduction
 	
     const double RERRCUT = 0.25;
@@ -168,9 +168,26 @@ void histset2::AnalyzeEntry(convsel& s){
     
     double wtPU;
 
+    std::vector<bool> vcuts;
+    std::vector<double> PosTkInfo;
+    std::vector<double> NegTkInfo;    
+    std::vector<int> vcandidate;
+    std::map<double, int> mNeg;
+    std::multimap<double, int> mmNeg;
+    std::map<double, int> mPos;
+    std::multimap<double, int> mmPos;
+    std::multimap<int, double> mmCandidate;
+    std::set <std::pair<double,double> > trkPair;
+
     if(lpr)std::cout << " " << std::endl;
-    if(lpr)std::cout << " ------------BoE-------------- " << std::endl;
+    if(lpr)std::cout << " ------------BoE-------------- " << eventNumber << std::endl;
     if(lpr)std::cout << " " << std::endl;
+
+//    if(eventNumber==161217968){
+//       if(lpr)std::cout << "Skipping this event" << std::endl;
+//       goto SKIP;
+//    }
+
 
     FillTH1(id_runHist, runNumber);
     FillTH1(id_isdataHist, isRealData);
@@ -223,15 +240,7 @@ void histset2::AnalyzeEntry(convsel& s){
 	FillTH1(id_numpvWHist, numberOfPV, wtPU);
 	FillTH2(id_npc_npvHist, numberOfPV, numberOfPC, wtPU);
 
-    std::vector<bool> vcuts;
-    std::vector<double> PosTkInfo;
-    std::vector<double> NegTkInfo;    
-    std::vector<int> vcandidate;
-    std::map<double, int> mNeg;
-    std::multimap<double, int> mmNeg;
-    std::map<double, int> mPos;
-    std::multimap<double, int> mmPos;
-    std::multimap<int, double> mmCandidate;
+
 
 // Probably a good idea to keep track of whether each conversion 
 // candidate passes particular cuts, to ease later code 
@@ -375,48 +384,59 @@ void histset2::AnalyzeEntry(convsel& s){
             if(q0 == 1 && q1 == -1){
                PosTkInfo[i] =  Tk0_chi2[i]/double(Tk0_ndof[i]);
                NegTkInfo[i] = -Tk1_chi2[i]/double(Tk1_ndof[i]);
+//               PosTkInfo[i] =  abs(Tk0_sd0[i])*Tk0_chi2[i]/double(Tk0_ndof[i]);
+//               NegTkInfo[i] = -abs(Tk1_sd0[i])*Tk1_chi2[i]/double(Tk1_ndof[i]);
             }
             else{
                PosTkInfo[i] =  Tk1_chi2[i]/double(Tk1_ndof[i]);
                NegTkInfo[i] = -Tk0_chi2[i]/double(Tk0_ndof[i]);
+//               PosTkInfo[i] =  abs(Tk1_sd0[i])*Tk1_chi2[i]/double(Tk1_ndof[i]);
+//               NegTkInfo[i] = -abs(Tk0_sd0[i])*Tk0_chi2[i]/double(Tk0_ndof[i]);
             }
+// Need to make sure that each track pair is distinguishable from pairs already selected
+            if(!trkPair.insert(std::make_pair(NegTkInfo[i], PosTkInfo[i])).second){
+               if(lpr)std::cout << "INDISTINGUISHABLE EDGE " << i << " ignored in event " << eventNumber << std::endl;
+// good idea to keep a tally in some histogram bin
+               vcuts[i] = false;
+            }
+            else{
 // Fill STL containers that help define the "matching problem"
-            vcandidate.push_back(i);
+               vcandidate.push_back(i);
 // For the key/value pair use charge-signed chi2/dof as key, and conversion index as edge id for value
-            mNeg.insert(std::make_pair(NegTkInfo[i],i));
-            mmNeg.insert(std::make_pair(NegTkInfo[i],i));
-            mPos.insert(std::make_pair(PosTkInfo[i],i));
-            mmPos.insert(std::make_pair(PosTkInfo[i],i));
+               mNeg.insert(std::make_pair(NegTkInfo[i],i));
+               mmNeg.insert(std::make_pair(NegTkInfo[i],i));
+               mPos.insert(std::make_pair(PosTkInfo[i],i));
+               mmPos.insert(std::make_pair(PosTkInfo[i],i));
 // Fill tuple with relevant derived quantities
-            tup[i].radius = r;
-            tup[i].rerr = rerr;
-//            tup[i].mpair = vpair.M();
-            tup[i].pfit = fitprob;
-            tup[i].alpha = APalpha;
-            tup[i].qpt0 = APpT0;
-            tup[i].qpt1 = APpT1;
-            tup[i].Pos = PosTkInfo[i];
-            tup[i].Neg = NegTkInfo[i];
-            tup[i].phierr = phierr;
-            tup[i].zerr = zerr;
-            tup[i].mass = {vpair.M(), vpairpipi.M(), vpairkk.M(), vpairLambda.M(), vpairALambda.M()};
+               tup[i].radius = r;
+               tup[i].rerr = rerr;
+               tup[i].pfit = fitprob;
+               tup[i].alpha = APalpha;
+               tup[i].qpt0 = APpT0;
+               tup[i].qpt1 = APpT1;
+               tup[i].Pos = PosTkInfo[i];
+               tup[i].Neg = NegTkInfo[i];
+               tup[i].phierr = phierr;
+               tup[i].zerr = zerr;
+               tup[i].mass = {vpair.M(), vpairpipi.M(), vpairkk.M(), vpairLambda.M(), vpairALambda.M()};
 // Check
-            if(lpr)std::cout << "Masses: " << tup[i].mass[0] << " " << tup[i].mass[1] << " " 
-                             << tup[i].mass[2] << " " << tup[i].mass[3] << " " << tup[i].mass[4] << std::endl;
-            tup[i].rho = rho;
-            tup[i].rps = rps;
-            tup[i].rnominal = rnominal;
-            tup[i].phi = phi;
-            tup[i].pt = pt;
-            tup[i].E = E;
-            tup[i].phip = phip;
-            double ptasym = (pt0-pt1)/(pt0+pt1);
-            if (q0<0) ptasym = -ptasym;
-            double xplus = (1.0 + ptasym)/2.0;
-            tup[i].xplus = xplus;
-            tup[i].theta = theta;
+               if(lpr)std::cout << "Masses: " << tup[i].mass[0] << " " << tup[i].mass[1] << " " 
+                                << tup[i].mass[2] << " " << tup[i].mass[3] << " " << tup[i].mass[4] << std::endl;
+               tup[i].rho = rho;
+               tup[i].rps = rps;
+               tup[i].rnominal = rnominal;
+               tup[i].phi = phi;
+               tup[i].pt = pt;
+               tup[i].E = E;
+               tup[i].phip = phip;
+               double ptasym = (pt0-pt1)/(pt0+pt1);
+               if (q0<0) ptasym = -ptasym;
+               double xplus = (1.0 + ptasym)/2.0;
+               tup[i].xplus = xplus;
+               tup[i].theta = theta;
 // for technical checks
-            FillTH1( id_r1dHist2, tup[i].radius );
+               FillTH1( id_r1dHist2, tup[i].radius );
+            }
         }
 // Also include correlation plot between APalpha and ptasym.
 	}
@@ -429,7 +449,7 @@ void histset2::AnalyzeEntry(convsel& s){
 // We actually have an assignment problem to worry about
        if(lpr){
           std::cout << " " << std::endl;
-          std::cout << "Event " << eventNumber << std::endl;
+          std::cout << "Event " << eventNumber << " numberOfPC " << numberOfPC << std::endl;
           std::cout << "nedges = " << vcandidate.size() << std::endl;
           std::cout << "N- = " << mmNeg.size() << std::endl;
           std::cout << "N+ = " << mmPos.size() << std::endl;
@@ -437,7 +457,7 @@ void histset2::AnalyzeEntry(convsel& s){
           std::cout << "n+ = " << mPos.size() << std::endl;
           std::cout << "Target maximum possible cardinality of solution = " << std::min(mNeg.size(),mPos.size()) << std::endl;
 // Prior solution with no arbitration
-          std::cout << "Prior edge solution: ";
+          std::cout << "Prior edge solution (no arbitration at all) : ";
           for(int i=0; i<numberOfPC; ++i){
               if(vcuts[i])std::cout << std::setw(3) << i; 
           }
@@ -804,5 +824,9 @@ void histset2::AnalyzeEntry(convsel& s){
         }
     } */
     vcuts.clear(); 
+    
+//    SKIP:
+//    int ijkl = 0; 
+
 }
 #endif
