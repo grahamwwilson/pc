@@ -119,7 +119,7 @@ void histset2::AnalyzeEntry(convsel& s){
     double rps;
     double rnominal;
 
-    const bool lpr = false;      // print flag
+    const bool lpr = true;      // print flag
     const bool lreduce = true;   // do problem reduction
     const bool lassign = true;   // Do assignment problem
 	
@@ -166,6 +166,7 @@ void histset2::AnalyzeEntry(convsel& s){
     double varsum_r, varsum_phi; //intermediate calculation variables
     double rerr,phierr,zerr;//errors
     double sphi,cphi;
+    double eta;
     
     double wtPU;
 
@@ -325,6 +326,7 @@ void histset2::AnalyzeEntry(convsel& s){
         r = sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) );
         phi = atan2(y-y0, x-x0);
         theta = atan2(pt,pz);
+        eta = -log(tan(theta/2.0));
         rho  =  sqrt( (x-x0bp)*(x-x0bp) + (y-y0bp)*(y-y0bp)) ;
         phip =  atan2(y-y0bp, x-x0bp);
         rps = sqrt( (x-x0ps)*(x-x0ps) + (y-y0ps)*(y-y0ps) );
@@ -445,6 +447,7 @@ void histset2::AnalyzeEntry(convsel& s){
                tup[i].theta = theta;
                tup[i].ptPos = PosPt[i];
                tup[i].ptNeg = NegPt[i];
+               tup[i].etaphys = eta;
 // for technical checks
                FillTH1( id_r1dHist2, tup[i].radius );
             }
@@ -677,6 +680,7 @@ void histset2::AnalyzeEntry(convsel& s){
         FillTH2(id_AP_pT_alphaHist, tup[i].alpha, std::min(tup[i].qpt0,tup[i].qpt1), wtPU);
 
         FillTH1(id_zcutHist, PC_z[i], wtPU);
+        FillTH1(id_zPVHist, PC_zPV[i], wtPU);
         FillTH1(id_r1dcutHist, r, wtPU);
         FillTH1(id_r1dwidecutHist, r);
         FillTH1(id_r1dwidecutWHist, r, wtPU);
@@ -707,7 +711,8 @@ void histset2::AnalyzeEntry(convsel& s){
         FillTH1(id_zerrHist, tup[i].zerr, wtPU);
         FillTH1(id_pfitHist, tup[i].pfit, wtPU);
         FillTH1(id_zHist, PC_z[i], wtPU);
-        FillTH1(id_costhetaHist, cos(tup[i].theta), wtPU);      
+        FillTH1(id_costhetaHist, cos(tup[i].theta), wtPU);
+        FillTH1(id_etaHist, tup[i].etaphys, wtPU);    
     	FillTH2(id_xyHist, PC_x[i], PC_y[i], wtPU);
         FillTH2(id_xywideHist, PC_x[i], PC_y[i], wtPU);
         FillTH2(id_rzHist, PC_z[i], r, wtPU);
@@ -739,7 +744,6 @@ void histset2::AnalyzeEntry(convsel& s){
         if(tup[i].pt>8.0)FillTH1(id_alpha8Hist, tup[i].alpha, wtPU);
         if(tup[i].pt>16.0)FillTH1(id_alpha16Hist, tup[i].alpha, wtPU);
         FillTH2(id_pTalphaHist, tup[i].alpha, tup[i].pt, wtPU);
-
 
         if(tup[i].pt>1.0)FillTH1(id_r1Hist, r, wtPU);
         if(tup[i].pt>2.0)FillTH1(id_r2Hist, r, wtPU);
@@ -821,6 +825,22 @@ void histset2::AnalyzeEntry(convsel& s){
               FillTH1(id_lambdasSignalMassHist, tup[i].mass[4], wtPU);
            }
         } 
+
+// DEBUG stuff
+        if(lpr){
+           if(abs(tup[i].alpha) > 0.96){
+              std::cout << " BIGALPHA: Event " << eventNumber << std::endl;
+              std::cout << " alpha: " << tup[i].alpha << std::endl;
+              std::cout << " pt: " << tup[i].pt << std::endl;
+              std::cout << " qpt0: " << tup[i].qpt0 << std::endl;
+              std::cout << " qpt1: " << tup[i].qpt1 << std::endl;
+              std::cout << " pfit: " << tup[i].pfit << std::endl;
+              std::cout << " mee : " << tup[i].mass[0] << std::endl;
+              std::cout << " radius : " << tup[i].radius << std::endl;
+              std::cout << " pT+ : " << tup[i].ptPos << std::endl;
+              std::cout << " pT- : " << tup[i].ptNeg << std::endl;
+           }
+        }
 
     }  // End of selected candidate loop
     

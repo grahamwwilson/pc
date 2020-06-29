@@ -54,6 +54,7 @@
     auto& PC_dcottheta = s.Conv_pairCotThetaSeparation;
     auto& PC_dmin = s.Conv_distOfMinimumApproach;
     auto& PC_dphi = s.Conv_dPhiTracksAtVtx;
+    auto& PC_zPV = s.Conv_zOfPrimaryVertexFromTracks;
 
 //    auto isRealData = *(s.isRealData);
     bool isRealData = true;

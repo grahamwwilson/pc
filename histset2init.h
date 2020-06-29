@@ -17,7 +17,9 @@ void histset2::init(){
     TH1Manager.at(id_zerrHist) = new MyTH1D("zerrHist","Conversion Z Error;#Delta z (cm); Entries per 0.1 bin", 50, 0.0, 5.0);
     TH1Manager.at(id_pfitHist) = new MyTH1D("pfitHist","Photon Conversions;Fit probability; ", 100, 0.0, 1.0);
     TH1Manager.at(id_zHist) = new MyTH1D("zHist","Photon Conversions; z (cm); ", 200, -25.0, 25.0);
+    TH1Manager.at(id_zPVHist) = new MyTH1D("zPVHist","Photon Conversions; zPV (cm); ", 200, -25.0, 25.0);
     TH1Manager.at(id_costhetaHist) = new MyTH1D("costhetaHist","Photon Conversions; cos(theta); ", 200, -1.0, 1.0);
+    TH1Manager.at(id_etaHist) = new MyTH1D("etaHist","Photon Conversions; #eta_{phys}; ", 150, -1.5, 1.5);
     TH1Manager.at(id_pfitHist) = new MyTH1D("pfitHist","Photon Conversions;Fit probability; ", 100, 0.0, 1.0);
     TH1Manager.at(id_r1dHist) = new MyTH1D("r1dHist","Conversion Radius No Cuts;R (cm);Entries per 0.1 bin",100, 0.0, 10.0);
     TH1Manager.at(id_r1dHist2) = new MyTH1D("r1dHist2","Conversion Radius;R (cm);Entries per 0.1 bin",250, 0.0, 25.0);
@@ -106,8 +108,8 @@ void histset2::init(){
     TH1Manager.at(id_m2Hist2) = new MyTH1D("m2p", "Photon pT [2,4] GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
     TH1Manager.at(id_m4Hist2) = new MyTH1D("m4p", "Photon pT [4,8] GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
     TH1Manager.at(id_m8Hist2) = new MyTH1D("m8p", "Photon pT [8,16] GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
-    TH1Manager.at(id_m16Hist) = new MyTH1D("m16", "Photon pT 16 GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
-    TH1Manager.at(id_m0Hist) = new MyTH1D("m8", "Photon pT 0 GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
+    TH1Manager.at(id_m16Hist) = new MyTH1D("m16", "Photon pT > 16 GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
+    TH1Manager.at(id_m0Hist) = new MyTH1D("m0", "Photon pT <= 1 GeV; Mass (GeV); Entries per bin", 100,  0.0, 0.025);
 
     TH1Manager.at(id_conversionCandidateMassHist) = new MyTH1D("conversionCandidateMassHist","e+e- Pair Mass; Mass (GeV); Conversions per bin",200,0.0,1.0);
     TH1Manager.at(id_conversionCandidateMassHist2) = new MyTH1D("conversionCandidateMassHist2","e+e- Pair Mass; Mass (GeV); Conversions per bin",100,0.0,0.1);

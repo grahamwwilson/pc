@@ -24,4 +24,5 @@ struct mytuple {
     double theta;
     double ptPos;
     double ptNeg;
+    double etaphys;
 };

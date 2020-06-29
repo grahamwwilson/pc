@@ -105,7 +105,7 @@ leg->Draw();
    tex->SetLineWidth(2);
    tex->Draw();
 
-   TLatex * tex2 = new TLatex(0.20,0.19,"Normalized to equal areas");
+   TLatex * tex2 = new TLatex(0.50,0.39,"Normalized to equal areas");
    tex2->SetNDC();
    tex2->SetTextFont(41);
    tex2->SetTextSize(0.03);
@@ -137,10 +137,10 @@ leg->Draw();
 */
 
 if(logscale){
-c1->Print((histtype+"_Log.pdf").c_str());
+c1->Print((histtype+"Newer_Log.pdf").c_str());
 }
 else{
-c1->Print((histtype+".pdf").c_str());
+c1->Print((histtype+"Newer.pdf").c_str());
 }
 
 }
