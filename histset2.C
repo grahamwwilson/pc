@@ -119,7 +119,7 @@ void histset2::AnalyzeEntry(convsel& s){
     double rps;
     double rnominal;
 
-    const bool lpr = true;      // print flag
+    const bool lpr = false;      // print flag
     const bool lreduce = true;   // do problem reduction
     const bool lassign = true;   // Do assignment problem
 	
