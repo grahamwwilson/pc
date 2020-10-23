@@ -8,6 +8,8 @@ CMSSW
 *.o
 compiledthreads
 compiledThreads2
+compiledThreads3
+distanc*.txt*
 *.log
 *.pdf
 histset.C1
@@ -15,4 +17,5 @@ SlimTree
 Performance.ods
 *stats.out
 Errors.txt
+sorted.txt
 Logs/*

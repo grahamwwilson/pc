@@ -25,4 +25,8 @@ struct mytuple {
     double ptPos;
     double ptNeg;
     double etaphys;
+    double x;
+    double y;
+    double z;
+    int id;
 };

@@ -27,6 +27,11 @@
             id_alphaBkgdHist, id_alphaSignalHist, id_alphaBkgdHistR1, id_alphaBkgdHistR2, id_alphaBkgdHistR3,
             id_nconvHist, id_nassignedHist, id_nnonassignedHist,
             id_rAsymmetricHist,
+            id_SimPhotonPt, id_SimPhotonEta, id_SimPhotonPhi, id_SimPhotons, id_SimVtxProcess, id_SimTrkPhotonProcess, id_SimPhotonDistance, id_SimPhotonDistance2,
+            id_SimPhotonRadialDistance, id_SimPhotonRadialDistance2, id_SimPhotonzVertex, 
+            id_SimConvPhotonERatio, id_SimConvPhotonERatioCut, id_SimConvPhotonCosAngle, id_SimConvPhotonMass, id_SimConvPhotonxPlus, 
+            id_SimConvPhotonR, id_SimConvPhotonAccR, id_SimPhotonId, id_SimConvPhotonId,
+            id_EffSimConvPhotonsDen, id_EffSimConvPhotonsNum,
             numTH1Hist};
        enum th2d_ids{id_pxpyHist, id_xyHist, id_xywideHist, id_rphiHist, 
             id_rzHist, id_rzHist2, id_rzHist3, id_rzHist4,

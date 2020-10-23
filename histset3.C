@@ -6,11 +6,12 @@
 #include "ROOT/TThreadedObject.hxx"
 #include "TTreeReader.h"
 #include "TTreeReaderValue.h"
-#include "convsel.C"
+#include "recosim.C"
 #include "myweights.h"
 #include "Math/Vector3D.h"
 #include "Math/Vector4D.h"
 #include <map>
+#include <tuple>
 #include <iomanip>
 #include "Hungarian.h"
 using MyTH1D = ROOT::TThreadedObject<TH1D>;
@@ -19,13 +20,13 @@ using MyTH2D = ROOT::TThreadedObject<TH2D>;
 // struct for derived quantities of each conversion
 #include  "mystruct.h"
 
-class histset2{
+class histset3{
     public:
        double PI =4.0*atan(1.0);
-       histset2();
+       histset3();
        void init();
        void setweightoption();
-       void AnalyzeEntry(convsel& s);
+       void AnalyzeEntry(recosim& s);
        #include "histset2enums.h"
 // make a big vector and load enumerated histograms onto the vector
        std::vector<MyTH1D*>  TH1Manager{};
@@ -36,7 +37,7 @@ class histset2{
        void WriteHist();
 };
 
-histset2::histset2(){
+histset3::histset3(){
     std::vector<MyTH1D*>  Manager1(numTH1Hist);
     TH1Manager=Manager1;
     std::vector<MyTH2D*>  Manager2(numTH2Hist);
@@ -45,7 +46,7 @@ histset2::histset2(){
     setweightoption();
 }
 
-void histset2::setweightoption(){
+void histset3::setweightoption(){
     for(int i=0; i<numTH1Hist; i++){
         auto hptr = TH1Manager.at(i)->Get();
         hptr->Sumw2(kTRUE);
@@ -56,20 +57,20 @@ void histset2::setweightoption(){
     }
 }
 
-#include "histset2init.h"     //Put the histogram declarations in one separate file
+#include "histset3init.h"     //Put the histogram declarations in one separate file
 
-void histset2::FillTH1(int index, double x, double w=1.0){
+void histset3::FillTH1(int index, double x, double w=1.0){
 	//we must make pointer copies for performance reasons when trying to fill a histogram
 	auto myhist = TH1Manager.at(index)->Get();
 	myhist->Fill(x,w);
 }
 
-void histset2::FillTH2(int index, double x, double y, double w=1.0){
+void histset3::FillTH2(int index, double x, double y, double w=1.0){
 	auto myhist = TH2Manager.at(index)->Get();
 	myhist->Fill(x,y,w);
 }
 
-void histset2::WriteHist(){
+void histset3::WriteHist(){
 
 	TFile* outfile = new TFile("Outfile.root", "RECREATE");
 
@@ -102,7 +103,7 @@ void histset2::WriteHist(){
 	}
 }
 
-void histset2::AnalyzeEntry(convsel& s){
+void histset3::AnalyzeEntry(recosim& s){
 
     #include "mylocaltree.h"     //All the variable incantations needed
 
@@ -119,9 +120,10 @@ void histset2::AnalyzeEntry(convsel& s){
     double rps;
     double rnominal;
 
-    const bool lpr = false;      // print flag
+    const bool lpr = false;       // print flag
     const bool lreduce = true;   // do problem reduction
     const bool lassign = true;   // Do assignment problem
+    const bool lpr2 = false;      // another print flag
 	
     const double RERRCUT = 0.25;
     const double COSTCUT = 0.85;
@@ -183,14 +185,22 @@ void histset2::AnalyzeEntry(convsel& s){
     std::multimap<int, double> mmCandidate;
     std::set <std::pair<double,double> > trkPair;
 
-    if(lpr)std::cout << " " << std::endl;
-    if(lpr)std::cout << " ------------BoE-------------- " << eventNumber << std::endl;
-    if(lpr)std::cout << " " << std::endl;
-
-//    if(eventNumber==161217968){
+//    if(eventNumber==772775){
+//    if(eventNumber==773069){
+//    if(eventNumber==764002){
+//    if(eventNumber==764127){
+    if(eventNumber!=-1){
 //       if(lpr)std::cout << "Skipping this event" << std::endl;
 //       goto SKIP;
 //    }
+
+/*    if(lpr)std::cout << " " << std::endl;
+    if(lpr)std::cout << " ------------BoE-------------- " << eventNumber << std::endl;
+    if(lpr)std::cout << " " << std::endl; */
+
+    std::cout << " " << std::endl;
+    std::cout << " ------------BoE-------------- " << eventNumber << std::endl;
+    std::cout << " " << std::endl;
 
 
     FillTH1(id_runHist, runNumber);
@@ -227,7 +237,7 @@ void histset2::AnalyzeEntry(convsel& s){
     if(numberOfPC < 1){
        FillTH1(id_numnopcHist, numberOfPC);
        FillTH1(id_numpvnopcHist, numberOfPV);
-       return;
+//       return;
     }
     else{     // not sure if this is needed - but may be need to make sure this histogram exists for data.
        FillTH1(id_numnopcHist, -1);
@@ -446,6 +456,10 @@ void histset2::AnalyzeEntry(convsel& s){
                tup[i].ptPos = PosPt[i];
                tup[i].ptNeg = NegPt[i];
                tup[i].etaphys = eta;
+               tup[i].id = i;
+               tup[i].x = x;
+               tup[i].y = y;
+               tup[i].z = z;
 // for technical checks
                FillTH1( id_r1dHist2, tup[i].radius );
             }
@@ -826,8 +840,8 @@ void histset2::AnalyzeEntry(convsel& s){
 
 // DEBUG stuff
         if(lpr){
-           if(abs(tup[i].alpha) > 0.96){
-              std::cout << " BIGALPHA: Event " << eventNumber << std::endl;
+//           if(abs(tup[i].alpha) > 0.96){
+//              std::cout << " BIGALPHA: Event " << eventNumber << std::endl;
               std::cout << " alpha: " << tup[i].alpha << std::endl;
               std::cout << " pt: " << tup[i].pt << std::endl;
               std::cout << " qpt0: " << tup[i].qpt0 << std::endl;
@@ -835,12 +849,133 @@ void histset2::AnalyzeEntry(convsel& s){
               std::cout << " pfit: " << tup[i].pfit << std::endl;
               std::cout << " mee : " << tup[i].mass[0] << std::endl;
               std::cout << " radius : " << tup[i].radius << std::endl;
-              std::cout << " pT+ : " << tup[i].ptPos << std::endl;
               std::cout << " pT- : " << tup[i].ptNeg << std::endl;
-           }
+              std::cout << " pT+ : " << tup[i].ptPos << std::endl;
+              std::cout << " (x,y,z): " << tup[i].x << " " << tup[i].y << " " << tup[i].z << std::endl;
+//           }
         }
 
     }  // End of selected candidate loop
+
+//   for(int i=0; i<Conv_vtxdl.GetSize(); i++){
+//	vtxdl->Fill(Conv_vtxdl[i]);	
+//   }
+
+    auto& Conv_vtxdl = s.Conv_vtxdl;
+    auto& Conv_Tk0_Idx = s.Conv_Tk0_Idx;
+    auto& Conv_Tk1_Idx = s.Conv_Tk1_Idx;
+    auto& Conv_convVtxIdx = s.Conv_convVtxIdx;
+	auto nSimTrk = *(s.nSimTrk);
+	auto nSimVtx = *(s.nSimVtx);
+
+    auto& SimVtx_x = s.SimVtx_x;
+    auto& SimVtx_y = s.SimVtx_y;
+    auto& SimVtx_z = s.SimVtx_z;
+    auto& SimVtx_tof = s.SimVtx_tof;
+    auto& SimVtx_processType = s.SimVtx_processType;
+    auto& SimVtx_simtrk_parent_tid = s.SimVtx_simtrk_parent_tid;
+
+    auto& SimTrk_charge = s.SimTrk_charge;
+    auto& SimTrk_eta = s.SimTrk_eta;
+    auto& SimTrk_phi = s.SimTrk_phi;
+    auto& SimTrk_pt = s.SimTrk_pt;
+    auto& SimTrk_pdgId = s.SimTrk_pdgId;
+    auto& SimTrk_simvtx_Idx = s.SimTrk_simvtx_Idx;
+    auto& SimTrk_trackId = s.SimTrk_trackId;
+
+// Maybe make some data structure for our own goals?
+
+    if (vsel.size()>=1) {
+       std::cout << "nSimVtx: " << nSimVtx << " nSimTrk: " << nSimTrk << std::endl; 
+// Check SimVtx and SimTrk info
+       for (unsigned int j=0; j<vsel.size(); j++){
+           int i = vsel[j];
+           std::cout << "Distance: " << Conv_vtxdl[i] << " " << Conv_convVtxIdx[i] << " " << Conv_Tk0_Idx[i] << " " << Conv_Tk1_Idx[i] << std::endl; 
+       }
+//       for (unsigned int i=0; i<nSimVtx; i++){
+           unsigned int i = Conv_convVtxIdx[vsel[0]];
+           std::cout << "SimVtx " << i << " " << SimVtx_x[i] << " " << SimVtx_y[i] << " " << SimVtx_z[i] << " " 
+                     << SimVtx_tof[i] << " " << SimVtx_processType[i] << " " << SimVtx_simtrk_parent_tid[i] << std::endl;
+           if(SimVtx_processType[i]==14){
+              std::cout << "CONVERSION PROCESS " << SimVtx_processType[i] << std::endl;
+           }
+           else{
+              std::cout << "SOMETHING-ELSE " << SimVtx_processType[i] << std::endl;
+           }
+
+//       }
+       for (unsigned int j=0; j<nSimTrk; j++){
+
+// Search first for the parent
+           if(SimTrk_trackId[j]==SimVtx_simtrk_parent_tid[i])
+           std::cout << "Vertex SimTrk PARENT " << j << " " << SimTrk_charge[j] << " " << SimTrk_eta[j] << " " << SimTrk_phi[j] 
+                                       << " " << SimTrk_pt[j] << " " << SimTrk_pt[j]*cosh(SimTrk_eta[j]) << " " << SimTrk_pdgId[j] << " " << SimTrk_simvtx_Idx[j] << " " << SimTrk_trackId[j] << std::endl;
+//           if(abs(SimTrk_pdgId[j])==11&&SimTrk_simvtx_Idx[j]==i)
+           if(SimTrk_simvtx_Idx[j]==i)
+           std::cout << "Vertex SimTrk Daughter " << j << " " << SimTrk_charge[j] << " " << SimTrk_eta[j] << " " << SimTrk_phi[j] 
+                                       << " " << SimTrk_pt[j] << " " << SimTrk_pt[j]*cosh(SimTrk_eta[j]) << " " << SimTrk_pdgId[j] << " " << SimTrk_simvtx_Idx[j] << " " << SimTrk_trackId[j] << std::endl;
+       }
+    }
+
+// Loop over all SimVtx
+//    if(vsel.size()>=1){
+    if(lpr2){
+       std::cout << " " << std::endl;
+       std::cout << "All SimVtx elements" << std::endl;
+    }
+    for (unsigned int i=0; i<nSimVtx; i++){
+         if(lpr2){
+         std::cout << "SimVtx " << i << " " << SimVtx_x[i] << " " << SimVtx_y[i] << " " << SimVtx_z[i] << " " 
+                   << SimVtx_tof[i] << " " << SimVtx_processType[i] << " " << SimVtx_simtrk_parent_tid[i] << std::endl;
+         if(SimVtx_processType[i]==14){
+              std::cout << "Process: CONVERSION " << SimVtx_processType[i] << std::endl;
+         }
+         else if(SimVtx_processType[i]==0){
+              std::cout << "Process: PRIMARY VERTEX " << SimVtx_processType[i] << std::endl;
+         }
+         else if(SimVtx_processType[i]==201){
+              std::cout << "Process: DECAY " << SimVtx_processType[i] << std::endl;
+         }
+         else if(SimVtx_processType[i]==3){
+              std::cout << "Process: BREMSSTRAHLUNG " << SimVtx_processType[i] << std::endl;
+         }
+         else if(SimVtx_processType[i]==121){
+              std::cout << "Process: HADRONIC INTERACTION " << SimVtx_processType[i] << std::endl;
+         }
+         else{
+              std::cout << "Process: SOMETHING-ELSE " << SimVtx_processType[i] << std::endl;
+         }
+         }
+         FillTH1(id_SimVtxProcess, SimVtx_processType[i]);
+         if(lpr2){
+         for (unsigned int j=0; j<nSimTrk; j++){
+// Search first for the parent SimTrk
+             if(SimTrk_trackId[j]==SimVtx_simtrk_parent_tid[i])
+             std::cout << "Vertex SimTrk PARENT " << j << " " << SimTrk_charge[j] << " " << SimTrk_eta[j] << " " << SimTrk_phi[j] 
+                                        << " " << SimTrk_pt[j] << " " << SimTrk_pt[j]*cosh(SimTrk_eta[j]) << " " << SimTrk_pdgId[j] << " " << SimTrk_simvtx_Idx[j] << " " << SimTrk_trackId[j] << std::endl;
+             if(SimTrk_simvtx_Idx[j]==i)
+             std::cout << "Vertex SimTrk Daughter " << j << " " << SimTrk_charge[j] << " " << SimTrk_eta[j] << " " << SimTrk_phi[j] 
+                                        << " " << SimTrk_pt[j] << " " << SimTrk_pt[j]*cosh(SimTrk_eta[j]) << " " << SimTrk_pdgId[j] << " " << SimTrk_simvtx_Idx[j] << " " << SimTrk_trackId[j] << std::endl;
+         }
+         }
+    }
+
+    int nSimPhotons = 0;
+    for (unsigned int j=0; j<nSimTrk; j++){
+       if(SimTrk_pdgId[j]==22){
+          if(lpr2){
+             std::cout << "SimTrk Photon " << j << " " << SimTrk_charge[j] << " " << SimTrk_eta[j] << " " << SimTrk_phi[j] 
+                                           << " " << SimTrk_pt[j] << " " << SimTrk_pt[j]*cosh(SimTrk_eta[j]) 
+                                           << " " << SimTrk_pdgId[j] << " " << SimTrk_simvtx_Idx[j] << " " << SimTrk_trackId[j] << std::endl;
+             std::cout << "SimTrkPhotonProcess " << SimVtx_processType[SimTrk_simvtx_Idx[j]] << std::endl;
+          }
+          FillTH1(id_SimTrkPhotonProcess, SimVtx_processType[SimTrk_simvtx_Idx[j]]);
+          nSimPhotons++;
+       }
+    }
+    std::cout << "nSimPhotons " << nSimPhotons << std::endl;
+
+//    }
     
 	//gamma gamma stuff
  	if (vsel.size()>=2){
@@ -891,9 +1026,212 @@ void histset2::AnalyzeEntry(convsel& s){
         }
     } */
     vcuts.clear(); 
-    
-//    SKIP:
-//    int ijkl = 0; 
 
-}
+// Loop over all SimTrks and fill photon information 
+/*    TH1Manager.at(id_SimPhotonPt) = new MyTH1D("SimPhotonPt", "Sim Photons; Photon pT; Entries per bin", 1000, 0.0, 10.0 );
+    TH1Manager.at(id_SimPhotonEta) = new MyTH1D("SimPhotonEta", "Sim Photons; Photon eta; Entries per bin", 200, -10.0, 10.0 );
+    TH1Manager.at(id_SimPhotonPhi) = new MyTH1D("SimPhotonPhi", "Sim Photons; Photon phi; Entries per bin", 200, -PI, PI );
+    TH1Manager.at(id_SimPhotons) = new MyTH1D("SimPhotons", "Sim Photons; Number of photons; Entries per bin", 1000, -0.5, 999.5 );*/
+
+    vector<int> vSimPhotons;
+    int nSimPhoton = 0;
+    std::cout << "vSimPhotons ";
+    for (unsigned int i=0; i<nSimTrk; i++){
+       vSimPhotons.push_back(0);
+       if(SimTrk_pdgId[i]==22){
+          vSimPhotons[i] += 1;    // Flag SimTrk as a SimPhoton
+          nSimPhoton++;
+          unsigned int ivtx = SimTrk_simvtx_Idx[i];
+// There sometimes seem to be non-statistical fluctuations in the 
+// pT histogram. This look like a numerical precision issue. 
+// Also maybe some cuts on the photon origin in space ?
+          double xv = SimVtx_x[ivtx]; double yv = SimVtx_y[ivtx]; double zv = SimVtx_z[ivtx];
+          double distv = sqrt(xv*xv +yv*yv + zv*zv);
+          double distxy = sqrt(xv*xv + yv*yv);
+          if(abs(SimTrk_eta[i]) < 1.2 && SimTrk_pt[i] > 1.000 && abs(zv) < 12.5 && distxy < 1.0){
+// For each SimPhoton - we need to keep track of whether it passes these acceptance cuts
+             vSimPhotons[i] += 2;  // Flag SimPhoton as accepted
+             FillTH1(id_SimPhotonPt, SimTrk_pt[i]);
+             FillTH1(id_SimPhotonEta, SimTrk_eta[i]);
+             FillTH1(id_SimPhotonPhi, SimTrk_phi[i]);
+             FillTH1(id_SimPhotonDistance, distv);
+             FillTH1(id_SimPhotonDistance2, distv);
+             FillTH1(id_SimPhotonRadialDistance, distxy);
+             FillTH1(id_SimPhotonRadialDistance2, distxy);
+             FillTH1(id_SimPhotonzVertex, zv);
+          }
+       }
+       if(vSimPhotons[i] > 0)std::cout << " " << vSimPhotons[i];
+    }
+    std::cout << endl;
+    FillTH1(id_SimPhotons, nSimPhoton);
+    
+    std::map<unsigned int, std::tuple<unsigned int, unsigned int, unsigned int, double, double, double, double>> mapIndices;
+    std::map<unsigned int, std::tuple<unsigned int, unsigned int, unsigned int, double, double, double, double>>::iterator mitr;
+    std::cout << "vCnvPhotons ";
+    vector<int> vConvertedPhotons(nSimTrk);
+    for (unsigned int i=0; i<nSimTrk; i++){
+       vConvertedPhotons.push_back(0);
+       if(SimTrk_pdgId[i]==22){
+// Loop over all SimVtx's trying to find one that has this SimPhoton 
+// as the parent
+          for (unsigned int j=0; j<nSimVtx; j++){
+             if(SimVtx_simtrk_parent_tid[j]==SimTrk_trackId[i]){
+                vConvertedPhotons[i] += 1;
+                if(SimVtx_processType[j] == 14){
+                   vConvertedPhotons[i] +=2;
+// Now that we have identified it as a conversion, find the 
+// resulting daughter tracks so that we can make kinematic cuts on the 
+// energy partitioning
+                   vector<unsigned int> vDaughters;
+                   int chargesum = 0;
+                   int nelectrons = 0;
+                   for (unsigned int k=0; k<nSimTrk; k++){
+                      if(SimTrk_simvtx_Idx[k]==j){
+                         chargesum += int(SimTrk_charge[k]);
+                         if(abs(SimTrk_pdgId[k]) == 11)nelectrons +=1;
+                         vDaughters.push_back(k);
+                      }
+                   }
+// Now some cuts
+                   double pxPos, pyPos, pzPos, pPos, pxNeg, pyNeg, pzNeg, pNeg;
+                   if(vDaughters.size()==2 && nelectrons==2 && chargesum ==0){
+                      vConvertedPhotons[i] +=4;
+// Also check energy matching and direction
+                      double pxParent = double(SimTrk_pt[i])*cos(double(SimTrk_phi[i]));
+                      double pyParent = double(SimTrk_pt[i])*sin(double(SimTrk_phi[i]));
+                      double pzParent = double(SimTrk_pt[i])*sinh(double(SimTrk_eta[i]));
+                      double pParent = sqrt(pxParent*pxParent + pyParent*pyParent + pzParent*pzParent);
+                      unsigned int k0 = vDaughters[0];
+                      unsigned int k1 = vDaughters[1];
+                      unsigned int kNeg, kPos;
+                      if(SimTrk_pdgId[k0] == 11){  // k0 is the electron
+                         pxNeg = double(SimTrk_pt[k0])*cos(double(SimTrk_phi[k0]));
+                         pyNeg = double(SimTrk_pt[k0])*sin(double(SimTrk_phi[k0]));
+                         pzNeg = double(SimTrk_pt[k0])*sinh(double(SimTrk_eta[k0]));
+                         pxPos = double(SimTrk_pt[k1])*cos(double(SimTrk_phi[k1]));
+                         pyPos = double(SimTrk_pt[k1])*sin(double(SimTrk_phi[k1]));
+                         pzPos = double(SimTrk_pt[k1])*sinh(double(SimTrk_eta[k1]));
+                         kNeg = k0;
+                         kPos = k1;
+                      }
+                      else{                        // k1 is the electron
+                         pxNeg = double(SimTrk_pt[k1])*cos(double(SimTrk_phi[k1]));
+                         pyNeg = double(SimTrk_pt[k1])*sin(double(SimTrk_phi[k1]));
+                         pzNeg = double(SimTrk_pt[k1])*sinh(double(SimTrk_eta[k1]));
+                         pxPos = double(SimTrk_pt[k0])*cos(double(SimTrk_phi[k0]));
+                         pyPos = double(SimTrk_pt[k0])*sin(double(SimTrk_phi[k0]));
+                         pzPos = double(SimTrk_pt[k0])*sinh(double(SimTrk_eta[k0]));
+                         kNeg = k1;
+                         kPos = k0;
+                      }
+                      pNeg = sqrt(pxNeg*pxNeg + pyNeg*pyNeg + pzNeg*pzNeg);
+                      pPos = sqrt(pxPos*pxPos + pyPos*pyPos + pzPos*pzPos);
+                      double pxtot = pxNeg + pxPos;
+                      double pytot = pyNeg + pyPos;
+                      double pztot = pzNeg + pzPos;
+                      double ptot = sqrt(pxtot*pxtot + pytot*pytot + pztot*pztot);
+//                      std::cout << "Parent    " << pxParent << " " << pyParent << " " << pzParent << " " << pParent << std::endl;
+//                      std::cout << "Daughters " << pNeg << " " << pPos << " " << pxtot << " " << pytot << " " << pztot << " " << ptot << std::endl;
+// should histogram ptot/pParent and cosangle
+//                      std::cout << "Momentum Ratio " << ptot/pParent << std::endl;
+                      double cosangle = (pxtot*pxParent + pytot*pyParent + pztot*pzParent)/(ptot*pParent);   // pointing between parent photon and daughter system
+//                      std::cout << "cosangle " << cosangle << std::endl;
+// Also calculate invariant mass of di-electron pair
+                      double melsq = MASS_ELECTRON*MASS_ELECTRON;
+// Let's assume very relativistic to avoid precision issues?
+                      double eNeg = sqrt(pNeg*pNeg + melsq);
+                      double ePos = sqrt(pPos*pPos + melsq);
+                      double cosNegPos = (pxNeg*pxPos + pyNeg*pyPos + pzNeg*pzPos)/(pNeg*pPos);
+                      double msq = 2.0*melsq + 2.0*eNeg*ePos - 2.0*pNeg*pPos*cosNegPos;
+//                      double msq = 2.0*melsq + std::max(0.0,2.0*pNeg*pPos*(1.0-cosNegPos));    // Add max function to clean up numerical issues
+//                      std::cout << "cosNegPos " << cosNegPos << std::endl;
+//                      std::cout << "pair mass  " << sqrt(msq) << std::endl;
+// Add some histograms
+                      double Eratio = (eNeg+ePos)/pParent;
+//                      std::cout << "Eratio " << Eratio << std::endl;
+//                      std::cout << "xPlus " << ePos/(ePos+eNeg) << std::endl;
+                      double xPlusLocal = ePos/(ePos+eNeg);
+                      FillTH1(id_SimConvPhotonERatio, Eratio);
+                      if(Eratio>0.98)FillTH1(id_SimConvPhotonERatioCut, Eratio);
+                      FillTH1(id_SimConvPhotonCosAngle, cosangle);
+                      FillTH1(id_SimConvPhotonMass, sqrt(msq));
+                      FillTH1(id_SimConvPhotonxPlus, ePos/(ePos+eNeg));
+                      if(Eratio>0.98)vConvertedPhotons[i] +=8;
+                      double xv = SimVtx_x[j]; double yv = SimVtx_y[j]; double zv = SimVtx_z[j];
+                      double distv = sqrt(xv*xv +yv*yv + zv*zv);
+                      double distxy = sqrt(xv*xv + yv*yv);
+                      if(vConvertedPhotons[i] == 15)FillTH1(id_SimConvPhotonR, distxy);
+                      if(vConvertedPhotons[i] == 15 && vSimPhotons[i]==3)FillTH1(id_SimConvPhotonAccR, distxy);
+// Add this instance to the map
+                      if(vConvertedPhotons[i] == 15){
+// map with [key = SimPhotonTrk i, value = tuple(SimVtx j, SimTrk kNeg, SimTrk kPos, x, y, z, xPlus)]
+                         mapIndices.emplace(i, std::make_tuple(j, kNeg, kPos, double(SimVtx_x[j]), double(SimVtx_y[j]), double(SimVtx_z[j]), xPlusLocal));  // should add some check on this being unique
+                      }
+                   }
+                }
+             }
+          }
+       }
+       if(vSimPhotons[i] > 0)std::cout << " " << vConvertedPhotons[i];
+    }
+    std::cout << endl;
+    std::cout <<"Accepted SimPhotons : " << std::endl;
+    for (unsigned int i=0; i<nSimTrk; i++){
+        FillTH1(id_SimPhotonId, vSimPhotons[i]);
+        FillTH1(id_SimConvPhotonId, vConvertedPhotons[i]);
+        if(vSimPhotons[i]==3&&vConvertedPhotons[i]==15){
+// Extract map info with SimConvPhoton info
+           mitr = mapIndices.find(i);
+           if(mitr != mapIndices.end()){
+              auto mytuple = mitr->second;
+              auto x = std::get<3>(mytuple);
+              auto y = std::get<4>(mytuple);
+              double Rlocal = sqrt(x*x + y*y);
+              FillTH1(id_EffSimConvPhotonsDen, Rlocal);
+           }
+        }
+    }
+    std::cout << endl;
+   // We want to find the best match if any amongst flagged SimConvPhotons and selected reconstructed conversions.
+   // Maybe only bother with Accepted SimPhotons to start with.
+    for(unsigned int icandidate=0; icandidate<vsel.size(); ++icandidate){
+// First loop over reco conversion candidates
+        int iconv = vsel[icandidate];
+        double x = PC_x[iconv]; double y = PC_y[iconv]; double z = PC_z[iconv];
+        std::cout << "Reco candidate " << icandidate << " " << iconv << " " << x << " " << y << " " << z << " " << PC_E[iconv] << std::endl;
+        double dmax = 2.0;  
+        double Rmatch;
+        int imatch = -1;
+// Loop over SimTrks trying to match to SimConvPhotons passing the acceptance cuts above
+        for(unsigned int i=0; i<nSimTrk; ++i){
+            if(vSimPhotons[i]==3 && vConvertedPhotons[i]==15){
+// Extract map info with SimConvPhoton info
+               mitr = mapIndices.find(i);
+               if(mitr != mapIndices.end()){
+                  auto mytuple = mitr->second;
+                  auto xi = std::get<3>(mytuple);
+                  auto yi = std::get<4>(mytuple);
+                  auto zi = std::get<5>(mytuple);
+                  double dist = sqrt((x-xi)*(x-xi) + (y-yi)*(y-yi) + (z-zi)*(z-zi));
+                  std::cout << "SimConvPhoton " << i << " " << xi << " " << yi << " " << zi << " " << " dist (cm) = " << dist << std::endl;
+                  if(dist < dmax){
+                     dmax = dist;
+                     imatch = i;
+                     Rmatch = sqrt(xi*xi + yi*yi);
+                  }
+               }
+            }
+        }
+        if(imatch >= 0){
+           std::cout << "imatch set to " << imatch << std::endl;
+           FillTH1(id_EffSimConvPhotonsNum, Rmatch);
+// TODO histogram match distance and other things ...
+        }
+        else{
+           std::cout << "no match found " << std::endl;
+        }
+    }
+}  // End of event number selection if block
+}  // End of sub-program
 #endif
